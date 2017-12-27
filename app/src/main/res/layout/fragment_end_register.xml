@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackgroundDark"
+    tools:context=".WelcomeActivity">
+
+    <LinearLayout
+        android:id="@+id/thirdLayout"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/student_created"
+            android:id="@+id/imageView"/>
+
+        <kiwigroup.yodelego.customui.DynamicTextView
+            android:id="@+id/text1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:maxLines="1"
+            android:layout_gravity="center"
+            android:text="¡Cuenta estudiante creada con éxito!"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+        <kiwigroup.yodelego.customui.DynamicTextView
+            android:id="@+id/text2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_gravity="center"
+            android:maxLines="6"
+            android:textAlignment="center"
+            android:text="Tu cuenta se ha creado de manera correcta, entra a tu muro para disfrutar de las funciones de YoDelego"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/go_to_wall"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="25dp"
+            android:background="@color/colorButtons"
+            android:layout_gravity="center"
+            android:text="IR A TU MURO"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+</RelativeLayout>

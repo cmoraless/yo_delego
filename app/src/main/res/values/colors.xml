@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="colorPrimary">#FC5457</color>
+    <color name="colorPrimaryDark">#646464</color>
+    <color name="colorAccent">#e0e0e0</color>
+    <color name="colorBackground">#3964A2</color>
+    <color name="colorPrimaryRipple">#3964A2</color>
+    <color name="colorMainSeparator">#D4D4D4</color>
+
+    <color name="colorAcademicShape">#fdaa29</color>
+
+    <color name="colorBackgroundDark">#212121</color>
+    <color name="colorButtons">#FC5457</color>
+    <color name="colorWelcomeText">#7E292A</color>
+    <color name="colorAcademicInfoText">#7e5410</color>
+    <color name="colorTextSecondaryButton">#787989</color>
+    <color name="colorPrimaryText">#842c2c</color>
+    <color name="colorSecondaryText">#777888</color>
+    <color name="colorGreenText">#14C767</color>
+    <color name="colorSplashBackground">#FC5457</color>
+    <color name="colorRedButton">#FFE6E6</color>
+    <color name="colorGreyButton">#F0F1F4</color>
+    <color name="colorToolBarBackground">#FBFCFC</color>
+    <color name="colorActivityBackground">#FFFFFF</color>
+    <color name="colorDialogBackground">#80323232</color>
+    <color name="colorMarkerBackground">#bfffffff</color>
+    <color name="colorRedLine">#E78989</color>
+    <color name="colorToggleSelected">#9E9FAA</color>
+    <color name="colorToggleUnselected">#FAFAFA</color>
+
+    <color name="white">#ffffff</color>
+    <color name="green">#47bf28</color>
+    <color name="colorListHeaderBackground">#F0F1F4</color>
+    <color name="light_gray">#a2a2a2</color>
+    <color name="text_black">#444</color>
+</resources>
