@@ -4,13 +4,64 @@
     <style name="YoDelegoTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorControlHighlight">@color/colorPrimaryRipple</item>
+        <item name="colorPrimaryDark">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorPrimary</item>
+
         <item name="android:windowBackground">@color/colorActivityBackground</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="drawerArrowStyle">@style/MyDrawerArrowToggle</item>
+        <item name="android:actionMenuTextColor">@color/colorPrimaryDark</item>
+
+        <!--<item name="colorControlNormal">@color/colorPrimary</item>-->
+        <item name="colorControlActivated">@color/colorPrimary</item>
+        <!--<item name="colorControlHighlight">@color/colorPrimary</item>-->
+
+    </style>
+
+    <style name="YoDelegoDarkTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorBackgroundDark</item>
+
+        <item name="android:windowBackground">@color/colorActivityBackground</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="drawerArrowStyle">@style/MyDrawerArrowToggle</item>
+        <item name="android:actionMenuTextColor">@color/colorPrimaryDark</item>
+
+        <!--<item name="colorControlNormal">@color/colorPrimary</item>-->
+        <item name="colorControlActivated">@color/colorPrimary</item>
+        <!--<item name="colorControlHighlight">@color/colorPrimary</item>-->
+
+    </style>
+
+    <style name="AppTheme.WhiteAccent">
+        <item name="colorAccent">@color/white</item> <!-- Whatever color you want-->
+    </style>
+
+    <style name="YoDelegoThemeWithActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimary</item>
+        <item name="android:windowBackground">@color/colorActivityBackground</item>
+        <item name="drawerArrowStyle">@style/MyDrawerArrowToggle</item>
+        <item name="android:actionMenuTextColor">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorPrimary</item>
+
+        <!--<item name="colorControlNormal">@color/colorPrimary</item>-->
+        <item name="colorControlActivated">@color/colorPrimary</item>
+        <!--<item name="colorControlHighlight">@color/colorPrimary</item>-->
+    </style>
+
+    <style name="TextLabel" parent="TextAppearance.AppCompat">
+        <!-- Hint color and label color in FALSE state -->
+        <item name="android:textColorHint">@color/colorPrimary</item>
+        <!-- Label color in TRUE state and bar color FALSE and TRUE State -->
+        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="colorControlNormal">@color/colorPrimary</item>
+        <item name="colorControlActivated">@color/colorPrimary</item>
     </style>
 
     <style name="MyDrawerArrowToggle" parent="Widget.AppCompat.DrawerArrowToggle">
@@ -35,4 +86,9 @@
         <item name="colorAccent">@color/colorSplashBackground</item>
         <item name="colorControlHighlight">@color/colorSplashBackground</item>
     </style>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
 </resources>

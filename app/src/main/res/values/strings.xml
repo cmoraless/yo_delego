@@ -7,13 +7,14 @@
     <string name="id_profile">id_profile</string>
     <string name="id_wall">id_wall</string>
     <string name="id_applications">id_applications</string>
+    <string name="id_profile_edit">id_profile_edit</string>
 
     <string name="app_name">YoDelego</string>
     <string name="cancel">Cancelar</string>
     <string name="confirm">Confirm</string>
     <string name="agree_terms">Agree to the terms &amp; condition loreim ipsum must explain to you how all this mistaken idea of denouncing pleasure.</string>
     <string name="send_email">Enviar correo</string>
-    <string name="login_in">Iniciar Sesión</string>
+    <string name="login_in">Ingresar</string>
     <string name="create_account">Crear tu cuenta</string>
     <string name="first_name">Nombre</string>
     <string name="last_name">Apellido</string>
@@ -35,7 +36,7 @@
     <string name="error_login_commerce">Commerce service problem</string>
     <string name="error_login_user">User service problem</string>
     <string name="error_login_devices">Devices service problem</string>
-    <string name="prompt_email">Email</string>
+    <string name="prompt_email">Correo electrónico</string>
     <string name="prompt_password">Contraseña</string>
     <string name="action_sign_in">Iniciar sesión</string>
     <string name="action_create_account">Crear cuenta</string>
@@ -45,13 +46,15 @@
     <string name="error_field_required">Este campo es necesario</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
 
-
     <string name="error_login">Problema al iniciar sesión</string>
-    <string name="error_network">Oops, network error, please check your internet connection</string>
+    <string name="error_network">Por favor verifica tu conexión a Internet</string>
     <string name="error_server">Oops, server error, please contact us for support</string>
     <string name="error_parser">Oops, an error occurred while processing your information</string>
     <string name="error_timeout">Oops, The server is taking too long to respond</string>
     <string name="error_json_exception">Json exception</string>
+
+    <string name="error_network_title">Problema de conexión</string>
+    <string name="error_network_details">Necesitas Internet para completar esta acción</string>
 
     <!-- Strings related to signup -->
     <string name="error_field_must_be_accepted">Este campo debe ser aceptado</string>
@@ -68,20 +71,24 @@
     <string name="inactive_account_message">Your account is not yet active. We\'ll send you an email with instructions.</string>
     <string name="message_ok">Ok</string>
 
-    <string name="university">Universidad</string>
+    <string name="university">Universidad o Instituto de Educación Superior</string>
     <string name="career">Carrera</string>
     <string name="semester">Semestre</string>
 
     <string name="rut">Rut</string>
+    <string name="rut_hint">1111111-1</string>
+
 
     <string name="text_wall">Muro</string>
     <string name="text_applications">Postulaciones</string>
     <string name="text_profile">Perfil</string>
+
+    <string name="edit">editar</string>
+    <string name="edit_photo">editar foto</string>
 </resources>
 
 
-
-<!--<resources>
+    <!--<resources>
     <string name="server_base_url">http://www.transactfirst.com/</string>
 
     <string name="id_main_fragment">id_main_fragment</string>

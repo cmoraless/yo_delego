@@ -3,11 +3,14 @@ package kiwigroup.yodelego;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
@@ -66,7 +69,37 @@ public class LoginActivity extends BaseLoginActivity {
         } else {
             showProgress(true);
             startLoginProcess(email, password);
+            //runTest(email, password);
         }
+    }
+
+
+    private void runTest(String username, String password){
+        User user = new User();
+        user.setName("Paulina");
+        user.setLastName("Miranda");
+        user.setEmail("paulina.miranda@yodelego.com");
+        user.setRut("16.508.909-k");
+        user.setEducationalInstitution("Universidad Técnica Federico Santa Maria");
+        user.setCareer("Ingeniería Civil Informática");
+        user.setEnrollmentYear(2009);
+
+        SharedPreferences sharedPref = getSharedPreferences("login", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("username", username);
+        editor.putString("password", password);
+        editor.apply();
+
+        Log.e("LoginActivity", "SCUser getName " + user.getName());
+        Log.e("LoginActivity", "SCUser getLastName " + user.getLastName());
+        Log.e("LoginActivity", "SCUser getSemesters " + user.getSemesters());
+        Log.e("LoginActivity", "SCUser getCareer " + user.getCareer());
+        Log.e("LoginActivity", "SCUser getEducationalInstitution " + user.getEducationalInstitution());
+        Log.e("LoginActivity", "SCUser getEmail " + user.getEmail());
+        Log.e("LoginActivity", "SCUser getRut " + user.getRut());
+        Log.e("LoginActivity", "SCUser getEnrollmentYear " + user.getEnrollmentYear());
+
+        onLoginSuccess(user);
     }
 
     private boolean isEmailValid(String email) {

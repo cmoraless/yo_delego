@@ -5,15 +5,15 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -22,12 +22,14 @@ public class RegisterMainFragment extends Fragment {
 
     private OnRegisterFragmentListener mListener;
     private View mProgressView;
-    private RelativeLayout formLayout;
+    private LinearLayout baseFormLayout;
+    private RelativeLayout studentFormLayout;
+
     private ToggleButton studentButton;
     private ToggleButton noStudentButton;
-    private AutoCompleteTextView textViewFirstName;
-    private AutoCompleteTextView textViewLastName;
-    private TextView textViewRut;
+    private TextInputEditText textViewFirstName;
+    private TextInputEditText textViewLastName;
+    private TextInputEditText textViewRut;
     private TextView textViewMail;
     private TextView textViewPassword;
     private TextView textViewConfirmPassword;
@@ -60,14 +62,38 @@ public class RegisterMainFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        formLayout = view.findViewById(R.id.email_login_form);
+        studentFormLayout = view.findViewById(R.id.email_login_form);
+        baseFormLayout = view.findViewById(R.id.base_form);
+
         mProgressView = view.findViewById(R.id.login_progress);
         studentButton = view.findViewById(R.id.student);
         studentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 noStudentButton.setChecked(false);
-                signUpButton.setText("CONTINUAR");
+                if(studentButton.isChecked()){
+                    textViewFirstName.setEnabled(true);
+                    textViewLastName.setEnabled(true);
+                    textViewRut.setEnabled(true);
+                    textViewMail.setEnabled(true);
+                    textViewPassword.setEnabled(true);
+                    textViewConfirmPassword.setEnabled(true);
+                    checkBoxAgree.setEnabled(true);
+                    signUpButton.setEnabled(true);
+                    cancelButton.setEnabled(true);
+                    signUpButton.setText("CONTINUAR");
+                } else {
+                    textViewFirstName.setEnabled(false);
+                    textViewLastName.setEnabled(false);
+                    textViewRut.setEnabled(false);
+                    textViewMail.setEnabled(false);
+                    textViewPassword.setEnabled(false);
+                    textViewConfirmPassword.setEnabled(false);
+                    checkBoxAgree.setEnabled(false);
+                    signUpButton.setEnabled(false);
+                    cancelButton.setEnabled(false);
+                    signUpButton.setText("FINALIZAR");
+                }
             }
         });
         noStudentButton = view.findViewById(R.id.no_student);
@@ -76,11 +102,47 @@ public class RegisterMainFragment extends Fragment {
             public void onClick(View view) {
                 studentButton.setChecked(false);
                 signUpButton.setText("FINALIZAR");
+                if(noStudentButton.isChecked()){
+                    textViewFirstName.setEnabled(true);
+                    textViewLastName.setEnabled(true);
+                    textViewRut.setEnabled(true);
+                    textViewMail.setEnabled(true);
+                    textViewPassword.setEnabled(true);
+                    textViewConfirmPassword.setEnabled(true);
+                    checkBoxAgree.setEnabled(true);
+                    signUpButton.setEnabled(true);
+                    cancelButton.setEnabled(true);
+                    signUpButton.setText("FINALIZAR");
+                } else {
+                    textViewFirstName.setEnabled(false);
+                    textViewLastName.setEnabled(false);
+                    textViewRut.setEnabled(false);
+                    textViewMail.setEnabled(false);
+                    textViewPassword.setEnabled(false);
+                    textViewConfirmPassword.setEnabled(false);
+                    checkBoxAgree.setEnabled(false);
+                    signUpButton.setEnabled(false);
+                    cancelButton.setEnabled(false);
+                    signUpButton.setText("FINALIZAR");
+                }
             }
         });
         textViewFirstName = view.findViewById(R.id.first_name);
         textViewLastName = view.findViewById(R.id.last_name);
         textViewRut = view.findViewById(R.id.rut);
+        textViewRut.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    textViewRut.setHint(getString(R.string.rut_hint));
+                    if(!textViewRut.getText().toString().isEmpty() && !isValidRut(textViewRut.getText().toString())){
+                        textViewRut.setError("el Rut no es válido");
+                    }
+                } else {
+                    textViewRut.setHint(getString(R.string.rut));
+                }
+            }
+        });
         textViewMail = view.findViewById(R.id.mail);
         textViewPassword = view.findViewById(R.id.pin);
         textViewConfirmPassword = view.findViewById(R.id.confirm_password);
@@ -103,12 +165,14 @@ public class RegisterMainFragment extends Fragment {
     }
 
     private void showProgress(final boolean show) {
-
-        for (int i = 0; i < formLayout.getChildCount(); i++) {
-            View child = formLayout.getChildAt(i);
+        for (int i = 0; i < studentFormLayout.getChildCount(); i++) {
+            View child = studentFormLayout.getChildAt(i);
             child.setEnabled(!show);
         }
-
+        for (int i = 0; i < baseFormLayout.getChildCount(); i++) {
+            View child = baseFormLayout.getChildAt(i);
+            child.setEnabled(!show);
+        }
         int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
         mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
@@ -152,6 +216,10 @@ public class RegisterMainFragment extends Fragment {
         }
         if(TextUtils.isEmpty(rut)){
             textViewRut.setError(getString(R.string.error_field_required));
+            focusView = textViewRut;
+            cancel = true;
+        } else if(!isValidRut(rut)){
+            textViewRut.setError("el Rut no es válido");
             focusView = textViewRut;
             cancel = true;
         }
@@ -203,12 +271,37 @@ public class RegisterMainFragment extends Fragment {
             cancelButton.setAlpha(.5f);
 
             if(noStudentButton.isChecked()) {
-                mListener.createStudentAccount(false, firstName, lastName, rut, email, password, null, null, null);
+                mListener.createAccount(false, firstName, lastName, rut, email, password, null, null, null);
             } else if(studentButton.isChecked()){
                 RegisterStudentFragment studentFragment = RegisterStudentFragment.newInstance(firstName, lastName, rut, email, password);
                 mListener.addFragmentToMainContent(studentFragment, true, getString(R.string.id_student_fragment));
             }
         }
+    }
+
+    public static boolean isValidRut(String rut) {
+
+        boolean validacion = false;
+        try {
+            rut =  rut.toUpperCase();
+            rut = rut.replace(".", "");
+            rut = rut.replace("-", "");
+            int rutAux = Integer.parseInt(rut.substring(0, rut.length() - 1));
+
+            char dv = rut.charAt(rut.length() - 1);
+
+            int m = 0, s = 1;
+            for (; rutAux != 0; rutAux /= 10) {
+                s = (s + rutAux % 10 * (9 - m++ % 6)) % 11;
+            }
+            if (dv == (char) (s != 0 ? s + 47 : 75)) {
+                validacion = true;
+            }
+
+        } catch (java.lang.NumberFormatException e) {
+        } catch (Exception e) {
+        }
+        return validacion;
     }
 
     private boolean isEmailValid(String email) {

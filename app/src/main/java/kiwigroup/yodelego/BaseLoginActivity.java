@@ -125,20 +125,41 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
                                 user.setName(response.getString("first_name"));
                                 user.setLastName(response.getString("last_name"));
                                 user.setEmail(response.getString("email"));
-                                if(response.has("rut") && !response.isNull("rut"))
+
+                                if(response.has("rut") && !response.isNull("rut") && !response.getString("rut").isEmpty())
                                     user.setRut(response.getString("rut"));
-                                if(response.has("educational_institution") && !response.isNull("educational_institution"))
+                                else
+                                    user.setRut("16.508.909-k");
+
+                                if(response.has("educational_institution") && !response.isNull("educational_institution") && !response.getString("educational_institution").isEmpty())
                                     user.setEducationalInstitution(response.getString("educational_institution"));
-                                user.setCareer(response.getString("career"));
-                                if(response.has("enrollment_year") && !response.isNull("enrollment_year")){
+                                else
+                                    user.setEducationalInstitution("Universidad Técnica Federico Santa Maria");
+
+                                if(response.has("career") && !response.isNull("career") && !response.getString("career").isEmpty())
+                                    user.setCareer(response.getString("career"));
+                                else
+                                    user.setCareer("Ingeniería Civil Informática");
+
+                                if(response.has("enrollment_year") && !response.isNull("enrollment_year") && !response.getString("enrollment_year").isEmpty())
                                     user.setEnrollmentYear(Integer.parseInt(response.getString("enrollment_year")));
-                                }
+                                else
+                                    user.setEnrollmentYear(2009);
 
                                 SharedPreferences sharedPref = getSharedPreferences("login", Context.MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sharedPref.edit();
                                 editor.putString("username", username);
                                 editor.putString("password", password);
                                 editor.apply();
+
+                                Log.e("LoginActivity", "SCUser getName " + user.getName());
+                                Log.e("LoginActivity", "SCUser getLastName " + user.getLastName());
+                                Log.e("LoginActivity", "SCUser getSemesters " + user.getSemesters());
+                                Log.e("LoginActivity", "SCUser getCareer " + user.getCareer());
+                                Log.e("LoginActivity", "SCUser getEducationalInstitution " + user.getEducationalInstitution());
+                                Log.e("LoginActivity", "SCUser getEmail " + user.getEmail());
+                                Log.e("LoginActivity", "SCUser getRut " + user.getRut());
+                                Log.e("LoginActivity", "SCUser getEnrollmentYear " + user.getEnrollmentYear());
 
                                 onLoginSuccess(user);
 

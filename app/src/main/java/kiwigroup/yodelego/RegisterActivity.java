@@ -1,14 +1,12 @@
 package kiwigroup.yodelego;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -24,11 +22,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
+import kiwigroup.yodelego.model.User;
 import kiwigroup.yodelego.server.ServerCommunication;
 
-public class RegisterActivity extends FragmentActivity implements OnRegisterFragmentListener{
+public class RegisterActivity extends AppCompatActivity implements OnRegisterFragmentListener{
 
     private RegisterMainFragment mainFragment;
     private RegisterStudentFragment studentFragment;
@@ -39,8 +39,33 @@ public class RegisterActivity extends FragmentActivity implements OnRegisterFrag
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
         mainFragment = RegisterMainFragment.newInstance();
         addFragmentToMainContent(mainFragment, false, getString(R.string.id_main_fragment));
+
+        /*RegisterStudentFragment studentFragment = RegisterStudentFragment.newInstance("", "", "", "", "");
+        addFragmentToMainContent(studentFragment, false, getString(R.string.id_student_fragment));*/
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        goToLogin();
+
+        Fragment mainFragment = getSupportFragmentManager().findFragmentByTag(getString(R.string.id_main_fragment));
+        if (mainFragment != null && mainFragment.isVisible()) {
+            goToLogin();
+        }
+        Fragment studentFragment = getSupportFragmentManager().findFragmentByTag(getString(R.string.id_student_fragment));
+        if (studentFragment != null && studentFragment.isVisible()) {
+            getSupportFragmentManager().popBackStack();
+        }
+        Fragment registerEndFragment = getSupportFragmentManager().findFragmentByTag(getString(R.string.id_end_fragment));
+        if (registerEndFragment != null && registerEndFragment.isVisible()) {
+            goToLogin();
+        }
+        return true;
     }
 
 
@@ -58,7 +83,65 @@ public class RegisterActivity extends FragmentActivity implements OnRegisterFrag
     }
 
     @Override
-    public void createStudentAccount(boolean student, String name, String lastName, String rut, String email, String password, String university, String career, String semester){
+    public void getEducationalInstitutions(final onEducationalInstitutionsListener listener) {
+        Log.d("RegisterActivity", "-call: getEducationalInstitutions");
+        ServerCommunication sc = new ServerCommunication.ServerCommunicationBuilder(this, "/educational-institutions")
+                .POST()
+                .tokenized(false)
+                .arrayReturnListener(new Response.Listener<JSONArray> (){
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        if(response != null) {
+                            ArrayList<String> educational = new ArrayList<>();
+                            for (int i = 0; i < response.length(); i++) {
+                                try {
+                                    JSONObject object = response.getJSONObject(i);
+                                    String name = object.getString("name");
+                                    //String commerce_id = object.getString("commerce_id");
+                                    Log.d("RegisterActivity", "-> -> name: " + name);
+                                    educational.add(name);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                    listener.onError(getString(R.string.error_json_exception));
+                                    return;
+                                }
+                            }
+                            listener.onEducationalInstitutionsResponse(educational);
+                        }
+                    }
+                })
+                .errorListener(new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Log.d("getEducationalInstitut", "volleyError: " + volleyError.toString());
+                        String message = "";
+                        if (volleyError instanceof NetworkError) {
+                            message = getString(R.string.error_network);
+                        } else if (volleyError instanceof ServerError) {
+                            if(volleyError.networkResponse != null){
+                                try {
+                                    JSONObject responseObject = new JSONObject(new String(volleyError.networkResponse.data));
+                                    JSONObject errorsObject = responseObject.getJSONObject("error");
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        } else if (volleyError instanceof AuthFailureError) {
+                            message = getString(R.string.error_incorrect_password_or_login);
+                        } else if (volleyError instanceof ParseError) {
+                            message = getString(R.string.error_parser);
+                        } else if (volleyError instanceof TimeoutError) {
+                            message = getString(R.string.error_timeout);
+                        }
+                        listener.onError(message);
+                    }
+                })
+                .build();
+        sc.execute();
+    }
+
+    @Override
+    public void createAccount(boolean student, String name, String lastName, String rut, String email, String password, String university, String career, String semester){
         /*HashMap<String, String> args = new HashMap<>();
         args.put("name", name);
         args.put("last_name", lastName);
@@ -162,6 +245,16 @@ public class RegisterActivity extends FragmentActivity implements OnRegisterFrag
     @Override
     public void goToWall(){
         Intent mainIntent = new Intent().setClass(RegisterActivity.this, MainActivity.class);
+        User user = new User();
+        user.setName("Paulina");
+        user.setLastName("Miranda");
+        user.setEmail("paulina.miranda@yodelego.com");
+        user.setRut("16.508.909-k");
+        user.setEducationalInstitution("Universidad Técnica Federico Santa Maria");
+        user.setCareer("Ingeniería Civil Informática");
+        user.setEnrollmentYear(2009);
+
+        mainIntent.putExtra("user", user);
         startActivity(mainIntent);
         finish();
     }
@@ -192,6 +285,11 @@ public class RegisterActivity extends FragmentActivity implements OnRegisterFrag
             e.printStackTrace();
         }
         return false;
+    }
+
+    public interface onEducationalInstitutionsListener {
+        void onEducationalInstitutionsResponse(List<String> response);
+        void onError(String error);
     }
 
 }

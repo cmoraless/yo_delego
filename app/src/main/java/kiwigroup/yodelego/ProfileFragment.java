@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +25,7 @@ public class ProfileFragment extends Fragment {
     private TextView rut;
     private TextView mail;
     private TextView academic_description;
+    private TextView edit;
 
     private User user;
     private OnUserFragmentsListener listener;
@@ -54,7 +56,15 @@ public class ProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         userType = view.findViewById(R.id.user_type);
-        userType.setText(user.getEducationalInstitution().isEmpty() ? "Trabajador" : "Estudiante");
+        userType.setText("Estudiante");
+        edit = view.findViewById(R.id.edit);
+        edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment editFragment = ProfileEditFragment.newInstance(user);
+                listener.addFragmentToMainContent(editFragment, true, getString(R.string.id_profile_edit));
+            }
+        });
         name = view.findViewById(R.id.name);
         name.setText(user.getName() + " " + user.getLastName());
         rut = view.findViewById(R.id.rut);
@@ -66,13 +76,13 @@ public class ProfileFragment extends Fragment {
         mail = view.findViewById(R.id.mail);
         mail.setText(user.getEmail());
         LinearLayout academic_layout = view.findViewById(R.id.academic_info);
-        if(user.getEducationalInstitution().isEmpty()){
+        /*if(user.getEducationalInstitution().isEmpty()){
             academic_layout.setVisibility(LinearLayout.GONE);
-        } else {
+        } else {*/
             academic_description = view.findViewById(R.id.academic_description);
             academic_layout.setVisibility(LinearLayout.VISIBLE);
-            academic_description.setText("Estudiante de " + user.getCareer() + ", en la " + user.getEducationalInstitution() + ", cursa " + user.getSemesters() + " semestre");
-        }
+            academic_description.setText(Html.fromHtml("Estudiante de <b>" + user.getCareer() + ", en la " + user.getEducationalInstitution() + ", cursa " + user.getSemesters() + " semestre</b>"));
+        //}
 
         Button cancelButton = view.findViewById(R.id.cancel_button);
         cancelButton.setOnClickListener(new View.OnClickListener() {

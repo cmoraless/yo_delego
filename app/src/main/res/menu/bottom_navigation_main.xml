@@ -4,19 +4,19 @@
     <item
         android:id="@+id/action_wall"
         android:enabled="true"
-        android:icon="@drawable/ic_wall"
+        android:icon="@drawable/ic_feed"
         android:title="@string/text_wall"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_applications"
         android:enabled="true"
-        android:icon="@drawable/ic_wall"
+        android:icon="@drawable/ic_post"
         android:title="@string/text_applications"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_profile"
         android:enabled="true"
-        android:icon="@drawable/ic_wall"
+        android:icon="@drawable/ic_profile"
         android:title="@string/text_profile"
         app:showAsAction="ifRoom" />
 </menu>

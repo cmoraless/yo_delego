@@ -4,11 +4,14 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class RegisterEndFragment extends Fragment {
 
@@ -22,7 +25,9 @@ public class RegisterEndFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_end_register, container, false);
+        final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), R.style.YoDelegoDarkTheme);
+        LayoutInflater localInflater = inflater.cloneInContext(contextThemeWrapper);
+        return localInflater.inflate(R.layout.fragment_end_register, container, false);
     }
 
     @Override
@@ -38,7 +43,8 @@ public class RegisterEndFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        TextView text = view.findViewById(R.id.text2);
+        text.setText(Html.fromHtml("Tu cuenta se ha creado de manera correcta, entra a tu muro para disfrutar de las funciones de <b>YoDelego</b>."));
         goToWallButton = view.findViewById(R.id.go_to_wall);
         goToWallButton.setOnClickListener(new View.OnClickListener() {
             @Override

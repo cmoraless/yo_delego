@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <color name="colorRed">#FF0000</color>
     <color name="colorPrimary">#FC5457</color>
     <color name="colorPrimaryDark">#646464</color>
     <color name="colorAccent">#e0e0e0</color>
@@ -9,14 +10,19 @@
     <color name="colorMainSeparator">#D4D4D4</color>
 
     <color name="colorAcademicShape">#fdaa29</color>
+    <color name="colorGreyText">#787878</color>
+
+    <color name="colorBackgroundOfferDetails">#f6f1f2</color>
 
     <color name="colorBackgroundDark">#212121</color>
     <color name="colorButtons">#FC5457</color>
     <color name="colorWelcomeText">#7E292A</color>
+
     <color name="colorAcademicInfoText">#7e5410</color>
-    <color name="colorTextSecondaryButton">#787989</color>
+    <color name="colorTextSecondaryButton">#6b6b6b</color>
+    <color name="colorBlackText">#383838</color>
     <color name="colorPrimaryText">#842c2c</color>
-    <color name="colorSecondaryText">#777888</color>
+    <color name="colorSecondaryText">#6f6f6f</color>
     <color name="colorGreenText">#14C767</color>
     <color name="colorSplashBackground">#FC5457</color>
     <color name="colorRedButton">#FFE6E6</color>
