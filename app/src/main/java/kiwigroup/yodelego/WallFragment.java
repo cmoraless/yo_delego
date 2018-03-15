@@ -2,11 +2,8 @@ package kiwigroup.yodelego;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,49 +11,28 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkError;
-import com.android.volley.ParseError;
-import com.android.volley.Response;
-import com.android.volley.ServerError;
-import com.android.volley.TimeoutError;
-import com.android.volley.VolleyError;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import kiwigroup.yodelego.adapter.WallAdapter;
 import kiwigroup.yodelego.model.Offer;
 import kiwigroup.yodelego.model.User;
-import kiwigroup.yodelego.server.ServerCommunication;
 
-public class WallFragment extends Fragment implements WallAdapter.AdapterListener {
-    private RecyclerView wallRecyclerView;
+public class WallFragment extends Fragment implements WallAdapter.AdapterListener, OnWallUpdateListener {
     private User user;
+    private static WallFragment fragment;
+    private OnUserFragmentsListener mListener;
     private WallAdapter adapter;
-    private LinearLayoutManager linearLayoutManager;
+    private RecyclerView wallRecyclerView;
     private EndlessRecyclerViewScrollListener listener;
 
     public static WallFragment newInstance(User user) {
-        WallFragment fragment = new WallFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("user", user);
-        fragment.setArguments(bundle);
+        if(fragment == null) {
+            fragment = new WallFragment();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("user", user);
+            fragment.setArguments(bundle);
+        }
         return fragment;
     }
 
@@ -79,7 +55,7 @@ public class WallFragment extends Fragment implements WallAdapter.AdapterListene
 
         wallRecyclerView = view.findViewById(R.id.lvWall);
         adapter = new WallAdapter(this);
-        linearLayoutManager = new LinearLayoutManager(getContext());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         wallRecyclerView.setLayoutManager(linearLayoutManager);
         wallRecyclerView.setAdapter(adapter);
         listener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
@@ -89,113 +65,54 @@ public class WallFragment extends Fragment implements WallAdapter.AdapterListene
             }
         };
         wallRecyclerView.addOnScrollListener(listener);
-        onLoadMoreOffers(0);
+        mListener.getWallItems(this);
     }
-
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        /*if (context instanceof OnRegisterFragmentListener) {
-            mListener = (OnRegisterFragmentListener) context;
+        if (context instanceof OnUserFragmentsListener) {
+            mListener = (OnUserFragmentsListener) context;
         } else {
             throw new RuntimeException(context.toString() + " must implement OnRegisterFragmentListener");
-        }*/
+        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        //mListener = null;
+        mListener = null;
     }
 
     @Override
     public void onOfferSelected(Offer offer) {
         Intent mainIntent = new Intent().setClass(getContext(), OfferDetailsActivity.class);
-        mainIntent.putExtra("user", user);
+        mainIntent.putExtra("offer", offer);
         startActivity(mainIntent);
     }
 
     @Override
     public void onLoadMoreOffers(int page) {
-        Log.d("WallFragment", "-> onLoadMoreOffers()");
+        mListener.getMoreWallItems();
+    }
+
+    @Override
+    public void onLoadingWallItems() {
         adapter.showLoading();
-        /*ServerCommunication userSC = new ServerCommunication.ServerCommunicationBuilder(getActivity(), "offers/")
-            .GET()
-            .tokenized(true)
-            .objectReturnListener(new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    if(response != null) {
-                        try {
-                            loadingMore = false;
-                            adapter.notifyDataSetChanged();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            loadingMore = false;
-                            adapter.notifyDataSetChanged();
-                        }
-                    } else {
-                        loadingMore = false;
-                        adapter.notifyDataSetChanged();
-                    }
-                }
-            })
-            .errorListener(new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError volleyError) {
-                    volleyError.printStackTrace();
-                    loadingMore = false;
-                    adapter.notifyDataSetChanged();
-                }
-            })
-            .build();
-        userSC.execute();*/
+    }
 
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-                Date date1 = null;
-                Date date2 = null;
-                try {
-                    date1 = df.parse("28/01/2018");
-                    date2 = df.parse("04/01/2018");
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                adapter.hideLoading();
-                Offer offer = new Offer(
-                        "Daniela Villalobos",
-                        date1,
-                        "Daniela Villalobos publicó un nuevo trabajo",
-                        true,
-                        "Toma de inventarios",
-                        15000,
-                        "Se necesita personal para toma de inventarios, son 3 noches consecutivas en el Mall Marina Arauco ubicado en 15 norte, Viña del Mar.",
-                        "15 norte 123234, Viña del Mar",
-                        "28/01/2018",
-                        Offer.OfferStatus.OPEN
-                );
+    @Override
+    public void onWallItemsResponse(List<Offer> wallOffers) {
+        adapter.hideLoading();
+        for(Offer offer : wallOffers){
+            adapter.append(offer);
+        }
+        listener.stopLoading();
+    }
 
-                Offer offer3 = new Offer(
-                        "Lily Anguita",
-                        date2,
-                        "Lily Anguita publicó un nuevo trabajo",
-                        true,
-                        "Toma de inventarios",
-                        15000,
-                        "Se necesita personal para toma de inventarios, son 3 noches consecutivas en el Mall Marina Arauco ubicado en 15 norte, Viña del Mar.",
-                        "15 norte 123234, Viña del Mar",
-                        "28/01/2018",
-                        Offer.OfferStatus.OPEN
-                );
-                adapter.append(offer);
-                adapter.append(offer3);
-                listener.stopLoading();
-            }
-        }, 3000);
+    @Override
+    public void onWallItemsError(String error) {
+
     }
 
     public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
@@ -249,7 +166,6 @@ public class WallFragment extends Fragment implements WallAdapter.AdapterListene
                     this.loading = true;
                 }
             }
-
             // If it isn’t currently loading, we check to see if we have breached
             // the visibleThreshold and need to reload more data.
             // If we do need to reload some more data, we execute onLoadMore to fetch the data.

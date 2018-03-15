@@ -1,31 +1,24 @@
 package kiwigroup.yodelego.adapter;
 
-import android.content.Context;
-import android.graphics.Color;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.PopupMenu;
+import android.graphics.PorterDuff;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.text.Layout;
-import android.text.SpannableString;
 import android.text.format.DateUtils;
-import android.text.style.AlignmentSpan;
-import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import kiwigroup.yodelego.R;
 import kiwigroup.yodelego.model.Offer;
@@ -59,9 +52,11 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     public void hideLoading() {
-        int index = offers.size() - 1;
-        offers.remove(index);
-        notifyItemRemoved(index);
+        if(!offers.isEmpty()){
+            int index = offers.size() - 1;
+            offers.remove(index);
+            notifyItemRemoved(index);
+        }
     }
 
     @Override
@@ -71,7 +66,7 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             View v = inflater.inflate(R.layout.content_wall_item, parent, false);
             return new OfferViewHolder(v);
         } else if (viewType == VIEW_TYPE_LOADING) {
-            View v = inflater.inflate(R.layout.content_wall_item_loading, parent, false);
+            View v = inflater.inflate(R.layout.content_item_loading, parent, false);
             return new LoadingViewHolder(v);
         }
         return null;
@@ -87,11 +82,17 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (holder instanceof OfferViewHolder) {
             OfferViewHolder offerViewHolder = (OfferViewHolder)holder;
             final Offer offer = offers.get(position);
-            offerViewHolder.resume.setText(Html.fromHtml("<b>Lily Anguita</b>  publicó un nuevo trabajo"));
+            offerViewHolder.resume.setText(Html.fromHtml("<b>" + offer.getPublisher() + "</b>  publicó un nuevo trabajo"));
             offerViewHolder.date.setText(DateUtils.getRelativeTimeSpanString(offer.getDate().getTime(), new Date().getTime(),0L, DateUtils.FORMAT_ABBREV_ALL));
-            offerViewHolder.status.setText(offer.getStatus() == Offer.OfferStatus.CLOSE ? "cerrado" : "abierto");
+            offerViewHolder.status.setText(offer.getStatus() == Offer.OfferStatus.ENTERED ? "abierto" : "cerrado");
+            offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                    offer.getStatus() == Offer.OfferStatus.ENTERED ? R.color.colorGreenText : R.color.colorRed),
+                    PorterDuff.Mode.SRC);
             offerViewHolder.title.setText(offer.getTitle());
-            offerViewHolder.amount.setText("$" + String.valueOf(offer.getAmount()));
+            DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.US);
+            otherSymbols.setDecimalSeparator(',');
+            otherSymbols.setGroupingSeparator('.');
+            offerViewHolder.amount.setText(String.format("$%s", new DecimalFormat("#,###", otherSymbols).format(offer.getTotalWage())));
             offerViewHolder.description.setText(offer.getSummary());
             offerViewHolder.details.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -129,16 +130,16 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             status = view.findViewById(R.id.button);
             image = view.findViewById(R.id.picture);
             title = view.findViewById(R.id.title);
-            amount = view.findViewById(R.id.amount);
+            amount = view.findViewById(R.id.totalWage);
             description = view.findViewById(R.id.description);
             details = view.findViewById(R.id.details);
         }
     }
 
     class LoadingViewHolder extends RecyclerView.ViewHolder {
-        public ProgressBar progressBar;
+        ProgressBar progressBar;
 
-        public LoadingViewHolder(View itemView) {
+        LoadingViewHolder(View itemView) {
             super(itemView);
             progressBar = itemView.findViewById(R.id.progressBar1);
         }

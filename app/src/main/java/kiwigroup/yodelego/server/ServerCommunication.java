@@ -41,7 +41,7 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
     private Response.Listener<JSONArray> jsonArrayListener;
     private Response.Listener<JSONObject> nullableJsonObjectListener;
     private Response.ErrorListener errorListener;
-    private Map<String, String> parameters;
+    private Map<String, Object> parameters;
     private boolean withToken;
     private boolean withParametersOnUrl;
 
@@ -58,7 +58,7 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
         private Response.Listener<JSONArray> jsonArrayListener;
         private Response.Listener<JSONObject> nullableJsonObjectListener;
         private Response.ErrorListener errorListener;
-        private Map<String, String> parameters;
+        private Map<String, Object> parameters;
         private boolean withToken;
         private boolean withParametersOnUrl;
 
@@ -97,7 +97,7 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
             return this;
         }
 
-        public ServerCommunicationBuilder parameters(Map<String, String> parameters){
+        public ServerCommunicationBuilder parameters(Map<String, Object> parameters){
             this.parameters = parameters;
             return this;
         }
@@ -210,10 +210,10 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
         String mUrl;
         StringBuilder stringBuilder = new StringBuilder(mContext.getString(R.string.server_base_url) + service);
         if(parameters != null){
-            Iterator<Map.Entry<String, String>> iterator = parameters.entrySet().iterator();
+            Iterator<Map.Entry<String, Object>> iterator = parameters.entrySet().iterator();
             int i = 1;
             while (iterator.hasNext()) {
-                Map.Entry<String, String> entry = iterator.next();
+                Map.Entry<String, Object> entry = iterator.next();
                 if (i == 1) {
                     stringBuilder.append("?" + entry.getKey() + "=" + entry.getValue());
                 } else {

@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import kiwigroup.yodelego.model.User;
 
@@ -30,7 +31,7 @@ public class ProfileEditFragment extends Fragment {
     private LinearLayout baseFormLayout;
     private Spinner universitySpinner;
     private TextInputEditText careerTextView;
-    private TextInputEditText semesterTextView;
+    private TextInputEditText yearTextView;
 
     private TextView userType;
     private TextView name;
@@ -72,16 +73,17 @@ public class ProfileEditFragment extends Fragment {
 
         universitySpinner = view.findViewById(R.id.spinner);
         careerTextView = view.findViewById(R.id.career);
-        semesterTextView = view.findViewById(R.id.semester);
+        yearTextView = view.findViewById(R.id.enrollment_year);
 
         showProgress(true);
         listener.getEducationalInstitutions(new RegisterActivity.onEducationalInstitutionsListener() {
             @Override
-            public void onEducationalInstitutionsResponse(List<String> response) {
-                response.add(0, "Universidad o Instituto");
+            public void onEducationalInstitutionsResponse(Map<String, Integer> response) {
+                List<String> values = new ArrayList<>(response.keySet());
+                values.add(0, "Universidad o Instituto");
                 showProgress(false);
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
-                        android.R.layout.simple_spinner_item, response){
+                        android.R.layout.simple_spinner_item, values){
                     @Override
                     public boolean isEnabled(int position){
                         return position != 0;

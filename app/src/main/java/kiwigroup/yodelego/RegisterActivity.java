@@ -1,11 +1,13 @@
 package kiwigroup.yodelego;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
@@ -23,7 +25,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import kiwigroup.yodelego.model.User;
 import kiwigroup.yodelego.server.ServerCommunication;
@@ -33,6 +37,7 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
     private RegisterMainFragment mainFragment;
     private RegisterStudentFragment studentFragment;
     private RegisterEndFragment endFragment;
+    private Fragment currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +77,7 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
     @Override
     public void addFragmentToMainContent(Fragment fragment, boolean addToBackStack, String fragmentId) {
         if (fragment != null) {
+            currentFragment = fragment;
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             if(addToBackStack)
                 ft.addToBackStack(fragmentId);
@@ -86,20 +92,20 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
     public void getEducationalInstitutions(final onEducationalInstitutionsListener listener) {
         Log.d("RegisterActivity", "-call: getEducationalInstitutions");
         ServerCommunication sc = new ServerCommunication.ServerCommunicationBuilder(this, "/educational-institutions")
-                .POST()
+                .GET()
                 .tokenized(false)
                 .arrayReturnListener(new Response.Listener<JSONArray> (){
                     @Override
                     public void onResponse(JSONArray response) {
                         if(response != null) {
-                            ArrayList<String> educational = new ArrayList<>();
+                            Map<String, Integer> educational = new HashMap<>();
                             for (int i = 0; i < response.length(); i++) {
                                 try {
                                     JSONObject object = response.getJSONObject(i);
+                                    Log.d("RegisterActivity", "-call: getEducationalInstitutions " + object.toString());
+                                    int id = object.getInt("id");
                                     String name = object.getString("name");
-                                    //String commerce_id = object.getString("commerce_id");
-                                    Log.d("RegisterActivity", "-> -> name: " + name);
-                                    educational.add(name);
+                                    educational.put(name, id);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                     listener.onError(getString(R.string.error_json_exception));
@@ -141,79 +147,112 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
     }
 
     @Override
-    public void createAccount(boolean student, String name, String lastName, String rut, String email, String password, String university, String career, String semester){
-        /*HashMap<String, String> args = new HashMap<>();
-        args.put("name", name);
+    public void createAccount(boolean student,
+                              String name,
+                              String lastName,
+                              String rut,
+                              final String email,
+                              final String password,
+                              int university,
+                              String career,
+                              String year){
+        HashMap<String, Object> args = new HashMap<>();
+        args.put("first_name", name);
         args.put("last_name", lastName);
+        args.put("rut", rut);
+        args.put("educational_institution", university);
         args.put("email", email);
         args.put("password", password);
-        if(!referralCode.isEmpty())
-            args.put("referral_code", referralCode);
+        args.put("enrollment_year", year);
+        args.put("career", career);
 
-        ServerCommunication sc = new ServerCommunication.ServerCommunicationBuilder(this, "api/auth/signup")
+        ServerCommunication sc = new ServerCommunication.ServerCommunicationBuilder(this, "users/")
             .POST()
             .tokenized(false)
             .parameters(args)
-            .nullableListener(new Response.Listener<JSONObject>() {
+            .objectReturnListener(new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    if(response == null) {
-                        signUpButton.setEnabled(true);
-                        signUpButton.setAlpha(1f);
-                        cancelButton.setEnabled(true);
-                        cancelButton.setAlpha(1f);
-                        showProgress(false);
+                    SharedPreferences sharedPref = getSharedPreferences("login", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putString("username", email);
+                    editor.putString("password", password);
+                    editor.apply();
 
-                        AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
-                        builder.setTitle(getString(R.string.account_created_title));
-                        builder.setMessage(getString(R.string.account_created));
-                        builder.setPositiveButton("OK",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                        finish();
-                                    }
-                                });
-                        builder.show();
-
-                    } else {
-                        Log.d("RegisterActivity", "creation return: " + response);
-                    }
+                    AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
+                    builder.setTitle(getString(R.string.account_created_title));
+                    builder.setMessage(getString(R.string.account_created));
+                    builder.setPositiveButton("OK",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                    endFragment = RegisterEndFragment.newInstance();
+                                    addFragmentToMainContent(endFragment, false, getString(R.string.id_end_fragment));
+                                }
+                            });
+                    builder.show();
                 }
             })
             .errorListener(new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError volleyError) {
-                    signUpButton.setEnabled(true);
+                    /*signUpButton.setEnabled(true);
                     signUpButton.setAlpha(1f);
                     cancelButton.setEnabled(true);
                     cancelButton.setAlpha(1f);
-                    showProgress(false);
+                    showProgress(false);*/
+                    Log.d("createAccount", "volleyError: " + volleyError.toString());
 
                     String message = "";
                     if (volleyError instanceof NetworkError) {
                         message = getString(R.string.error_network);
                     } else if (volleyError instanceof ServerError) {
                         if(volleyError.networkResponse != null){
+                            Log.d("createAccount", "serverError: " + new String(volleyError.networkResponse.data));
                             try {
                                 JSONObject responseObject = new JSONObject(new String(volleyError.networkResponse.data));
-                                JSONObject errorsObject = responseObject.getJSONObject("error");
 
-                                boolean fieldError = false;
-                                if(checkForError(errorsObject, "name", textViewFirstName)) fieldError = true;
-                                if(checkForError(errorsObject, "last_name", textViewLastName)) fieldError = true;
-                                if(checkForError(errorsObject, "email", textViewMail)) fieldError = true;
-                                if(checkForError(errorsObject, "password", textViewPassword)) fieldError = true;
-                                if(checkForError(errorsObject, "referral_code", textViewReferralCode)) fieldError = true;
-                                if(fieldError)
+                                String firstNameError = checkForError(responseObject, "first_name");
+                                String lastNameError = checkForError(responseObject, "last_name");
+                                String rutError = checkForError(responseObject, "rut");
+                                String emailError = checkForError(responseObject, "email");
+                                String passwordError = checkForError(responseObject, "password");
+
+                                if( firstNameError != null ||
+                                    lastNameError != null ||
+                                    rutError != null ||
+                                    emailError != null ||
+                                    passwordError != null) {
+                                    getSupportFragmentManager().popBackStack();
+                                    RegisterMainFragment mainFragment = (RegisterMainFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.id_main_fragment));
+                                    mainFragment.updateErrors(
+                                            firstNameError,
+                                            lastNameError,
+                                            emailError,
+                                            passwordError,
+                                            rutError);
+
                                     return;
-                                else
-                                    message = errorsObject.getString("message");
+                                }
+
+                                String firstEducational = checkForError(responseObject, "educational_institution");
+                                String yearError = checkForError(responseObject, "enrollment_year");
+                                String careerError = checkForError(responseObject, "career");
+
+                                if( firstEducational == null ||
+                                    yearError == null ||
+                                    careerError == null){
+                                    RegisterStudentFragment studentFragment = (RegisterStudentFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.id_student_fragment));
+                                    studentFragment.updateErrors(firstEducational, yearError, careerError);
+                                    return;
+                                }
+
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                         }
+                        return;
                     } else if (volleyError instanceof AuthFailureError) {
                         message = getString(R.string.error_incorrect_password_or_login);
                     } else if (volleyError instanceof ParseError) {
@@ -223,7 +262,7 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
                     }
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
-                    builder.setTitle(getString(R.string.error_login));
+                    builder.setTitle(getString(R.string.error_creating_account));
                     builder.setMessage(message);
                     builder.setPositiveButton("OK",
                             new DialogInterface.OnClickListener() {
@@ -236,25 +275,12 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
                 }
             })
             .build();
-        sc.execute();*/
-
-        endFragment = RegisterEndFragment.newInstance();
-        addFragmentToMainContent(endFragment, false, getString(R.string.id_end_fragment));
+        sc.execute();
     }
 
     @Override
     public void goToWall(){
-        Intent mainIntent = new Intent().setClass(RegisterActivity.this, MainActivity.class);
-        User user = new User();
-        user.setName("Paulina");
-        user.setLastName("Miranda");
-        user.setEmail("paulina.miranda@yodelego.com");
-        user.setRut("16.508.909-k");
-        user.setEducationalInstitution("Universidad Técnica Federico Santa Maria");
-        user.setCareer("Ingeniería Civil Informática");
-        user.setEnrollmentYear(2009);
-
-        mainIntent.putExtra("user", user);
+        Intent mainIntent = new Intent().setClass(RegisterActivity.this, SplashActivity.class);
         startActivity(mainIntent);
         finish();
     }
@@ -266,29 +292,25 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
         finish();
     }
 
-    private static boolean checkForError(JSONObject object, String tag, TextView textView){
-        JSONObject errorsObject = null;
+    private static String checkForError(JSONObject object, String tag){
         try {
-            errorsObject = object.getJSONObject("errors");
-            if(errorsObject.has(tag)){
+            if(object.has(tag)){
                 JSONArray errorsArray = null;
-                errorsArray = errorsObject.getJSONArray(tag);
+                errorsArray = object.getJSONArray(tag);
                 String errors = "";
                 for(int i=0; i<errorsArray.length(); i++){
                     errors += errorsArray.getString(i);
                 }
-                textView.setError(errors);
-                textView.requestFocus();
-                return true;
+                return errors;
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return false;
+        return null;
     }
 
     public interface onEducationalInstitutionsListener {
-        void onEducationalInstitutionsResponse(List<String> response);
+        void onEducationalInstitutionsResponse(Map<String, Integer> response);
         void onError(String error);
     }
 

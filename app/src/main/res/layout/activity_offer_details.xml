@@ -72,7 +72,7 @@
                         android:text="Administración de páginas web"
                         android:textColor="@color/white"
                         android:textStyle="bold"
-                        android:textSize="18sp" />
+                        android:textSize="20sp" />
 
                     <TextView
                         android:id="@+id/date"
@@ -81,7 +81,6 @@
                         android:textColor="@color/colorBlackText"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-
                         android:text="4 min"
                         android:textSize="12sp" />
 
@@ -97,6 +96,7 @@
                     android:layout_marginStart="16dp"
                     android:text="publicado por Felipe Scolari"
                     android:textColor="@color/colorBackgroundDark"
+                    android:textSize="14sp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
 
             </LinearLayout>
@@ -124,7 +124,7 @@
             android:orientation="vertical">
 
             <kiwigroup.yodelego.customui.DynamicTextView
-                android:id="@+id/text2"
+                android:id="@+id/publication_resume"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
@@ -145,8 +145,8 @@
 
                 <ImageView
                     android:id="@+id/transaction_title"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
+                    android:layout_width="27dp"
+                    android:layout_height="27dp"
                     android:layout_marginTop="2dp"
                     android:layout_alignParentStart="true"
                     android:src="@drawable/ic_money"/>
@@ -161,10 +161,10 @@
                     android:layout_marginStart="10dp"
                     android:text="Precio a pagar"
                     android:textStyle="bold"
-                    android:textSize="14sp" />
+                    android:textSize="18sp" />
 
                 <TextView
-                    android:id="@+id/amount"
+                    android:id="@+id/dailyWage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorPrimary"
@@ -172,7 +172,7 @@
                     android:layout_centerVertical="true"
                     android:text="45.000"
                     android:textStyle="bold"
-                    android:textSize="18sp" />
+                    android:textSize="24sp" />
 
             </RelativeLayout>
 
@@ -186,7 +186,7 @@
                 android:layout_marginTop="20dp"
                 android:text="ubicación"
                 android:textStyle="bold"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
 
             <RelativeLayout
                 xmlns:android="http://schemas.android.com/apk/res/android"
@@ -200,8 +200,8 @@
 
                 <ImageView
                     android:id="@+id/address_icon"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
+                    android:layout_width="27dp"
+                    android:layout_height="27dp"
                     android:layout_alignParentStart="true"
                     android:src="@drawable/ic_location"/>
 
@@ -215,7 +215,7 @@
                     android:layout_marginStart="10dp"
                     android:text="Bascuñan 1530, departamento 5"
                     android:textStyle="bold"
-                    android:textSize="14sp" />
+                    android:textSize="16sp" />
 
             </RelativeLayout>
 
@@ -229,7 +229,7 @@
                 android:layout_marginStart="10dp"
                 android:text="horarios"
                 android:textStyle="bold"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
 
             <RelativeLayout
                 xmlns:android="http://schemas.android.com/apk/res/android"
@@ -238,12 +238,13 @@
                 android:layout_marginTop="10dp"
                 android:paddingTop="10dip"
                 android:paddingLeft="10dp"
-                android:paddingRight="10dp">
+                android:paddingRight="10dp"
+                android:paddingBottom="10dip">
 
                 <ImageView
                     android:id="@+id/schedule_icon"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
+                    android:layout_width="27dp"
+                    android:layout_height="27dp"
                     android:layout_alignParentStart="true"
                     android:src="@drawable/ic_schedule"/>
 
@@ -257,7 +258,7 @@
                     android:layout_marginStart="10dp"
                     android:text="6 horas diarias"
                     android:textStyle="bold"
-                    android:textSize="14sp" />
+                    android:textSize="16sp" />
 
             </RelativeLayout>
 

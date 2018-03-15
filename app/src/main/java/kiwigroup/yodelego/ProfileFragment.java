@@ -30,11 +30,15 @@ public class ProfileFragment extends Fragment {
     private User user;
     private OnUserFragmentsListener listener;
 
+    private static ProfileFragment fragment;
+
     public static ProfileFragment newInstance(User user) {
-        ProfileFragment fragment = new ProfileFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("user", user);
-        fragment.setArguments(bundle);
+        if(fragment == null) {
+            fragment = new ProfileFragment();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("user", user);
+            fragment.setArguments(bundle);
+        }
         return fragment;
     }
 

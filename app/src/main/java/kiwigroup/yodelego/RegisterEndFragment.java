@@ -1,6 +1,7 @@
 package kiwigroup.yodelego;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -21,6 +22,12 @@ public class RegisterEndFragment extends Fragment {
     public static RegisterEndFragment newInstance() {
         RegisterEndFragment fragment = new RegisterEndFragment();
         return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getActivity().setTheme(R.style.YoDelegoDarkTheme);
     }
 
     @Override

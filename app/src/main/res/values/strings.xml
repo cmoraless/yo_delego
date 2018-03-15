@@ -9,6 +9,10 @@
     <string name="id_applications">id_applications</string>
     <string name="id_profile_edit">id_profile_edit</string>
 
+    <string name="adjudicated_applications_title">adjudicadas</string>
+    <string name="reviewing_applications_title">revisión</string>
+    <string name="close_applications_title">cerrados</string>
+
     <string name="app_name">YoDelego</string>
     <string name="cancel">Cancelar</string>
     <string name="confirm">Confirm</string>
@@ -53,6 +57,8 @@
     <string name="error_timeout">Oops, The server is taking too long to respond</string>
     <string name="error_json_exception">Json exception</string>
 
+    <string name="error_creating_account">Problema al crear la cuenta</string>
+
     <string name="error_network_title">Problema de conexión</string>
     <string name="error_network_details">Necesitas Internet para completar esta acción</string>
 
@@ -73,9 +79,9 @@
 
     <string name="university">Universidad o Instituto de Educación Superior</string>
     <string name="career">Carrera</string>
-    <string name="semester">Semestre</string>
+    <string name="enrollment_year">Año de Ingreso</string>
 
-    <string name="rut">Rut</string>
+    <string name="rut">Rut (1111111-1)</string>
     <string name="rut_hint">1111111-1</string>
 
 

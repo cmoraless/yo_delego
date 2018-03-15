@@ -3,34 +3,33 @@ package kiwigroup.yodelego;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.RelativeLayout;
 
 import kiwigroup.yodelego.model.User;
 
 public class ApplicationsFragment extends Fragment {
 
-
-    private View mProgressView;
-    private RelativeLayout formLayout;
-    private TextInputEditText universityTextView;
-    private TextInputEditText careerTextView;
-    private TextInputEditText semesterTextView;
-    private Button signUpButton;
-    private Button cancelButton;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
 
     private User user;
+
+    private OnUserFragmentsListener mListener;
 
     public static ApplicationsFragment newInstance(User user) {
         ApplicationsFragment fragment = new ApplicationsFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable("user", user);
         fragment.setArguments(bundle);
+
         return fragment;
     }
 
@@ -51,44 +50,76 @@ public class ApplicationsFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        /*formLayout = view.findViewById(R.id.email_login_form);
-        mProgressView = view.findViewById(R.id.login_progress);
+        TabLayout tabLayout = view.findViewById(R.id.tab_layout);
+        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.adjudicated_applications_title)));
+        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.reviewing_applications_title)));
+        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.close_applications_title)));
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        universityTextView = view.findViewById(R.id.university);
-        careerTextView = view.findViewById(R.id.career);
-        semesterTextView = view.findViewById(R.id.semester);
-
-        signUpButton = view.findViewById(R.id.create_account_button);
-        signUpButton.setOnClickListener(new View.OnClickListener() {
+        viewPager = view.findViewById(R.id.pager);
+        final PagerAdapter adapter = new PagerAdapter(((MainActivity)getContext()).getSupportFragmentManager(), tabLayout.getTabCount());
+        viewPager.setAdapter(adapter);
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onClick(View view) {
-                attemptCreateAccount();
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
             }
         });
-        cancelButton = view.findViewById(R.id.cancel_button);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mListener.finish();
-            }
-        });*/
+
     }
-
-
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        /*if (context instanceof OnRegisterFragmentListener) {
-            mListener = (OnRegisterFragmentListener) context;
+        if (context instanceof OnUserFragmentsListener) {
+            mListener = (OnUserFragmentsListener) context;
         } else {
             throw new RuntimeException(context.toString() + " must implement OnRegisterFragmentListener");
-        }*/
+        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        //mListener = null;
+        mListener = null;
+    }
+
+    public class PagerAdapter extends FragmentStatePagerAdapter {
+        int mNumOfTabs;
+
+        PagerAdapter(FragmentManager fm, int NumOfTabs) {
+            super(fm);
+            this.mNumOfTabs = NumOfTabs;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0:
+                    return new AdjudicatedApplicationsFragment();
+                case 1:
+                    return new ReviewingApplicationsFragment();
+                case 2:
+                    return new CloseApplicationsFragment();
+                default:
+                    return null;
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return mNumOfTabs;
+        }
     }
 }

@@ -43,7 +43,7 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
         this.username = username;
         this.password = password;
 
-        HashMap<String, String> args = new HashMap<>();
+        HashMap<String, Object> args = new HashMap<>();
         args.put("username", username);
         args.put("password", password);
         ServerCommunication serverCommunication = new ServerCommunication.ServerCommunicationBuilder(this, "auth/")
@@ -75,6 +75,8 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
                 .errorListener(new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
+
+
                         volleyError.printStackTrace();
                         if (volleyError instanceof NetworkError) {
                             onLoginError(getString(R.string.error_network));

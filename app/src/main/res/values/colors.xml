@@ -9,9 +9,12 @@
     <color name="colorPrimaryRipple">#3964A2</color>
     <color name="colorMainSeparator">#D4D4D4</color>
 
+    <color name="colorDarkBackground">#f1f1f1</color>
+    <color name="colorAdjudicated">#8f2bfa</color>
     <color name="colorAcademicShape">#fdaa29</color>
+    <color name="colorYellowText">#81560f</color>
     <color name="colorGreyText">#787878</color>
-
+    <color name="colorLightGreyText">#8f8f8f</color>
     <color name="colorBackgroundOfferDetails">#f6f1f2</color>
 
     <color name="colorBackgroundDark">#212121</color>

@@ -2,11 +2,13 @@ package kiwigroup.yodelego;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -14,12 +16,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 public class RegisterStudentFragment extends Fragment {
 
@@ -30,7 +35,8 @@ public class RegisterStudentFragment extends Fragment {
     //private TextInputEditText universityTextView;
     private Spinner universitySpinner;
     private TextInputEditText careerTextView;
-    private TextInputEditText semesterTextView;
+    private TextInputEditText yearTextView;
+    private TextInputLayout yearLayout;
     private Button signUpButton;
     private Button cancelButton;
 
@@ -39,8 +45,22 @@ public class RegisterStudentFragment extends Fragment {
     private String rut;
     private String email;
     private String password;
+    private Map educationInstitutions;
+    private String errorUniversity;
+    private String errorCareer;
+    private String errorYear;
 
-    public static RegisterStudentFragment newInstance(String firstName, String lastName, String rut, String email, String password) {
+    public static RegisterStudentFragment newInstance(String firstName,
+                                                      String lastName,
+                                                      String rut,
+                                                      String email,
+                                                      String password
+                                                      /*String career,
+                                                      String year,
+                                                      String university,
+                                                      String errorUniversity,
+                                                      String errorCareer,
+                                                      String errorYear*/) {
         RegisterStudentFragment fragment = new RegisterStudentFragment();
 
         Bundle bundle = new Bundle();
@@ -49,6 +69,13 @@ public class RegisterStudentFragment extends Fragment {
         bundle.putString("rut", rut);
         bundle.putString("email", email);
         bundle.putString("password", password);
+        /*bundle.putString("career", career);
+        bundle.putString("year", year);
+        bundle.putString("university", university);
+        bundle.putString("errorUniversity", errorUniversity);
+        bundle.putString("errorCareer", errorCareer);
+        bundle.putString("errorYear", errorYear);*/
+
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -62,6 +89,10 @@ public class RegisterStudentFragment extends Fragment {
             rut = getArguments().getString("rut");
             email = getArguments().getString("email");
             password = getArguments().getString("password");
+
+            /*errorUniversity = getArguments().getString("errorUniversity");
+            errorCareer = getArguments().getString("errorCareer");
+            errorYear = getArguments().getString("errorYear");*/
         }
     }
 
@@ -79,7 +110,7 @@ public class RegisterStudentFragment extends Fragment {
 
         universitySpinner = view.findViewById(R.id.spinner);
         careerTextView = view.findViewById(R.id.career);
-        semesterTextView = view.findViewById(R.id.semester);
+        yearTextView = view.findViewById(R.id.enrollment_year);
 
         signUpButton = view.findViewById(R.id.create_account_button);
         signUpButton.setOnClickListener(new View.OnClickListener() {
@@ -99,18 +130,19 @@ public class RegisterStudentFragment extends Fragment {
         showProgress(true);
         mListener.getEducationalInstitutions(new RegisterActivity.onEducationalInstitutionsListener() {
             @Override
-            public void onEducationalInstitutionsResponse(List<String> response) {
-                response.add(0, "Universidad o Instituto");
+            public void onEducationalInstitutionsResponse(Map<String, Integer> response) {
+                educationInstitutions = response;
+                List<String> values = new ArrayList<>(response.keySet());
+                values.add(0, "Universidad o Instituto");
                 showProgress(false);
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
-                        android.R.layout.simple_spinner_item, response){
+                        android.R.layout.simple_spinner_item, values){
                     @Override
                     public boolean isEnabled(int position){
                         return position != 0;
                     }
                     @Override
-                    public View getDropDownView(int position, View convertView,
-                                                ViewGroup parent) {
+                    public View getDropDownView(int position, View convertView, ViewGroup parent) {
                         View view = super.getDropDownView(position, convertView, parent);
                         TextView tv = (TextView) view;
                         tv.setTextColor(position == 0 ? Color.GRAY : Color.BLACK);
@@ -147,31 +179,50 @@ public class RegisterStudentFragment extends Fragment {
         universitySpinner.setAdapter(adapter);
     }
 
+    public void updateErrors(String errorUniversity,
+                             String errorCareer,
+                             String errorYear){
+        ((TextView)universitySpinner.getSelectedView()).setError(errorUniversity);
+        careerTextView.setError(errorCareer);
+        yearTextView.setError(errorYear);
+    }
+
     private void attemptCreateAccount() {
-        //universitySpinner.setError(null);
+        ((TextView)universitySpinner.getSelectedView()).setError(errorUniversity);
         careerTextView.setError(null);
-        semesterTextView.setError(null);
+        yearTextView.setError(null);
 
         String university = universitySpinner.getSelectedItem().toString();
+        int universityId;
         String career = careerTextView.getText().toString();
-        String semester = semesterTextView.getText().toString();
+        String year = yearTextView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
-        /*if(TextUtils.isEmpty(university)){
-            universityTextView.setError(getString(R.string.error_field_required));
-            focusView = universityTextView;
+        if(educationInstitutions != null){
+            try{
+                universityId = (Integer) educationInstitutions.get(university);
+            } catch(Exception ex){
+                ex.printStackTrace();
+                universityId = 0;
+            }
+        } else {
+            universityId = 0;
+        }
+        if(universityId < 1){
+            ((TextView)universitySpinner.getSelectedView()).setError(getString(R.string.error_field_required));
+            focusView = universitySpinner.getSelectedView();
             cancel = true;
-        }*/
+        }
         if(TextUtils.isEmpty(career)){
             careerTextView.setError(getString(R.string.error_field_required));
             focusView = careerTextView;
             cancel = true;
         }
-        if(TextUtils.isEmpty(semester)){
-            semesterTextView.setError(getString(R.string.error_field_required));
-            focusView = semesterTextView;
+        if(TextUtils.isEmpty(year)){
+            yearTextView.setError(getString(R.string.error_field_required));
+            focusView = yearTextView;
             cancel = true;
         }
 
@@ -183,7 +234,7 @@ public class RegisterStudentFragment extends Fragment {
             signUpButton.setAlpha(.5f);
             cancelButton.setEnabled(false);
             cancelButton.setAlpha(.5f);
-            mListener.createAccount(true, firstName, lastName, rut, email, password, university, career, semester);
+            mListener.createAccount(true, firstName, lastName, rut, email, password, universityId, career, year);
         }
     }
 

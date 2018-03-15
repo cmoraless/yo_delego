@@ -118,7 +118,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     }
 
     private void startRecoveryProcess(final String email){
-        HashMap<String, String> args = new HashMap<>();
+        HashMap<String, Object> args = new HashMap<>();
         args.put("email", email);
         ServerCommunication serverCommunication = new ServerCommunication.ServerCommunicationBuilder(this, "api/auth/recovery")
                 .POST()

@@ -54,11 +54,11 @@
                         android:text="Toma de inventarios"
                         android:layout_weight="1"
                         android:textColor="@android:color/black"
-                        android:textSize="18sp"
+                        android:textSize="19sp"
                         android:textStyle="bold" />
 
                     <kiwigroup.yodelego.customui.DynamicTextView
-                        android:id="@+id/amount"
+                        android:id="@+id/totalWage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:maxLines="1"
@@ -78,7 +78,7 @@
                     android:maxLines="3"
                     android:text="Se necesita personal para toma de inventarios, son 3 noches consecutivas en el Mall Marina Arauco ubicado en 15 norte, Viña del Mar"
                     android:layout_weight="1"
-                    android:textColor="@color/colorBlackText"
+                    android:textColor="@color/colorLightGreyText"
                     android:textSize="18sp" />
 
                 <LinearLayout

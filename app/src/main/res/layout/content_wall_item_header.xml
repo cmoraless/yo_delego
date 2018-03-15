@@ -25,7 +25,7 @@
         android:layout_weight="1"
         android:gravity="center_vertical"
         android:layout_marginEnd="5dp"
-        android:padding="5dp">
+        android:padding="6dp">
 
         <TextView
             android:id="@+id/publication_resume"
@@ -35,15 +35,15 @@
             android:lineSpacingMultiplier="1"
             android:text="Catherine Barra publicó un nuevo"
             android:textColor="@android:color/black"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
 
 
         <RelativeLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/publication_resume"
-            android:paddingRight="10dp">
+            android:layout_marginTop="2dp"
+            android:layout_below="@id/publication_resume">
 
             <ImageView
                 android:id="@+id/schedule_icon"
@@ -62,11 +62,9 @@
                 android:layout_marginLeft="2dp"
                 android:layout_centerVertical="true"
                 android:textColor="@color/colorGreyText"
-                android:textSize="10sp" />
+                android:textSize="12sp" />
 
         </RelativeLayout>
-
-
 
     </RelativeLayout>
 
@@ -79,13 +77,15 @@
         <Button
             android:id="@+id/button"
             android:layout_width="65dp"
-            android:layout_height="25dp"
+            android:layout_height="19dp"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:padding="0dp"
+            android:background="@drawable/button_status_background"
             android:text="cerrado"
+            android:textColor="@color/white"
             android:textAllCaps="false"
-            android:textSize="12dp" />
+            android:textSize="14sp" />
 
     </RelativeLayout>
 
