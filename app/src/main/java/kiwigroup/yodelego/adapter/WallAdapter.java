@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Locale;
 
 import kiwigroup.yodelego.R;
+import kiwigroup.yodelego.model.Application;
 import kiwigroup.yodelego.model.Offer;
 
 /**
@@ -59,6 +60,11 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
+    public void clear() {
+        offers.clear();
+        notifyDataSetChanged();
+    }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
@@ -84,10 +90,18 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             final Offer offer = offers.get(position);
             offerViewHolder.resume.setText(Html.fromHtml("<b>" + offer.getPublisher() + "</b>  publicó un nuevo trabajo"));
             offerViewHolder.date.setText(DateUtils.getRelativeTimeSpanString(offer.getDate().getTime(), new Date().getTime(),0L, DateUtils.FORMAT_ABBREV_ALL));
-            offerViewHolder.status.setText(offer.getStatus() == Offer.OfferStatus.ENTERED ? "abierto" : "cerrado");
-            offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+            if(!offer.isApplied()){
+                offerViewHolder.status.setText(offer.getStatus() == Offer.OfferStatus.ENTERED ? "abierto" : "cerrado");
+                offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
                     offer.getStatus() == Offer.OfferStatus.ENTERED ? R.color.colorGreenText : R.color.colorRed),
                     PorterDuff.Mode.SRC);
+            } else {
+                offerViewHolder.status.setText("postulando");
+                offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                    R.color.colorAcademicShape),
+                    PorterDuff.Mode.SRC);
+
+            }
             offerViewHolder.title.setText(offer.getTitle());
             DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.US);
             otherSymbols.setDecimalSeparator(',');

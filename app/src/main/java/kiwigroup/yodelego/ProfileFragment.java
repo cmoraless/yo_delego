@@ -23,23 +23,32 @@ public class ProfileFragment extends Fragment {
     private TextView userType;
     private TextView name;
     private TextView rut;
+
+    private TextView assigned_offers;
+    private TextView cancelled_offers;
+
     private TextView mail;
+
     private TextView academic_description;
     private TextView edit;
+    private LinearLayout academic_layout;
 
     private User user;
     private OnUserFragmentsListener listener;
 
-    private static ProfileFragment fragment;
 
     public static ProfileFragment newInstance(User user) {
-        if(fragment == null) {
-            fragment = new ProfileFragment();
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("user", user);
-            fragment.setArguments(bundle);
-        }
+        ProfileFragment fragment = new ProfileFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("user", user);
+        fragment.setArguments(bundle);
+
         return fragment;
+    }
+
+    public void updateUser(User user){
+        this.user = user;
+        loadData(user);
     }
 
     @Override
@@ -60,7 +69,6 @@ public class ProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         userType = view.findViewById(R.id.user_type);
-        userType.setText("Estudiante");
         edit = view.findViewById(R.id.edit);
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,32 +78,34 @@ public class ProfileFragment extends Fragment {
             }
         });
         name = view.findViewById(R.id.name);
-        name.setText(user.getName() + " " + user.getLastName());
         rut = view.findViewById(R.id.rut);
-        if(user.getRut() != null && !user.getRut().isEmpty())
-            rut.setText(user.getRut());
-        else
-            rut.setVisibility(LinearLayout.GONE);
-
         mail = view.findViewById(R.id.mail);
-        mail.setText(user.getEmail());
-        LinearLayout academic_layout = view.findViewById(R.id.academic_info);
-        /*if(user.getEducationalInstitution().isEmpty()){
-            academic_layout.setVisibility(LinearLayout.GONE);
-        } else {*/
-            academic_description = view.findViewById(R.id.academic_description);
-            academic_layout.setVisibility(LinearLayout.VISIBLE);
-            academic_description.setText(Html.fromHtml("Estudiante de <b>" + user.getCareer() + ", en la " + user.getEducationalInstitution() + ", cursa " + user.getSemesters() + " semestre</b>"));
-        //}
-
-        Button cancelButton = view.findViewById(R.id.cancel_button);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.cancel_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 listener.closeSession();
             }
         });
+        academic_layout = view.findViewById(R.id.academic_info);
+        assigned_offers = view.findViewById(R.id.assigned_offers);
+        cancelled_offers = view.findViewById(R.id.cancelled_offers);
+        loadData(user);
     }
+
+    private void loadData(User user){
+        name.setText(user.getName() + " " + user.getLastName());
+        rut.setText(user.getRut());
+        mail.setText(user.getEmail());
+        userType.setText(user.getEducationalInstitution() == null ? "Trabajador" : "Estudiante");
+
+        if(user.getEducationalInstitution() == null || user.getEducationalInstitution().isEmpty()){
+            academic_layout.setVisibility(LinearLayout.GONE);
+        } else {
+            academic_layout.setVisibility(LinearLayout.VISIBLE);
+            academic_description.setText(Html.fromHtml("Estudiante de <b>" + user.getCareer() + ", en la " + user.getEducationalInstitution() + ", cursa " + user.getSemesters() + " semestre</b>"));
+        }
+    }
+
 
     @Override
     public void onAttach(Context context) {

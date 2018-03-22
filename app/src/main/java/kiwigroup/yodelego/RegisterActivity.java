@@ -155,126 +155,168 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
                               final String password,
                               int university,
                               String career,
-                              String year){
-        HashMap<String, Object> args = new HashMap<>();
+                              String year,
+                              int bank_id,
+                              int bank_account_type,
+                              String bank_account_number){
+        final HashMap<String, Object> args = new HashMap<>();
         args.put("first_name", name);
         args.put("last_name", lastName);
         args.put("rut", rut);
-        args.put("educational_institution", university);
         args.put("email", email);
         args.put("password", password);
-        args.put("enrollment_year", year);
-        args.put("career", career);
+        if (university >= 0)
+            args.put("educational_institution_id", university);
+        if (year != null)
+            args.put("enrollment_year", year);
+        if (career != null)
+            args.put("career", career);
 
+        if (bank_id >= 1 && bank_account_type >= 1 && bank_account_number != null && !bank_account_number.isEmpty()) {
+            args.put("bank_id", bank_id);
+            args.put("bank_account_kind", bank_account_type);
+            args.put("bank_account_number", bank_account_number);
+            callServer(args, email, password);
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
+            builder.setTitle("Datos de pago");
+            builder.setMessage("Recuerda que debes completar tus datos de pago para postular a ofertas de trabajo!");
+            builder.setPositiveButton("OK",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            callServer(args, email, password);
+                        }
+                    });
+            builder.show();
+        }
+    }
+
+    private void callServer(HashMap<String, Object> args, final String email, final String password){
         ServerCommunication sc = new ServerCommunication.ServerCommunicationBuilder(this, "users/")
-            .POST()
-            .tokenized(false)
-            .parameters(args)
-            .objectReturnListener(new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    SharedPreferences sharedPref = getSharedPreferences("login", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putString("username", email);
-                    editor.putString("password", password);
-                    editor.apply();
+                .POST()
+                .tokenized(false)
+                .parameters(args)
+                .objectReturnListener(new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        SharedPreferences sharedPref = getSharedPreferences("login", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("username", email);
+                        editor.putString("password", password);
+                        editor.apply();
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
-                    builder.setTitle(getString(R.string.account_created_title));
-                    builder.setMessage(getString(R.string.account_created));
-                    builder.setPositiveButton("OK",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                    endFragment = RegisterEndFragment.newInstance();
-                                    addFragmentToMainContent(endFragment, false, getString(R.string.id_end_fragment));
-                                }
-                            });
-                    builder.show();
-                }
-            })
-            .errorListener(new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError volleyError) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
+                        builder.setTitle(getString(R.string.account_created_title));
+                        builder.setMessage(getString(R.string.account_created));
+                        builder.setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        endFragment = RegisterEndFragment.newInstance();
+                                        addFragmentToMainContent(endFragment, false, getString(R.string.id_end_fragment));
+                                    }
+                                });
+                        builder.show();
+                    }
+                })
+                .errorListener(new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
                     /*signUpButton.setEnabled(true);
                     signUpButton.setAlpha(1f);
                     cancelButton.setEnabled(true);
                     cancelButton.setAlpha(1f);
                     showProgress(false);*/
-                    Log.d("createAccount", "volleyError: " + volleyError.toString());
+                        Log.d("createAccount", "volleyError: " + volleyError.toString());
 
-                    String message = "";
-                    if (volleyError instanceof NetworkError) {
-                        message = getString(R.string.error_network);
-                    } else if (volleyError instanceof ServerError) {
-                        if(volleyError.networkResponse != null){
-                            Log.d("createAccount", "serverError: " + new String(volleyError.networkResponse.data));
-                            try {
-                                JSONObject responseObject = new JSONObject(new String(volleyError.networkResponse.data));
+                        String message = "";
+                        if (volleyError instanceof NetworkError) {
+                            message = getString(R.string.error_network);
+                        } else if (volleyError instanceof ServerError) {
+                            if(volleyError.networkResponse != null){
+                                Log.d("createAccount", "serverError: " + new String(volleyError.networkResponse.data));
+                                try {
+                                    JSONObject responseObject = new JSONObject(new String(volleyError.networkResponse.data));
 
-                                String firstNameError = checkForError(responseObject, "first_name");
-                                String lastNameError = checkForError(responseObject, "last_name");
-                                String rutError = checkForError(responseObject, "rut");
-                                String emailError = checkForError(responseObject, "email");
-                                String passwordError = checkForError(responseObject, "password");
+                                    String firstNameError = checkForError(responseObject, "first_name");
+                                    String lastNameError = checkForError(responseObject, "last_name");
+                                    String rutError = checkForError(responseObject, "rut");
+                                    String emailError = checkForError(responseObject, "email");
+                                    String passwordError = checkForError(responseObject, "password");
+                                    String bankNameError = checkForError(responseObject, "bank_id");
+                                    String bankAccountNumberError = checkForError(responseObject, "bank_account_number");
+                                    String bankAccountType = checkForError(responseObject, "bank_account_kind");
 
-                                if( firstNameError != null ||
-                                    lastNameError != null ||
-                                    rutError != null ||
-                                    emailError != null ||
-                                    passwordError != null) {
-                                    getSupportFragmentManager().popBackStack();
-                                    RegisterMainFragment mainFragment = (RegisterMainFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.id_main_fragment));
-                                    mainFragment.updateErrors(
-                                            firstNameError,
-                                            lastNameError,
-                                            emailError,
-                                            passwordError,
-                                            rutError);
+                                    if( firstNameError != null ||
+                                            lastNameError != null ||
+                                            rutError != null ||
+                                            emailError != null ||
+                                            passwordError != null ||
+                                            bankNameError != null ||
+                                            bankAccountNumberError != null ||
+                                            bankAccountType != null) {
 
-                                    return;
+                                        Log.d("createAccount", "-> showing RegisterMainFragment");
+
+                                        RegisterMainFragment mainFragment = (RegisterMainFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.id_main_fragment));
+                                        if(!mainFragment.isResumed()){
+                                            getSupportFragmentManager().popBackStack();
+                                        }
+                                        mainFragment.updateErrors(
+                                                firstNameError,
+                                                lastNameError,
+                                                emailError,
+                                                passwordError,
+                                                rutError,
+                                                bankNameError,
+                                                bankAccountType,
+                                                bankAccountNumberError);
+                                        return;
+                                    }
+
+                                    String firstEducational = checkForError(responseObject, "educational_institution");
+                                    String yearError = checkForError(responseObject, "enrollment_year");
+                                    String careerError = checkForError(responseObject, "career");
+
+                                    if( firstEducational == null ||
+                                            yearError == null ||
+                                            careerError == null){
+                                        Log.d("createAccount", "-> showing RegisterStudentFragment");
+                                        RegisterStudentFragment studentFragment = (RegisterStudentFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.id_student_fragment));
+                                        studentFragment.updateErrors(firstEducational, yearError, careerError);
+                                        return;
+                                    }
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
-
-                                String firstEducational = checkForError(responseObject, "educational_institution");
-                                String yearError = checkForError(responseObject, "enrollment_year");
-                                String careerError = checkForError(responseObject, "career");
-
-                                if( firstEducational == null ||
-                                    yearError == null ||
-                                    careerError == null){
-                                    RegisterStudentFragment studentFragment = (RegisterStudentFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.id_student_fragment));
-                                    studentFragment.updateErrors(firstEducational, yearError, careerError);
-                                    return;
-                                }
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
                             }
+                            return;
+                        } else if (volleyError instanceof AuthFailureError) {
+                            message = getString(R.string.error_incorrect_password_or_login);
+                        } else if (volleyError instanceof ParseError) {
+                            message = getString(R.string.error_parser);
+                        } else if (volleyError instanceof TimeoutError) {
+                            message = getString(R.string.error_timeout);
                         }
-                        return;
-                    } else if (volleyError instanceof AuthFailureError) {
-                        message = getString(R.string.error_incorrect_password_or_login);
-                    } else if (volleyError instanceof ParseError) {
-                        message = getString(R.string.error_parser);
-                    } else if (volleyError instanceof TimeoutError) {
-                        message = getString(R.string.error_timeout);
-                    }
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
-                    builder.setTitle(getString(R.string.error_creating_account));
-                    builder.setMessage(message);
-                    builder.setPositiveButton("OK",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                    builder.show();
-                }
-            })
-            .build();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
+                        builder.setTitle(getString(R.string.error_creating_account));
+                        builder.setMessage(message);
+                        builder.setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        builder.show();
+                    }
+                })
+                .build();
         sc.execute();
     }
 

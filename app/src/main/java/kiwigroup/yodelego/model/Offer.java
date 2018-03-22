@@ -1,13 +1,82 @@
 package kiwigroup.yodelego.model;
 
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by cristian on 1/21/18.
  */
 
 public class Offer implements Serializable {
+
+    private long id;
+    private String publisher;
+    private Date date;
+    private String publicationResume;
+    private boolean open;
+    private String title;
+    private int dailyWage;
+    private int hourlyWage;
+    private int totalWage;
+    private float rating;
+    private String summary;
+    private String address;
+    private String schedule;
+    private OfferStatus status;
+    private boolean applied;
+
+    public Offer(){}
+
+    public static Offer parseFromJson(JSONObject object){
+        Offer offer = new Offer();
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", Locale.US);
+        try {
+
+            Log.d("Offer", "****** " + object.toString());
+
+            offer.setId(object.getLong("id"));
+            offer.setTitle(object.getString("title"));
+            offer.setSummary(object.getString("description"));
+            offer.setPublisher(object.getString("publisher"));
+            offer.setDate(df.parse(object.getString("created_at")));
+
+            if(!object.isNull("daily_wage"))
+                offer.setDailyWage(object.getInt("daily_wage"));
+            if(!object.isNull("hourly_wage"))
+                offer.setHourlyWage(object.getInt("hourly_wage"));
+            if(!object.isNull("total_wage"))
+                offer.setTotalWage(object.getInt("total_wage"));
+
+            offer.setStatus(Offer.OfferStatus.fromInteger(object.getInt("status")));
+
+
+            if(!object.isNull("rating")){
+                try {
+                    offer.setRating(BigDecimal.valueOf(object.getDouble("rating")).floatValue());
+                } catch(Exception ex){
+                    ex.printStackTrace();
+                    offer.setRating(-1.0f);
+                }
+            } else {
+                offer.setRating(-1.0f);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return offer;
+    }
 
     public OfferStatus getStatus() {
         return status;
@@ -47,65 +116,6 @@ public class Offer implements Serializable {
 
     public void setTotalWage(int totalWage) {
         this.totalWage = totalWage;
-    }
-
-    public enum OfferStatus{
-        CANCELED,
-        ENTERED,
-        PUBLISHED,
-        PAUSED,
-        FILLED,
-        CLOSED;
-
-        public static OfferStatus fromInteger(int number) {
-            switch(number) {
-                case -1:
-                    return CANCELED;
-                case 0:
-                    return ENTERED;
-                case 1:
-                    return PUBLISHED;
-                case 2:
-                    return PAUSED;
-                case 3:
-                    return FILLED;
-                case 4:
-                    return CLOSED;
-            }
-            return null;
-        }
-    }
-
-    private long id;
-    private String publisher;
-    private Date date;
-    private String publicationResume;
-    private boolean open;
-    private String title;
-    private int dailyWage;
-    private int hourlyWage;
-    private int totalWage;
-    private String summary;
-    private String address;
-    private String schedule;
-    private OfferStatus status;
-
-
-    public Offer(){
-    }
-
-    public Offer(long id, String publisher, Date date, String publicationResume, boolean open, String title, int dailyWage, String summary, String address, String schedule, OfferStatus status) {
-        this.id = id;
-        this.publisher = publisher;
-        this.date = date;
-        this.publicationResume = publicationResume;
-        this.open = open;
-        this.title = title;
-        this.dailyWage = dailyWage;
-        this.summary = summary;
-        this.address = address;
-        this.schedule = schedule;
-        this.status = status;
     }
 
     public String getPublisher() {
@@ -170,5 +180,48 @@ public class Offer implements Serializable {
 
     public void setSchedule(String schedule) {
         this.schedule = schedule;
+    }
+
+    public boolean isApplied() {
+        return applied;
+    }
+
+    public void setApplied(boolean applied) {
+        this.applied = applied;
+    }
+
+    public float getRating() {
+        return rating;
+    }
+
+    public void setRating(float rating) {
+        this.rating = rating;
+    }
+
+    public enum OfferStatus {
+        CANCELED,
+        ENTERED,
+        PUBLISHED,
+        PAUSED,
+        FILLED,
+        CLOSED;
+
+        public static OfferStatus fromInteger(int number) {
+            switch(number) {
+                case -1:
+                    return CANCELED;
+                case 0:
+                    return ENTERED;
+                case 1:
+                    return PUBLISHED;
+                case 2:
+                    return PAUSED;
+                case 3:
+                    return FILLED;
+                case 4:
+                    return CLOSED;
+            }
+            return null;
+        }
     }
 }

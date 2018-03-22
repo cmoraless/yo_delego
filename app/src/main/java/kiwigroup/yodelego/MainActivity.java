@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -68,6 +69,14 @@ public class MainActivity extends AppCompatActivity implements OnUserFragmentsLi
                 }
             });
         displayView(R.id.action_wall);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        wallOffers = null;
+        myApplications = null;
+        getWallItemsForListener();
     }
 
     public void displayView(int viewId) {
@@ -120,9 +129,8 @@ public class MainActivity extends AppCompatActivity implements OnUserFragmentsLi
 
     @Override
     public void getEducationalInstitutions(final RegisterActivity.onEducationalInstitutionsListener listener) {
-        Log.d("MinActivity", "-call: getEducationalInstitutions");
         ServerCommunication sc = new ServerCommunication.ServerCommunicationBuilder(this, "/educational-institutions")
-            .POST()
+            .GET()
             .tokenized(false)
             .arrayReturnListener(new Response.Listener<JSONArray> (){
                 @Override
@@ -182,6 +190,14 @@ public class MainActivity extends AppCompatActivity implements OnUserFragmentsLi
     @Override
     public void getWallItems(final OnWallUpdateListener listener) {
         this.listener = listener;
+        getWallItemsForListener();
+    }
+
+    private void getWallItemsForListener() {
+        if(listener == null)
+            return;
+
+        listener.cleanWall();
         if(myApplications == null){
             getMyApplications(new OnApplicationUpdateListener() {
                 @Override
@@ -218,8 +234,8 @@ public class MainActivity extends AppCompatActivity implements OnUserFragmentsLi
 
     @Override
     public void getMoreWallItems() {
-        listener.onLoadingWallItems();
-        getWallItemsFromServer(listener, myApplications);
+        /*listener.onLoadingWallItems();
+        getWallItemsFromServer(listener, myApplications);*/
     }
 
     private void getWallItemsFromServer(final OnWallUpdateListener listener, final List<Application> myApplications) {
@@ -275,40 +291,17 @@ public class MainActivity extends AppCompatActivity implements OnUserFragmentsLi
                 @Override
                 public void onResponse(JSONArray response) {
                     if(response != null) {
-                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", Locale.US);
                         for (int i = 0; i < response.length(); i++) {
+                            Offer offer = null;
                             try {
-                                JSONObject object = response.getJSONObject(i);
-                                Offer offer = new Offer();
-
-                                Log.d("RegisterActivity", "->-> offers response : " + object.toString());
-
-                                offer.setId(object.getLong("id"));
-                                offer.setTitle(object.getString("title"));
-                                offer.setSummary(object.getString("description"));
-                                offer.setPublisher(object.getString("publisher"));
-                                offer.setDate(df.parse(object.getString("created_at")));
-
-                                if(!object.isNull("daily_wage"))
-                                    offer.setDailyWage(object.getInt("daily_wage"));
-                                if(!object.isNull("hourly_wage"))
-                                    offer.setHourlyWage(object.getInt("hourly_wage"));
-                                if(!object.isNull("total_wage"))
-                                    offer.setTotalWage(object.getInt("total_wage"));
-
-                                offer.setStatus(Offer.OfferStatus.fromInteger(object.getInt("status")));
-
+                                offer = Offer.parseFromJson(response.getJSONObject(i));
                                 for(Application application : myApplications){
-                                    if(application.getId() == offer.getId()){
-                                        offer = application;
+                                    if(application.getOfferId() == offer.getId()){
+                                        offer.setApplied(true);
                                     }
                                 }
                                 wallOffers.add(offer);
-
                             } catch (JSONException e) {
-                                e.printStackTrace();
-                                return;
-                            } catch (ParseException e) {
                                 e.printStackTrace();
                             }
                         }
@@ -405,7 +398,6 @@ public class MainActivity extends AppCompatActivity implements OnUserFragmentsLi
                     mOnApplicationUpdateListener.onApplicationsResponse(myApplications);
                 }
             }, 3000);*/
-            Log.d("RegisterActivity", "->-> get applications");
             if(MyApplicationsWS == null){
                 MyApplicationsWS = new ServerCommunication.ServerCommunicationBuilder(MainActivity.this, "applications/")
                     .GET()
@@ -414,38 +406,23 @@ public class MainActivity extends AppCompatActivity implements OnUserFragmentsLi
                         @Override
                         public void onResponse(JSONArray response) {
                             if (response != null) {
-                                Log.d("RegisterActivity", "->-> applications response : " + response.toString());
-                                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", Locale.US);
+
+                                Log.d("MainActivity", "**** applications response: " + response.toString());
+
                                 myApplications.clear();
 
-                                for (int i = 0; i < response.length(); i++) {
-                                    try {
-                                        JSONObject object = response.getJSONObject(i);
-
-                                        Application postulation = new Application();
-
-                                        /*postulation.setId(object.getLong("id"));
-                                        postulation.setTitle(object.getString("title"));
-                                        postulation.setSummary(object.getString("description"));
-                                        postulation.setPublisher(object.getString("publisher"));
-                                        postulation.setDate(df.parse(object.getString("created_at")));
-
-                                        if(!object.isNull("daily_wage"))
-                                            postulation.setDailyWage(object.getInt("daily_wage"));
-                                        if(!object.isNull("hourly_wage"))
-                                            postulation.setHourlyWage(object.getInt("hourly_wage"));
-                                        if(!object.isNull("total_wage"))
-                                            postulation.setTotalWage(object.getInt("total_wage"));
-
-                                        postulation.setStatus(Offer.OfferStatus.fromInteger(object.getInt("status")));
-
-                                        wallOffers.add(postulation);*/
-
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
+                                if(response.length() > 0){
+                                    for (int i = 0; i < response.length(); i++) {
+                                        try {
+                                            Application application = Application.parseFromJson(response.getJSONObject(i));
+                                            getOfferForApplication(application, mOnApplicationUpdateListener, response.length());
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
                                     }
+                                } else {
+                                    mOnApplicationUpdateListener.onApplicationsResponse(myApplications);
                                 }
-                                mOnApplicationUpdateListener.onApplicationsResponse(myApplications);
                             }
                             MyApplicationsWS = null;
                         }
@@ -466,7 +443,151 @@ public class MainActivity extends AppCompatActivity implements OnUserFragmentsLi
     }
 
     @Override
-    public void onListFragmentInteraction(Application application) {
+    public void onWallOfferSelected(Offer offer) {
+        if(offer.isApplied()){
+            displayView(R.id.action_applications);
+            Application application = null;
+            for(Application app : myApplications){
+                if(app.getOfferId() == offer.getId()){
+                    application = app;
+                }
+            }
+            if(application != null)
+                onApplicationSelected(application);
+        } else {
+            Intent mainIntent = new Intent().setClass(MainActivity.this, OfferDetailsActivity.class);
+            mainIntent.putExtra("offer", offer);
+            startActivity(mainIntent);
+        }
+    }
 
+    private void getOfferForApplication(final Application application,
+                                        final OnApplicationUpdateListener mOnApplicationUpdateListener,
+                                        final int expectedAmount){
+        ServerCommunication serverCommunication = new ServerCommunication.ServerCommunicationBuilder(
+                MainActivity.this,
+                String.format(Locale.US,"offers/%d/", application.getOfferId()))
+            .GET()
+            .tokenized(true)
+            .objectReturnListener(new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    if (response != null) {
+                        Offer offer = Offer.parseFromJson(response);
+                        application.setOffer(offer);
+                        myApplications.add(application);
+
+                        if (myApplications.size() == expectedAmount)
+                            mOnApplicationUpdateListener.onApplicationsResponse(myApplications);
+
+                    }
+                }
+            })
+            .errorListener(new Response.ErrorListener() {
+               @Override
+               public void onErrorResponse(VolleyError error) {
+                   error.printStackTrace();
+               }
+            }).build();
+        serverCommunication.execute();
+    }
+
+    @Override
+    public void onApplicationSelected(Application application) {
+        Intent mainIntent = new Intent().setClass(MainActivity.this, OfferDetailsActivity.class);
+        mainIntent.putExtra("application", application);
+        startActivity(mainIntent);
+    }
+
+    @Override
+    public void updateUser() {
+        ServerCommunication userSC = new ServerCommunication.ServerCommunicationBuilder(MainActivity.this, "profile/")
+                .GET()
+                .tokenized(true)
+                .objectReturnListener(new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        if(response != null) {
+                            Log.e("LoginActivity", "SCUser response " + response.toString());
+                            try {
+                                user = new User();
+                                user.setName(response.getString("first_name"));
+                                user.setLastName(response.getString("last_name"));
+                                user.setEmail(response.getString("email"));
+
+                                if(response.has("rut") && !response.isNull("rut") && !response.getString("rut").isEmpty())
+                                    user.setRut(response.getString("rut"));
+
+                                if(response.has("educational_institution") && !response.isNull("educational_institution") && !response.getString("educational_institution").isEmpty())
+                                    user.setEducationalInstitution(response.getString("educational_institution"));
+
+                                if(response.has("career") && !response.isNull("career") && !response.getString("career").isEmpty())
+                                    user.setCareer(response.getString("career"));
+
+                                if(response.has("enrollment_year") && !response.isNull("enrollment_year") && !response.getString("enrollment_year").isEmpty())
+                                    user.setEnrollmentYear(Integer.parseInt(response.getString("enrollment_year")));
+
+                                if(response.has("bank") && !response.isNull("bank") && !response.getString("bank").isEmpty())
+                                    user.setBank(response.getString("bank"));
+
+                                if(response.has("bank_account_kind") && !response.isNull("bank_account_kind"))
+                                    user.setAccountType(response.getInt("bank_account_kind"));
+
+                                if(response.has("bank_account_number") && !response.isNull("bank_account_number") && !response.getString("bank_account_number").isEmpty())
+                                    user.setAccountNumber(response.getString("bank_account_number"));
+
+
+                                Log.e("LoginActivity", "SCUser getName " + user.getName());
+                                Log.e("LoginActivity", "SCUser getLastName " + user.getLastName());
+                                Log.e("LoginActivity", "SCUser getSemesters " + user.getSemesters());
+                                Log.e("LoginActivity", "SCUser getCareer " + user.getCareer());
+                                Log.e("LoginActivity", "SCUser getEducationalInstitution " + user.getEducationalInstitution());
+                                Log.e("LoginActivity", "SCUser getEmail " + user.getEmail());
+                                Log.e("LoginActivity", "SCUser getRut " + user.getRut());
+                                Log.e("LoginActivity", "SCUser getEnrollmentYear " + user.getEnrollmentYear());
+
+
+                                ProfileFragment mainFragment = (ProfileFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.id_profile));
+                                if(mainFragment != null){
+                                    mainFragment.updateUser(user);
+                                }
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                        }
+                    }
+                })
+                .errorListener(new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        volleyError.printStackTrace();
+                        if (volleyError instanceof NetworkError) {
+                        } else if (volleyError instanceof ServerError) {
+                            try {
+                                JSONObject responseObject = new JSONObject(new String(volleyError.networkResponse.data));
+                                Log.d("startLoginProcess", "---> onErrorResponse " + responseObject.toString());
+                                String genericError = "";
+                                Iterator<String> iter = responseObject.keys();
+                                while (iter.hasNext()) {
+                                    String key = iter.next();
+                                    String errors = "";
+                                    JSONArray errorsArray = responseObject.getJSONArray(key);
+                                    for(int i = 0; i < errorsArray.length(); i++){
+                                        errors += " " + errorsArray.getString(i);
+                                    }
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        } else if (volleyError instanceof AuthFailureError) {
+                        } else if (volleyError instanceof ParseError) {
+                        } else if (volleyError instanceof TimeoutError) {
+                        }
+                    }
+                })
+                .build();
+        userSC.execute();
     }
 }

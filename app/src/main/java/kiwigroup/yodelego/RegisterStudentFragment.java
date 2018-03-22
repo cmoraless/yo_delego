@@ -45,22 +45,20 @@ public class RegisterStudentFragment extends Fragment {
     private String rut;
     private String email;
     private String password;
+    private int bank;
+    private int accountType;
+    private String account;
+
     private Map educationInstitutions;
-    private String errorUniversity;
-    private String errorCareer;
-    private String errorYear;
 
     public static RegisterStudentFragment newInstance(String firstName,
                                                       String lastName,
                                                       String rut,
                                                       String email,
-                                                      String password
-                                                      /*String career,
-                                                      String year,
-                                                      String university,
-                                                      String errorUniversity,
-                                                      String errorCareer,
-                                                      String errorYear*/) {
+                                                      String password,
+                                                      int bank,
+                                                      int accountType,
+                                                      String account) {
         RegisterStudentFragment fragment = new RegisterStudentFragment();
 
         Bundle bundle = new Bundle();
@@ -69,12 +67,10 @@ public class RegisterStudentFragment extends Fragment {
         bundle.putString("rut", rut);
         bundle.putString("email", email);
         bundle.putString("password", password);
-        /*bundle.putString("career", career);
-        bundle.putString("year", year);
-        bundle.putString("university", university);
-        bundle.putString("errorUniversity", errorUniversity);
-        bundle.putString("errorCareer", errorCareer);
-        bundle.putString("errorYear", errorYear);*/
+
+        bundle.putInt("bank", bank);
+        bundle.putInt("accountType", accountType);
+        bundle.putString("account", account);
 
         fragment.setArguments(bundle);
         return fragment;
@@ -89,10 +85,9 @@ public class RegisterStudentFragment extends Fragment {
             rut = getArguments().getString("rut");
             email = getArguments().getString("email");
             password = getArguments().getString("password");
-
-            /*errorUniversity = getArguments().getString("errorUniversity");
-            errorCareer = getArguments().getString("errorCareer");
-            errorYear = getArguments().getString("errorYear");*/
+            bank = getArguments().getInt("bank");
+            accountType = getArguments().getInt("accountType");
+            account = getArguments().getString("account");
         }
     }
 
@@ -159,24 +154,6 @@ public class RegisterStudentFragment extends Fragment {
             }
         });
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
-                android.R.layout.simple_spinner_item, new ArrayList<String>()){
-            @Override
-            public boolean isEnabled(int position){
-                return position != 0;
-            }
-            @Override
-            public View getDropDownView(int position, View convertView,
-                                        ViewGroup parent) {
-                View view = super.getDropDownView(position, convertView, parent);
-                TextView tv = (TextView) view;
-                tv.setTextColor(position == 0 ? Color.GRAY : Color.BLACK);
-                return view;
-            }
-        };
-        adapter.add("Universidad o Instituto");
-        adapter.setDropDownViewResource(R.layout.spinner_layout);
-        universitySpinner.setAdapter(adapter);
     }
 
     public void updateErrors(String errorUniversity,
@@ -188,7 +165,7 @@ public class RegisterStudentFragment extends Fragment {
     }
 
     private void attemptCreateAccount() {
-        ((TextView)universitySpinner.getSelectedView()).setError(errorUniversity);
+        ((TextView)universitySpinner.getSelectedView()).setError(null);
         careerTextView.setError(null);
         yearTextView.setError(null);
 
@@ -234,7 +211,17 @@ public class RegisterStudentFragment extends Fragment {
             signUpButton.setAlpha(.5f);
             cancelButton.setEnabled(false);
             cancelButton.setAlpha(.5f);
-            mListener.createAccount(true, firstName, lastName, rut, email, password, universityId, career, year);
+            mListener.createAccount(
+                    true,
+                    firstName,
+                    lastName,
+                    rut,
+                    email,
+                    password,
+                    universityId,
+                    career,
+                    year
+                    , bank, accountType, account);
         }
     }
 

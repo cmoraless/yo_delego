@@ -32,7 +32,7 @@
         android:layout_height="fill_parent"
         app:layoutManager="LinearLayoutManager"
         tools:context="kiwigroup.yodelego.AdjudicatedApplicationsFragment"
-        tools:listitem="@layout/fragment_postulation_item"/>
+        tools:listitem="@layout/fragment_application_item"/>
 
     <TextView
         android:id="@+id/empty"

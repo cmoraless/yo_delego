@@ -12,12 +12,14 @@
     <color name="colorDarkBackground">#f1f1f1</color>
     <color name="colorAdjudicated">#8f2bfa</color>
     <color name="colorAcademicShape">#fdaa29</color>
+    <color name="colorBankShape">#159587</color>
     <color name="colorYellowText">#81560f</color>
     <color name="colorGreyText">#787878</color>
     <color name="colorLightGreyText">#8f8f8f</color>
     <color name="colorBackgroundOfferDetails">#f6f1f2</color>
 
     <color name="colorBackgroundDark">#212121</color>
+    <color name="colorTextDark">#812a2b</color>
     <color name="colorButtons">#FC5457</color>
     <color name="colorWelcomeText">#7E292A</color>
 
@@ -42,5 +44,6 @@
     <color name="green">#47bf28</color>
     <color name="colorListHeaderBackground">#F0F1F4</color>
     <color name="light_gray">#a2a2a2</color>
+    <color name="transparent_gray">#28a2a2a2</color>
     <color name="text_black">#444</color>
 </resources>

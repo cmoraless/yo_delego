@@ -3,6 +3,7 @@ package kiwigroup.yodelego;
 import android.support.v4.app.Fragment;
 
 import kiwigroup.yodelego.model.Application;
+import kiwigroup.yodelego.model.Offer;
 
 public interface OnUserFragmentsListener {
     void closeSession();
@@ -11,5 +12,7 @@ public interface OnUserFragmentsListener {
     void getWallItems(OnWallUpdateListener listener);
     void getMoreWallItems();
     void getMyApplications(OnApplicationUpdateListener listener, boolean forceReload);
-    void onListFragmentInteraction(Application application);
+    void onWallOfferSelected(Offer offer);
+    void onApplicationSelected(Application application);
+    void updateUser();
 }

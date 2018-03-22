@@ -3,9 +3,7 @@ package kiwigroup.yodelego;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +12,6 @@ import java.util.List;
 
 import kiwigroup.yodelego.adapter.ApplicationAdapter;
 import kiwigroup.yodelego.model.Application;
-import kiwigroup.yodelego.model.Offer;
 
 public class AdjudicatedApplicationsFragment extends Fragment implements OnApplicationUpdateListener {
 
@@ -33,7 +30,7 @@ public class AdjudicatedApplicationsFragment extends Fragment implements OnAppli
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_postulation_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_application_list, container, false);
 
         recyclerView = view.findViewById(R.id.list);
         adapter = new ApplicationAdapter(mListener, Application.ApplicationStatus.ACCEPTED);

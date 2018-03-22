@@ -20,8 +20,6 @@ public class ApplicationsFragment extends Fragment {
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
-    private User user;
-
     private OnUserFragmentsListener mListener;
 
     public static ApplicationsFragment newInstance(User user) {
@@ -31,14 +29,6 @@ public class ApplicationsFragment extends Fragment {
         fragment.setArguments(bundle);
 
         return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            user = (User) getArguments().getSerializable("user");
-        }
     }
 
     @Override

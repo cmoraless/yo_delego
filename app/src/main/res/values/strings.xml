@@ -69,6 +69,11 @@
     <string name="account_created_title">Registardo con éxito</string>
     <string name="account_created">Tu cuenta ha sido creada</string>
 
+    <string name="application">Postulación</string>
+    <string name="ask_application">Estas postulando al trabajo &lt;b>%1$s&lt;/b>, luego de postular te notificaremos si te lo has adjudicado. ¿Quieres postular?</string>
+
+    <string name="applicated">Postulando</string>
+
     <string name="error_recovering_password">Error mientras recuperas tu contraseña</string>
     <string name="password_recovery_message">Password recovery success</string>
     <string name="password_recovery">Password recovery</string>
@@ -81,9 +86,10 @@
     <string name="career">Carrera</string>
     <string name="enrollment_year">Año de Ingreso</string>
 
+    <string name="account_number">Número de cuenta (Opcional)</string>
+
     <string name="rut">Rut (1111111-1)</string>
     <string name="rut_hint">1111111-1</string>
-
 
     <string name="text_wall">Muro</string>
     <string name="text_applications">Postulaciones</string>
@@ -91,6 +97,33 @@
 
     <string name="edit">editar</string>
     <string name="edit_photo">editar foto</string>
+
+    <string-array name="banks_array">
+        <item>Banco (Opcional)</item>
+        <item>BANCO ESTADO</item>
+        <item>BANCO SANTANDER</item>
+        <item>BANCO DE CHILE / EDWARDS - CITI</item>
+        <item>BANCO DE CREDITO E INVERSIONES (BCI)</item>
+        <item>BANCO BICE</item>
+        <item>BANCO ESTADO</item>
+        <item>SCOTIABANK CHILE</item>
+        <item>ITAÚ CORPBANCA</item>
+        <item>BANCO BILBAO VIZCAYA ARGENTARIA, CHILE (BBVA)</item>
+        <item>BANCO SECURITY</item>
+        <item>BANCO FALABELLA</item>
+        <item>BANCO RIPLEY</item>
+        <item>BANCO CONSORCIO</item>
+        <item>BANCO BTG PACTUAL CHILE</item>
+        <item>BANCO INTERNACIONAL</item>
+        <item>BANCO DEL DESARROLLO</item>
+    </string-array>
+
+    <string-array name="account_array">
+        <item>Tipo de cuenta (Opcional)</item>
+        <item>Cuenta Corriente</item>
+        <item>Cuenta de Ahorro</item>
+        <item>Cuenta Vista</item>
+    </string-array>
 </resources>
 
 

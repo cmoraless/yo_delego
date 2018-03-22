@@ -24,6 +24,9 @@ public class User implements Serializable {
     private int enrollmentYear;
     private int semesters;
     private String rut;
+    private String bank;
+    private int accountType;
+    private String accountNumber;
 
     public String getName() {
         return name;
@@ -118,5 +121,29 @@ public class User implements Serializable {
 
     public void setSemesters(int semesters) {
         this.semesters = semesters;
+    }
+
+    public String getBank() {
+        return bank;
+    }
+
+    public void setBank(String bank) {
+        this.bank = bank;
+    }
+
+    public int getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(int accountType) {
+        this.accountType = accountType;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
     }
 }

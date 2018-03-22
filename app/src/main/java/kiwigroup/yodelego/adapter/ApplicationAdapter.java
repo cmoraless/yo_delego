@@ -3,7 +3,6 @@ package kiwigroup.yodelego.adapter;
 import android.graphics.PorterDuff;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,6 @@ import android.widget.TextView;
 import kiwigroup.yodelego.OnUserFragmentsListener;
 import kiwigroup.yodelego.R;
 import kiwigroup.yodelego.model.Application;
-import kiwigroup.yodelego.model.Offer.OfferStatus;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -67,13 +65,13 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         if (viewType == VIEW_TYPE_ITEM) {
-            View v = inflater.inflate(R.layout.fragment_postulation_item, parent, false);
+            View v = inflater.inflate(R.layout.fragment_application_item, parent, false);
             return new ApplicationViewHolder(v);
         } else if (viewType == VIEW_TYPE_LOADING) {
             View v = inflater.inflate(R.layout.content_item_loading, parent, false);
             return new LoadingViewHolder(v);
         } else if (viewType == VIEW_TYPE_EMPTY) {
-            View v = inflater.inflate(R.layout.fragment_postulation_empty, parent, false);
+            View v = inflater.inflate(R.layout.fragment_application_empty, parent, false);
             return new EmptyViewHolder(v);
         }
         return null;
@@ -83,9 +81,8 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ApplicationViewHolder) {
             ApplicationViewHolder offerViewHolder = (ApplicationViewHolder) holder;
-            final Application offer = applications.get(position);
-
-            switch(offer.getApplicationStatus()){
+            final Application application = applications.get(position);
+            switch(application.getApplicationStatus()){
                 case CANCELED:
                     offerViewHolder.status.setText("cerrado");
                     offerViewHolder.status.getBackground().setColorFilter(
@@ -108,11 +105,20 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                             PorterDuff.Mode.SRC);
                     break;
             }
-            offerViewHolder.resume.setText(Html.fromHtml("<b>Lily Anguita</b>  publicó un nuevo trabajo"));
+            offerViewHolder.resume.setText(application.getOffer().getTitle());
             DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.US);
             otherSymbols.setDecimalSeparator(',');
             otherSymbols.setGroupingSeparator('.');
-            offerViewHolder.amount.setText(String.format("$%s", new DecimalFormat("#,###", otherSymbols).format(offer.getDailyWage())));
+            offerViewHolder.amount.setText(
+                    String.format("$%s", new DecimalFormat("#,###", otherSymbols).format(
+                            application.getOffer().getTotalWage())));
+
+            ((ApplicationViewHolder) holder).layout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.onApplicationSelected(application);
+                }
+            });
         } else if(holder instanceof LoadingViewHolder) {
             LoadingViewHolder loadingViewHolder = (LoadingViewHolder) holder;
             loadingViewHolder.progressBar.setIndeterminate(true);

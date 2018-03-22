@@ -39,7 +39,6 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
     private User user;
 
     protected void startLoginProcess(final String username, final String password){
-        Log.d("startLoginProcess", "--- startLoginProcess ---");
         this.username = username;
         this.password = password;
 
@@ -58,7 +57,6 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
                                 String token = response.getString("token");
                                 if (token != null) {
                                     ServerCommunication.setTOKEN(token);
-                                    Log.d("startLoginProcess", "---> token: " + token);
                                     getUserProfile();
                                 } else {
                                     onLoginError(getString(R.string.error_json_exception));
@@ -113,7 +111,6 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
     }
 
     protected void getUserProfile(){
-        Log.d("getUserProfile", "*****getUserProfile");
         ServerCommunication userSC = new ServerCommunication.ServerCommunicationBuilder(BaseLoginActivity.this, "profile/")
                 .GET()
                 .tokenized(true)
@@ -130,23 +127,24 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
 
                                 if(response.has("rut") && !response.isNull("rut") && !response.getString("rut").isEmpty())
                                     user.setRut(response.getString("rut"));
-                                else
-                                    user.setRut("16.508.909-k");
 
                                 if(response.has("educational_institution") && !response.isNull("educational_institution") && !response.getString("educational_institution").isEmpty())
                                     user.setEducationalInstitution(response.getString("educational_institution"));
-                                else
-                                    user.setEducationalInstitution("Universidad Técnica Federico Santa Maria");
 
                                 if(response.has("career") && !response.isNull("career") && !response.getString("career").isEmpty())
                                     user.setCareer(response.getString("career"));
-                                else
-                                    user.setCareer("Ingeniería Civil Informática");
 
                                 if(response.has("enrollment_year") && !response.isNull("enrollment_year") && !response.getString("enrollment_year").isEmpty())
                                     user.setEnrollmentYear(Integer.parseInt(response.getString("enrollment_year")));
-                                else
-                                    user.setEnrollmentYear(2009);
+
+                                if(response.has("bank") && !response.isNull("bank") && !response.getString("bank").isEmpty())
+                                    user.setBank(response.getString("bank"));
+
+                                if(response.has("bank_account_kind") && !response.isNull("bank_account_kind"))
+                                    user.setAccountType(response.getInt("bank_account_kind"));
+
+                                if(response.has("bank_account_number") && !response.isNull("bank_account_number") && !response.getString("bank_account_number").isEmpty())
+                                    user.setAccountNumber(response.getString("bank_account_number"));
 
                                 SharedPreferences sharedPref = getSharedPreferences("login", Context.MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sharedPref.edit();

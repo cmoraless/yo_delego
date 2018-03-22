@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorBackgroundOfferDetails"
     android:fitsSystemWindows="true">
 
     <android.support.design.widget.AppBarLayout
@@ -23,7 +24,7 @@
             app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Title"
             app:expandedTitleMarginStart="@dimen/activity_margin_content"
             app:titleEnabled="false"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
             <ImageView
                 android:id="@+id/header"
@@ -31,6 +32,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/wall_item_demo_image"
                 android:scaleType="centerCrop"
+                android:tint="@color/transparent_gray"
                 app:layout_collapseMode="parallax"/>
 
             <View
@@ -53,23 +55,23 @@
                 android:layout_gravity="bottom"
                 android:orientation="vertical"
                 android:layout_marginTop="?attr/actionBarSize"
-                android:background="@color/colorPrimary"
                 app:layout_collapseMode="pin">
 
                 <RelativeLayout
-                    xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginStart="16dp">
 
-                    <TextView
+                    <kiwigroup.yodelego.customui.DynamicTextView
                         android:id="@+id/title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
-                        android:text="Administración de páginas web"
+                        android:layout_marginEnd="60dp"
+                        android:maxLines="1"
+                        android:text="Administración de páginas web en la universidad de las americas"
                         android:textColor="@color/white"
                         android:textStyle="bold"
                         android:textSize="20sp" />
@@ -78,7 +80,7 @@
                         android:id="@+id/date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/colorBlackText"
+                        android:textColor="@color/white"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:text="4 min"
@@ -86,18 +88,54 @@
 
                 </RelativeLayout>
 
-                <TextView
-                    android:id="@+id/publication_owner"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginStart="16dp"
-                    android:text="publicado por Felipe Scolari"
-                    android:textColor="@color/colorBackgroundDark"
-                    android:textSize="14sp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/publication_owner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginStart="16dp"
+                        android:text="publicado por Felipe Scolari"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"/>
+
+                    <LinearLayout
+                        android:id="@+id/rating_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/publication_owner"
+                        android:layout_marginTop="2dp"
+                        android:padding="2dp"
+                        android:background="@drawable/button_rating_background"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="15dp"
+                            android:layout_height="15dp"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="1dp"
+                            android:src="@drawable/ic_star"/>
+
+                        <TextView
+                            android:id="@+id/rating"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="7dp"
+                            android:text="5.0"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            android:textSize="12sp"/>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
 
             </LinearLayout>
 
@@ -105,13 +143,11 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        xmlns:tools="http://schemas.android.com/tools"
         tools:context=".objectDetailsFragment"
-        android:background="@color/colorBackgroundOfferDetails"
+        android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <android.support.v7.widget.LinearLayoutCompat
@@ -123,16 +159,16 @@
             android:layout_marginRight="10dp"
             android:orientation="vertical">
 
-            <kiwigroup.yodelego.customui.DynamicTextView
+            <TextView
                 android:id="@+id/publication_resume"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:layout_gravity="center"
-                android:maxLines="7"
+                android:layout_gravity="left"
                 android:text="Se necesita persona con conocimiento de HTML5, para cambios en un admisnitrador web. El trabajo se pude realizar de forma remota y remunerará abonando el 30% para empezar el trabajo y el restante para cuando el trabajo este finalizado Todo bajo una clausula firmada por ambas partes para no tener inconvenientes."
                 android:textColor="@color/colorGreyText"
-                android:textSize="18sp" />
+                android:lineSpacingExtra="8dp"
+                android:textSize="16sp" />
 
             <RelativeLayout
                 xmlns:android="http://schemas.android.com/apk/res/android"

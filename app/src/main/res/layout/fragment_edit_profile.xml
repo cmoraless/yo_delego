@@ -79,7 +79,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
             android:paddingEnd="20dp"
             android:paddingStart="20dp"
             android:paddingBottom="10dp"
@@ -104,13 +103,43 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/bank_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:paddingEnd="20dp"
+            android:paddingStart="20dp"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:gravity="center|top"
+            android:layout_below="@id/academic_info"
+            android:elevation="5dp"
+            android:orientation="vertical"
+            android:background="@drawable/profile_bank_info_shape">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginTop="8dp"
+                app:srcCompat="@drawable/ic_bank"/>
+
+            <include
+                android:id="@+id/form"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                layout="@layout/content_bank_form"/>
+
+        </LinearLayout>
+
         <Button
-            android:id="@+id/sale_btn"
+            android:id="@+id/edit_btn"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="30dp"
-            android:layout_below="@id/academic_info"
+            android:layout_below="@id/bank_info"
             android:text="editar"
             android:background="@drawable/button_secondary_background"
             android:textColor="@color/colorPrimary"

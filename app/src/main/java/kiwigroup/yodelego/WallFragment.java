@@ -86,14 +86,17 @@ public class WallFragment extends Fragment implements WallAdapter.AdapterListene
 
     @Override
     public void onOfferSelected(Offer offer) {
-        Intent mainIntent = new Intent().setClass(getContext(), OfferDetailsActivity.class);
-        mainIntent.putExtra("offer", offer);
-        startActivity(mainIntent);
+        mListener.onWallOfferSelected(offer);
     }
 
     @Override
     public void onLoadMoreOffers(int page) {
         mListener.getMoreWallItems();
+    }
+
+    @Override
+    public void cleanWall() {
+        adapter.clear();
     }
 
     @Override
@@ -103,6 +106,7 @@ public class WallFragment extends Fragment implements WallAdapter.AdapterListene
 
     @Override
     public void onWallItemsResponse(List<Offer> wallOffers) {
+        Log.d("WallFragment", " ***** onWallItemsResponse: " + wallOffers.size());
         adapter.hideLoading();
         for(Offer offer : wallOffers){
             adapter.append(offer);

@@ -3,31 +3,24 @@ package kiwigroup.yodelego;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkError;
-import com.android.volley.ParseError;
-import com.android.volley.Response;
-import com.android.volley.ServerError;
-import com.android.volley.TimeoutError;
-import com.android.volley.VolleyError;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,6 +41,13 @@ public class RegisterMainFragment extends Fragment {
     private TextView textViewMail;
     private TextView textViewPassword;
     private TextView textViewConfirmPassword;
+
+    private Spinner bankSpinner;
+    private Spinner accountSpinner;
+    private TextInputEditText TextViewAccount;
+    private ArrayAdapter<String> bankAdapter;
+    private ArrayAdapter<String> accountAdapter;
+
     private CheckBox checkBoxAgree;
 
     private Button signUpButton;
@@ -58,6 +58,9 @@ public class RegisterMainFragment extends Fragment {
     private String mailError;
     private String passwordError;
     private String rutError;
+    private String bankError;
+    private String accountTypeError;
+    private String accountError;
 
     private boolean student;
     private boolean noStudent;
@@ -71,7 +74,10 @@ public class RegisterMainFragment extends Fragment {
                                                    String lastNameError,
                                                    String mailError,
                                                    String passwordError,
-                                                   String rutError) {
+                                                   String rutError,
+                                                   String bankError,
+                                                   String accountTypeError,
+                                                   String accountError) {
         RegisterMainFragment fragment = new RegisterMainFragment();
 
         Bundle bundle = new Bundle();
@@ -80,6 +86,9 @@ public class RegisterMainFragment extends Fragment {
         bundle.putString("mailError", mailError);
         bundle.putString("passwordError", passwordError);
         bundle.putString("rutError", rutError);
+        bundle.putString("bankError", bankError);
+        bundle.putString("accountTypeError", accountTypeError);
+        bundle.putString("accountError", accountError);
         fragment.setArguments(bundle);
 
         return fragment;
@@ -94,6 +103,9 @@ public class RegisterMainFragment extends Fragment {
             mailError = getArguments().getString("mailError");
             passwordError = getArguments().getString("passwordError");
             rutError = getArguments().getString("rutError");
+            bankError = getArguments().getString("bankError");
+            accountTypeError = getArguments().getString("accountTypeError");
+            accountError = getArguments().getString("accountError");
         }
     }
 
@@ -115,7 +127,6 @@ public class RegisterMainFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.d("**********", "******** onViewCreated");
         studentFormLayout = view.findViewById(R.id.email_login_form);
         baseFormLayout = view.findViewById(R.id.base_form);
         mProgressView = view.findViewById(R.id.login_progress);
@@ -132,6 +143,9 @@ public class RegisterMainFragment extends Fragment {
                     textViewMail.setEnabled(true);
                     textViewPassword.setEnabled(true);
                     textViewConfirmPassword.setEnabled(true);
+                    bankSpinner.setClickable(true);
+                    accountSpinner.setClickable(true);
+                    TextViewAccount.setEnabled(true);
                     checkBoxAgree.setEnabled(true);
                     signUpButton.setEnabled(true);
                     cancelButton.setEnabled(true);
@@ -144,6 +158,9 @@ public class RegisterMainFragment extends Fragment {
                     textViewMail.setEnabled(false);
                     textViewPassword.setEnabled(false);
                     textViewConfirmPassword.setEnabled(false);
+                    bankSpinner.setClickable(false);
+                    accountSpinner.setClickable(false);
+                    TextViewAccount.setEnabled(false);
                     checkBoxAgree.setEnabled(false);
                     signUpButton.setEnabled(false);
                     cancelButton.setEnabled(false);
@@ -166,6 +183,9 @@ public class RegisterMainFragment extends Fragment {
                     textViewPassword.setEnabled(true);
                     textViewConfirmPassword.setEnabled(true);
                     checkBoxAgree.setEnabled(true);
+                    bankSpinner.setClickable(true);
+                    accountSpinner.setClickable(true);
+                    TextViewAccount.setEnabled(true);
                     signUpButton.setEnabled(true);
                     cancelButton.setEnabled(true);
                     signUpButton.setText("FINALIZAR");
@@ -178,6 +198,9 @@ public class RegisterMainFragment extends Fragment {
                     textViewPassword.setEnabled(false);
                     textViewConfirmPassword.setEnabled(false);
                     checkBoxAgree.setEnabled(false);
+                    bankSpinner.setClickable(false);
+                    accountSpinner.setClickable(false);
+                    TextViewAccount.setEnabled(false);
                     signUpButton.setEnabled(false);
                     cancelButton.setEnabled(false);
                     signUpButton.setText("FINALIZAR");
@@ -198,8 +221,46 @@ public class RegisterMainFragment extends Fragment {
             }
         });
         textViewMail = view.findViewById(R.id.mail);
-        textViewPassword = view.findViewById(R.id.pin);
+        textViewPassword = view.findViewById(R.id.password);
         textViewConfirmPassword = view.findViewById(R.id.confirm_password);
+
+        bankSpinner = view.findViewById(R.id.bank_spinner);
+        accountSpinner = view.findViewById(R.id.account_spinner);
+        TextViewAccount = view.findViewById(R.id.account_number);
+        bankAdapter = new ArrayAdapter<String>(getContext(),
+                android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.banks_array)){
+            @Override
+            public boolean isEnabled(int position){
+                return position != 0;
+            }
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView tv = (TextView) view;
+                tv.setTextColor(position == 0 ? Color.GRAY : Color.BLACK);
+                return view;
+            }
+        };
+        bankAdapter.setDropDownViewResource(R.layout.spinner_layout);
+        bankSpinner.setAdapter(bankAdapter);
+
+        accountAdapter = new ArrayAdapter<String>(getContext(),
+                android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.account_array)){
+            @Override
+            public boolean isEnabled(int position){
+                return position != 0;
+            }
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView tv = (TextView) view;
+                tv.setTextColor(position == 0 ? Color.GRAY : Color.BLACK);
+                return view;
+            }
+        };
+        accountAdapter.setDropDownViewResource(R.layout.spinner_layout);
+        accountSpinner.setAdapter(accountAdapter);
+
         checkBoxAgree = view.findViewById(R.id.terms);
 
         signUpButton = view.findViewById(R.id.create_account_button);
@@ -224,6 +285,11 @@ public class RegisterMainFragment extends Fragment {
             textViewMail.setEnabled(true);
             textViewPassword.setEnabled(true);
             textViewConfirmPassword.setEnabled(true);
+            bankSpinner.setEnabled(true);
+            accountSpinner.setEnabled(true);
+            bankSpinner.setClickable(true);
+            accountSpinner.setClickable(true);
+            TextViewAccount.setEnabled(true);
             checkBoxAgree.setEnabled(true);
             signUpButton.setEnabled(true);
             cancelButton.setEnabled(true);
@@ -238,6 +304,13 @@ public class RegisterMainFragment extends Fragment {
                 textViewPassword.setError(passwordError);
             if(rutError != null)
                 textViewRut.setError(rutError);
+
+            if(bankError != null)
+                ((TextView)bankSpinner.getSelectedView()).setError(bankError);
+            if(accountTypeError != null)
+                ((TextView)accountSpinner.getSelectedView()).setError(accountTypeError);
+            if(accountError != null)
+                TextViewAccount.setError(accountError);
         }
     }
 
@@ -245,13 +318,43 @@ public class RegisterMainFragment extends Fragment {
                              String lastNameError,
                              String mailError,
                              String passwordError,
-                             String rutError){
+                             String rutError,
+                             String bankError,
+                             String accountTypeError,
+                             String accountError){
 
         this.firstNameError = firstNameError;
         this.lastNameError = lastNameError;
         this.mailError = mailError;
         this.passwordError = passwordError;
         this.rutError = rutError;
+        this.bankError = bankError;
+        this.accountTypeError = accountTypeError;
+        this.accountError = accountError;
+
+        signUpButton.setEnabled(true);
+        signUpButton.setAlpha(1f);
+        cancelButton.setEnabled(true);
+        cancelButton.setAlpha(1f);
+        showProgress(false);
+
+        if(firstNameError != null)
+            textViewFirstName.setError(firstNameError);
+        if(lastNameError != null)
+            textViewLastName.setError(lastNameError);
+        if(mailError != null)
+            textViewMail.setError(mailError);
+        if(passwordError != null)
+            textViewPassword.setError(passwordError);
+        if(rutError != null)
+            textViewRut.setError(rutError);
+
+        if(bankError != null)
+            ((TextView)bankSpinner.getSelectedView()).setError(bankError);
+        if(accountTypeError != null)
+            ((TextView)accountSpinner.getSelectedView()).setError(accountTypeError);
+        if(accountError != null)
+            TextViewAccount.setError(accountError);
     }
 
     private void showProgress(final boolean show) {
@@ -283,6 +386,10 @@ public class RegisterMainFragment extends Fragment {
         textViewPassword.setError(null);
         textViewConfirmPassword.setError(null);
         textViewRut.setError(null);
+        ((TextView)bankSpinner.getSelectedView()).setError(null);
+        ((TextView)accountSpinner.getSelectedView()).setError(null);
+        TextViewAccount.setError(null);
+
         checkBoxAgree.setError(null);
 
         String firstName = textViewFirstName.getText().toString();
@@ -291,6 +398,9 @@ public class RegisterMainFragment extends Fragment {
         String email = textViewMail.getText().toString();
         String password = textViewPassword.getText().toString();
         String passwordConfirm = textViewConfirmPassword.getText().toString();
+        int bank = bankSpinner.getSelectedItemPosition();
+        int accountType = accountSpinner.getSelectedItemPosition();
+        String account = TextViewAccount.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -333,6 +443,21 @@ public class RegisterMainFragment extends Fragment {
             focusView = textViewConfirmPassword;
             cancel = true;
         }
+        /*if(bank < 1){
+            ((TextView)bankSpinner.getSelectedView()).setError(getString(R.string.error_field_required));
+            focusView = bankSpinner.getSelectedView();
+            cancel = true;
+        }
+        if(accountType < 1){
+            ((TextView)accountSpinner.getSelectedView()).setError(getString(R.string.error_field_required));
+            focusView = accountSpinner.getSelectedView();
+            cancel = true;
+        }
+        if(TextUtils.isEmpty(account)){
+            TextViewAccount.setError(getString(R.string.error_field_required));
+            focusView = TextViewAccount;
+            cancel = true;
+        }*/
 
         if(!checkBoxAgree.isChecked()){
             checkBoxAgree.setError(getString(R.string.error_field_must_be_accepted));
@@ -370,16 +495,19 @@ public class RegisterMainFragment extends Fragment {
                     password,
                     -1,
                     null,
-                    null);
+                    null,
+                    bank,
+                    accountType,
+                    account.replaceAll("-", ""));
             } else if(studentButton.isChecked()){
                 RegisterStudentFragment studentFragment = RegisterStudentFragment.newInstance(
-                        firstName, lastName, rut, email, password);
+                        firstName, lastName, rut, email, password, bank, accountType, account.replaceAll("-", ""));
                 mListener.addFragmentToMainContent(studentFragment, true, getString(R.string.id_student_fragment));
             }
         }
     }
 
-    public static boolean isValidRut(String rut) {
+    private static boolean isValidRut(String rut) {
 
         boolean validacion = false;
         try {

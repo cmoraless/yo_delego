@@ -76,12 +76,12 @@
 
         <Button
             android:id="@+id/button"
-            android:layout_width="65dp"
+            android:layout_width="85dp"
             android:layout_height="19dp"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:padding="0dp"
-            android:background="@drawable/button_status_background"
+            android:background="@drawable/button_wall_status_background"
             android:text="cerrado"
             android:textColor="@color/white"
             android:textAllCaps="false"

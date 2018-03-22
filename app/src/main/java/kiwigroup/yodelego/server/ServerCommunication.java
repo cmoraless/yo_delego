@@ -77,6 +77,18 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
             return this;
         }
 
+        public ServerCommunicationBuilder PATCH(){
+            this.method = Request.Method.PATCH;
+            Log.d("Server", "TOKEN: " + TOKEN);
+            return this;
+        }
+
+        public ServerCommunicationBuilder PUT(){
+            this.method = Request.Method.PUT;
+            Log.d("Server", "TOKEN: " + TOKEN);
+            return this;
+        }
+
         public ServerCommunicationBuilder objectReturnListener(Response.Listener<JSONObject> jsonObjectListener){
             this.jsonObjectListener = jsonObjectListener;
             return this;
@@ -143,6 +155,7 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
                         public Map<String, String> getHeaders() throws AuthFailureError {
                             Map<String, String> headers = new HashMap<>();
                             headers.put("Authorization", "Token " + TOKEN);
+                            //headers.put("Content-Type", "application/json");
                             return headers;
                         }
                 };
