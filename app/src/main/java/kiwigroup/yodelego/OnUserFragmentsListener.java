@@ -7,12 +7,16 @@ import kiwigroup.yodelego.model.Offer;
 
 public interface OnUserFragmentsListener {
     void closeSession();
-    void addFragmentToMainContent(Fragment fragment, boolean addToBackStack, String fragmentId);
-    void getEducationalInstitutions(RegisterActivity.onEducationalInstitutionsListener listener);
+    void askAddFragmentToMainContent(Fragment fragment, boolean addToBackStack, String fragmentId);
+    void getEducationalInstitutions(RegisterActivity.OnEducationalInstitutionsListener listener);
+    void getCareerCategories(RegisterActivity.OnCareerCategoriesListener listener);
     void getWallItems(OnWallUpdateListener listener);
     void getMoreWallItems();
     void getMyApplications(OnApplicationUpdateListener listener, boolean forceReload);
+    void refreshWall(OnWallUpdateListener listener);
     void onWallOfferSelected(Offer offer);
-    void onApplicationSelected(Application application);
+    void onApplicationSelected(Offer application);
     void updateUser();
+    void closeNotifications();
+    void onNotificationSelected();
 }

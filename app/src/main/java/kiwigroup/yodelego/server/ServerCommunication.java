@@ -140,7 +140,6 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
 
     @Override
     protected String doInBackground(String... args) {
-        Log.d("startLoginProcess", "-> doInBackground");
         mQueue = Volley.newRequestQueue(mContext);
 
         if(jsonObjectListener != null){

@@ -128,8 +128,14 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
                                 if(response.has("rut") && !response.isNull("rut") && !response.getString("rut").isEmpty())
                                     user.setRut(response.getString("rut"));
 
+                                if(response.has("phone_number") && !response.isNull("phone_number") && !response.getString("phone_number").isEmpty())
+                                    user.setPhone(response.getString("phone_number"));
+
                                 if(response.has("educational_institution") && !response.isNull("educational_institution") && !response.getString("educational_institution").isEmpty())
                                     user.setEducationalInstitution(response.getString("educational_institution"));
+
+                                if(response.has("career_category") && !response.isNull("career_category") && !response.getString("career_category").isEmpty())
+                                    user.setCareerCategory(response.getString("career_category"));
 
                                 if(response.has("career") && !response.isNull("career") && !response.getString("career").isEmpty())
                                     user.setCareer(response.getString("career"));

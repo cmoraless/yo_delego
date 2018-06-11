@@ -1,5 +1,5 @@
 <resources>
-    <string name="server_base_url">http://173.230.137.218/</string>
+    <string name="server_base_url">https://web.yodelego.com/</string>
 
     <string name="id_main_fragment">id_main_fragment</string>
     <string name="id_student_fragment">id_student_fragment</string>
@@ -11,7 +11,7 @@
 
     <string name="adjudicated_applications_title">adjudicadas</string>
     <string name="reviewing_applications_title">revisión</string>
-    <string name="close_applications_title">cerrados</string>
+    <string name="complete_applications_title">completadas</string>
 
     <string name="app_name">YoDelego</string>
     <string name="cancel">Cancelar</string>
@@ -23,6 +23,7 @@
     <string name="first_name">Nombre</string>
     <string name="last_name">Apellido</string>
     <string name="email">Tu correo</string>
+    <string name="phone">Número de teléfono</string>
     <string name="password">Contraseña</string>
     <string name="confirm_password">Confirmar Contraseña</string>
     <string name="country">País</string>
@@ -66,7 +67,7 @@
     <string name="error_field_must_be_accepted">Este campo debe ser aceptado</string>
     <string name="error_password_must_be_same">Las contraseñas deben ser las mismas</string>
 
-    <string name="account_created_title">Registardo con éxito</string>
+    <string name="account_created_title">Registrado con éxito</string>
     <string name="account_created">Tu cuenta ha sido creada</string>
 
     <string name="application">Postulación</string>
@@ -88,8 +89,8 @@
 
     <string name="account_number">Número de cuenta (Opcional)</string>
 
-    <string name="rut">Rut (1111111-1)</string>
-    <string name="rut_hint">1111111-1</string>
+    <string name="rut">Rut (1111111k)</string>
+    <string name="rut_hint">1111111k</string>
 
     <string name="text_wall">Muro</string>
     <string name="text_applications">Postulaciones</string>

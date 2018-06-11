@@ -1,22 +1,21 @@
 package kiwigroup.yodelego;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.text.Html;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.List;
+import java.util.Locale;
+
+import kiwigroup.yodelego.model.Application;
+import kiwigroup.yodelego.model.Offer;
 import kiwigroup.yodelego.model.User;
 
 public class ProfileFragment extends Fragment {
@@ -25,13 +24,14 @@ public class ProfileFragment extends Fragment {
     private TextView rut;
 
     private TextView assigned_offers;
-    private TextView cancelled_offers;
+    private TextView complete_offers;
 
     private TextView mail;
 
     private TextView academic_description;
     private TextView edit;
     private LinearLayout academic_layout;
+    private TextView textViewRating;
 
     private User user;
     private OnUserFragmentsListener listener;
@@ -74,12 +74,13 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Fragment editFragment = ProfileEditFragment.newInstance(user);
-                listener.addFragmentToMainContent(editFragment, true, getString(R.string.id_profile_edit));
+                listener.askAddFragmentToMainContent(editFragment, true, getString(R.string.id_profile_edit));
             }
         });
         name = view.findViewById(R.id.name);
         rut = view.findViewById(R.id.rut);
         mail = view.findViewById(R.id.mail);
+        academic_description = view.findViewById(R.id.academic_description);
         view.findViewById(R.id.cancel_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,13 +88,39 @@ public class ProfileFragment extends Fragment {
             }
         });
         academic_layout = view.findViewById(R.id.academic_info);
-        assigned_offers = view.findViewById(R.id.assigned_offers);
-        cancelled_offers = view.findViewById(R.id.cancelled_offers);
+
+        assigned_offers = view.findViewById(R.id.assigned_offers_amounts);
+        complete_offers = view.findViewById(R.id.complete_offers_amount);
+
+        textViewRating = view.findViewById(R.id.rating);
+
         loadData(user);
+
+        listener.getMyApplications(new OnApplicationUpdateListener() {
+            @Override
+            public void onApplicationsResponse(List<Offer> applications) {
+                int assigned_offers_amount = 0;
+                int complete_offers_amount = 0;
+                for(Offer application : applications){
+                    if(application.getApplication().getApplicationStatus().equals(Application.ApplicationStatus.ACCEPTED)){
+                        assigned_offers_amount++;
+                    }
+                    /*if(application.getApplicationStatus().equals(Application.ApplicationStatus.)){
+                        complete_offers_amount++;
+                    }*/
+                }
+                assigned_offers.setText(String.valueOf(assigned_offers_amount));
+            }
+
+            @Override
+            public void onApplicationError(String error) {
+
+            }
+        }, false);
     }
 
     private void loadData(User user){
-        name.setText(user.getName() + " " + user.getLastName());
+        name.setText(String.format(Locale.US, "%s %s", user.getName(), user.getLastName()));
         rut.setText(user.getRut());
         mail.setText(user.getEmail());
         userType.setText(user.getEducationalInstitution() == null ? "Trabajador" : "Estudiante");
@@ -102,10 +129,13 @@ public class ProfileFragment extends Fragment {
             academic_layout.setVisibility(LinearLayout.GONE);
         } else {
             academic_layout.setVisibility(LinearLayout.VISIBLE);
-            academic_description.setText(Html.fromHtml("Estudiante de <b>" + user.getCareer() + ", en la " + user.getEducationalInstitution() + ", cursa " + user.getSemesters() + " semestre</b>"));
+            academic_description.setText(Html.fromHtml(String.format(Locale.US, "Estudiante de <b>%s, en la %s, cursa %d semestre</b>", user.getCareer(), user.getEducationalInstitution(), user.getSemesters())));
         }
+        if(user.getApplicantRating() == -1.0f)
+            textViewRating.setText("");
+        else
+            textViewRating.setText(String.format(Locale.US, "%.1f", user.getApplicantRating()));
     }
-
 
     @Override
     public void onAttach(Context context) {

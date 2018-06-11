@@ -13,6 +13,7 @@ import android.widget.TextView;
 import kiwigroup.yodelego.OnUserFragmentsListener;
 import kiwigroup.yodelego.R;
 import kiwigroup.yodelego.model.Application;
+import kiwigroup.yodelego.model.Offer;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -20,12 +21,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static kiwigroup.yodelego.model.Application.ApplicationStatus.ACCEPTED;
+import static kiwigroup.yodelego.model.Application.ApplicationStatus.REVISION;
+
 public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final int VIEW_TYPE_ITEM = 0;
     private final int VIEW_TYPE_LOADING = 1;
     private final int VIEW_TYPE_EMPTY = 2;
     private final OnUserFragmentsListener mListener;
-    private List<Application> applications;
+    private List<Offer> applications;
     private Application.ApplicationStatus statusFilter;
 
     public ApplicationAdapter(OnUserFragmentsListener listener, Application.ApplicationStatus filter) {
@@ -34,11 +38,11 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         statusFilter = filter;
     }
 
-    public void update(List<Application> applications) {
+    public void update(List<Offer> applications) {
         this.applications.clear();
-        for(Application app : applications){
-            if(app.getApplicationStatus() == statusFilter)
-                this.applications.add(app);
+        for(Offer offer : applications){
+            if(offer.getApplication().getApplicationStatus() == statusFilter)
+                this.applications.add(offer);
         }
         notifyDataSetChanged();
     }
@@ -77,12 +81,17 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return null;
     }
 
+    public void clear() {
+        applications.clear();
+        notifyDataSetChanged();
+    }
+
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ApplicationViewHolder) {
             ApplicationViewHolder offerViewHolder = (ApplicationViewHolder) holder;
-            final Application application = applications.get(position);
-            switch(application.getApplicationStatus()){
+            final Offer offer = applications.get(position);
+            switch(offer.getApplication().getApplicationStatus()){
                 case CANCELED:
                     offerViewHolder.status.setText("cerrado");
                     offerViewHolder.status.getBackground().setColorFilter(
@@ -105,25 +114,26 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                             PorterDuff.Mode.SRC);
                     break;
             }
-            offerViewHolder.resume.setText(application.getOffer().getTitle());
+            offerViewHolder.resume.setText(offer.getTitle());
             DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.US);
             otherSymbols.setDecimalSeparator(',');
             otherSymbols.setGroupingSeparator('.');
             offerViewHolder.amount.setText(
                     String.format("$%s", new DecimalFormat("#,###", otherSymbols).format(
-                            application.getOffer().getTotalWage())));
+                            offer.getTotalWage())));
 
             ((ApplicationViewHolder) holder).layout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mListener.onApplicationSelected(application);
+                    mListener.onApplicationSelected(offer);
                 }
             });
         } else if(holder instanceof LoadingViewHolder) {
             LoadingViewHolder loadingViewHolder = (LoadingViewHolder) holder;
             loadingViewHolder.progressBar.setIndeterminate(true);
         } else if(holder instanceof EmptyViewHolder) {
-            EmptyViewHolder loadingViewHolder = (EmptyViewHolder) holder;
+            EmptyViewHolder emptyViewHolder = (EmptyViewHolder) holder;
+            emptyViewHolder.resume.setText(statusFilter == ACCEPTED ? "no tienes postulaciones adjudicadas" : statusFilter == REVISION ? "no tienes postulaciones en revisión" : "no tienes postulaciones completadas");
         }
     }
 
@@ -157,9 +167,11 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     class EmptyViewHolder extends RecyclerView.ViewHolder {
+        TextView resume;
 
         EmptyViewHolder(View itemView) {
             super(itemView);
+            resume = itemView.findViewById(R.id.publication_resume);
         }
     }
 }

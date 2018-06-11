@@ -11,7 +11,6 @@
         android:id="@+id/spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="20dp"
         android:focusable="true"
@@ -21,11 +20,24 @@
         android:textColorHighlight="@color/colorBlackText"
         android:textColorHint="@color/colorPrimary" />
 
+    <Spinner
+        android:id="@+id/cat_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:spinnerMode="dialog"
+        android:layout_below="@id/spinner"
+        android:textColor="@color/colorBlackText"
+        android:textColorHighlight="@color/colorBlackText"
+        android:textColorHint="@color/colorPrimary" />
+
     <android.support.design.widget.TextInputLayout
         android:id="@+id/last_name_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/spinner"
+        android:layout_below="@id/cat_spinner"
         android:textColorHint="@color/colorBlackText"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"

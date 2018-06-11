@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,10 +42,12 @@ public class ApplicationsFragment extends Fragment {
         TabLayout tabLayout = view.findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.adjudicated_applications_title)));
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.reviewing_applications_title)));
-        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.close_applications_title)));
+        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.complete_applications_title)));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         viewPager = view.findViewById(R.id.pager);
+        viewPager.setOffscreenPageLimit(1);
+
         final PagerAdapter adapter = new PagerAdapter(((MainActivity)getContext()).getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
@@ -88,6 +89,10 @@ public class ApplicationsFragment extends Fragment {
     public class PagerAdapter extends FragmentStatePagerAdapter {
         int mNumOfTabs;
 
+        AdjudicatedApplicationsFragment mAdjudicatedApplicationsFragment;
+        ReviewingApplicationsFragment mReviewingApplicationsFragment;
+        CloseApplicationsFragment mCloseApplicationsFragment;
+
         PagerAdapter(FragmentManager fm, int NumOfTabs) {
             super(fm);
             this.mNumOfTabs = NumOfTabs;
@@ -97,11 +102,20 @@ public class ApplicationsFragment extends Fragment {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return new AdjudicatedApplicationsFragment();
+                    if(mAdjudicatedApplicationsFragment == null)
+                        mAdjudicatedApplicationsFragment = new AdjudicatedApplicationsFragment();
+                    mAdjudicatedApplicationsFragment.updateData();
+                    return mAdjudicatedApplicationsFragment;
                 case 1:
-                    return new ReviewingApplicationsFragment();
+                    if(mReviewingApplicationsFragment == null)
+                        mReviewingApplicationsFragment = new ReviewingApplicationsFragment();
+                    mReviewingApplicationsFragment.updateData();
+                    return mReviewingApplicationsFragment;
                 case 2:
-                    return new CloseApplicationsFragment();
+                    if(mCloseApplicationsFragment == null)
+                        mCloseApplicationsFragment = new CloseApplicationsFragment();
+                    mCloseApplicationsFragment.updateData();
+                    return mCloseApplicationsFragment;
                 default:
                     return null;
             }
@@ -112,4 +126,5 @@ public class ApplicationsFragment extends Fragment {
             return mNumOfTabs;
         }
     }
+
 }

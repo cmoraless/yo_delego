@@ -61,7 +61,7 @@
                     android:layout_height="45dp"
                     android:background="@drawable/button_selector"
                     android:textAllCaps="true"
-                    android:textColor="@color/white"
+                    android:textColor="@color/primary_text_dark_focused"
                     android:textOff="Sí"
                     android:textOn="Sí"
                     android:textSize="17sp" />
@@ -73,7 +73,7 @@
                     android:layout_marginLeft="55dp"
                     android:background="@drawable/button_selector"
                     android:textAllCaps="true"
-                    android:textColor="@color/white"
+                    android:textColor="@color/primary_text_dark_focused"
                     android:textOff="No"
                     android:textOn="No"
                     android:textSize="16sp" />

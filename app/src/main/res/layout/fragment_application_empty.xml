@@ -24,11 +24,11 @@
 
         <TextView
             android:id="@+id/publication_resume"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxLines="2"
             android:lineSpacingMultiplier="1"
-            android:text="no tienes publicaciones adjudicadas"
+            android:text="no tienes postulaciones adjudicadas"
             android:layout_centerVertical="true"
             android:textColor="@color/colorYellowText"
             android:textStyle="bold"

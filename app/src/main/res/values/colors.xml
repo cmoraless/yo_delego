@@ -2,6 +2,7 @@
 <resources>
 
     <color name="colorRed">#FF0000</color>
+    <color name="colorRedNotification">#f83c48</color>
     <color name="colorPrimary">#FC5457</color>
     <color name="colorPrimaryDark">#646464</color>
     <color name="colorAccent">#e0e0e0</color>
@@ -10,7 +11,7 @@
     <color name="colorMainSeparator">#D4D4D4</color>
 
     <color name="colorDarkBackground">#f1f1f1</color>
-    <color name="colorAdjudicated">#8f2bfa</color>
+    <color name="colorAdjudicated">#6645c3</color>
     <color name="colorAcademicShape">#fdaa29</color>
     <color name="colorBankShape">#159587</color>
     <color name="colorYellowText">#81560f</color>
@@ -46,4 +47,5 @@
     <color name="light_gray">#a2a2a2</color>
     <color name="transparent_gray">#28a2a2a2</color>
     <color name="text_black">#444</color>
+
 </resources>

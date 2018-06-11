@@ -1,10 +1,10 @@
 package kiwigroup.yodelego;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,16 +15,20 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import kiwigroup.yodelego.adapter.WallAdapter;
+import kiwigroup.yodelego.model.Application;
+import kiwigroup.yodelego.model.NotificationResume;
 import kiwigroup.yodelego.model.Offer;
 import kiwigroup.yodelego.model.User;
+import kiwigroup.yodelego.model.WallItem;
 
-public class WallFragment extends Fragment implements WallAdapter.AdapterListener, OnWallUpdateListener {
+public class WallFragment extends Fragment implements WallAdapter.AdapterListener, OnWallUpdateListener, SwipeRefreshLayout.OnRefreshListener {
     private User user;
     private static WallFragment fragment;
     private OnUserFragmentsListener mListener;
     private WallAdapter adapter;
     private RecyclerView wallRecyclerView;
     private EndlessRecyclerViewScrollListener listener;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     public static WallFragment newInstance(User user) {
         if(fragment == null) {
@@ -54,6 +58,12 @@ public class WallFragment extends Fragment implements WallAdapter.AdapterListene
         super.onViewCreated(view, savedInstanceState);
 
         wallRecyclerView = view.findViewById(R.id.lvWall);
+        mSwipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(
+                R.color.colorPrimary,
+                R.color.colorPrimaryDark,
+                R.color.colorPrimary);
         adapter = new WallAdapter(this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         wallRecyclerView.setLayoutManager(linearLayoutManager);
@@ -95,6 +105,16 @@ public class WallFragment extends Fragment implements WallAdapter.AdapterListene
     }
 
     @Override
+    public void closeNotifications() {
+        mListener.closeNotifications();
+    }
+
+    @Override
+    public void onNotificationSelected() {
+        mListener.onNotificationSelected();
+    }
+
+    @Override
     public void cleanWall() {
         adapter.clear();
     }
@@ -105,13 +125,20 @@ public class WallFragment extends Fragment implements WallAdapter.AdapterListene
     }
 
     @Override
-    public void onWallItemsResponse(List<Offer> wallOffers) {
-        Log.d("WallFragment", " ***** onWallItemsResponse: " + wallOffers.size());
+    public void onWallItemsResponse(List<WallItem> wallOffers) {
+        Log.d("onWallItemsResponse","->>>>>>: s" + wallOffers.size());
+        mSwipeRefreshLayout.setRefreshing(false);
         adapter.hideLoading();
-        for(Offer offer : wallOffers){
+        for(WallItem offer : wallOffers){
             adapter.append(offer);
         }
         listener.stopLoading();
+    }
+
+    @Override
+    public void onNotificationResponse(NotificationResume notificationResume) {
+        adapter.addNotificationResume(notificationResume);
+        wallRecyclerView.smoothScrollToPosition(0);
     }
 
     @Override
@@ -119,22 +146,31 @@ public class WallFragment extends Fragment implements WallAdapter.AdapterListene
 
     }
 
+    @Override
+    public void onApplicationsResponse(List<Offer> applications) {
+
+    }
+
+    @Override
+    public void onApplicationError(String error) {
+
+    }
+
+    @Override
+    public void onRefresh() {
+        mListener.refreshWall(this);
+    }
+
     public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
-        // The minimum amount of items to have below your current scroll position
-        // before loading more.
         private int visibleThreshold = 2;
-        // The current offset index of data you have loaded
         private int currentPage = 0;
-        // The total number of items in the dataset after the last load
         private int previousTotalItemCount = 0;
-        // True if we are still waiting for the last set of data to load.
         private boolean loading = true;
-        // Sets the starting page index
         private int startingPageIndex = 0;
 
         RecyclerView.LayoutManager mLayoutManager;
 
-        public EndlessRecyclerViewScrollListener(LinearLayoutManager layoutManager) {
+        EndlessRecyclerViewScrollListener(LinearLayoutManager layoutManager) {
             this.mLayoutManager = layoutManager;
         }
 
@@ -151,9 +187,6 @@ public class WallFragment extends Fragment implements WallAdapter.AdapterListene
             return maxSize;
         }
 
-        // This happens many times a second during a scroll, so be wary of the code you place here.
-        // We are given a few useful parameters to help us work out if we need to load some more data,
-        // but first we check if we are waiting for the previous load to finish.
         @Override
         public void onScrolled(RecyclerView view, int dx, int dy) {
             int lastVisibleItemPosition = 0;
@@ -161,8 +194,6 @@ public class WallFragment extends Fragment implements WallAdapter.AdapterListene
 
             lastVisibleItemPosition = ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition();
 
-            // If the total item count is zero and the previous isn't, assume the
-            // list is invalidated and should be reset back to initial state
             if (totalItemCount < previousTotalItemCount) {
                 this.currentPage = this.startingPageIndex;
                 this.previousTotalItemCount = totalItemCount;
@@ -170,10 +201,6 @@ public class WallFragment extends Fragment implements WallAdapter.AdapterListene
                     this.loading = true;
                 }
             }
-            // If it isn’t currently loading, we check to see if we have breached
-            // the visibleThreshold and need to reload more data.
-            // If we do need to reload some more data, we execute onLoadMore to fetch the data.
-            // threshold should reflect how many total columns there are too
             if (!loading && (lastVisibleItemPosition + visibleThreshold) > totalItemCount) {
                 currentPage++;
                 onLoadMore(currentPage, totalItemCount, view);
@@ -181,25 +208,20 @@ public class WallFragment extends Fragment implements WallAdapter.AdapterListene
             }
         }
 
-        public void stopLoading(){
+        void stopLoading(){
             int totalItemCount = mLayoutManager.getItemCount();
-            // If it’s still loading, we check to see if the dataset count has
-            // changed, if so we conclude it has finished loading and update the current page
-            // number and total item count.
             if (loading && (totalItemCount > previousTotalItemCount)) {
                 loading = false;
                 previousTotalItemCount = totalItemCount;
             }
         }
 
-        // Call this method whenever performing new searches
         public void resetState() {
             this.currentPage = this.startingPageIndex;
             this.previousTotalItemCount = 0;
             this.loading = true;
         }
 
-        // Defines the process for actually loading more data based on page
         public abstract void onLoadMore(int page, int totalItemsCount, RecyclerView view);
 
     }

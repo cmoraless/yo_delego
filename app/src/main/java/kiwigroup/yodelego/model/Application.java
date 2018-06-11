@@ -125,11 +125,11 @@ public class Application implements Serializable {
         this.date = date;
     }
 
-    public Offer getOffer() {
+    /*public Offer getOffer() {
         return offer;
     }
 
     public void setOffer(Offer offer) {
         this.offer = offer;
-    }
+    }*/
 }

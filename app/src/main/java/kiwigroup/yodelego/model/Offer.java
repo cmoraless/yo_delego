@@ -17,11 +17,13 @@ import java.util.Locale;
  * Created by cristian on 1/21/18.
  */
 
-public class Offer implements Serializable {
+public class Offer implements Serializable, WallItem {
 
     private long id;
     private String publisher;
-    private Date date;
+    private Date creationDate;
+    private Date startDate;
+    private Date endDate;
     private String publicationResume;
     private boolean open;
     private String title;
@@ -30,16 +32,19 @@ public class Offer implements Serializable {
     private int totalWage;
     private float rating;
     private String summary;
+    private String commune;
     private String address;
     private String schedule;
     private OfferStatus status;
     private boolean applied;
+    private Application application;
 
     public Offer(){}
 
     public static Offer parseFromJson(JSONObject object){
         Offer offer = new Offer();
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", Locale.US);
+        DateFormat df2 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         try {
 
             Log.d("Offer", "****** " + object.toString());
@@ -47,9 +52,14 @@ public class Offer implements Serializable {
             offer.setId(object.getLong("id"));
             offer.setTitle(object.getString("title"));
             offer.setSummary(object.getString("description"));
+            offer.setCommune(object.getString("commune"));
             offer.setPublisher(object.getString("publisher"));
-            offer.setDate(df.parse(object.getString("created_at")));
+            offer.setCreationDate(df.parse(object.getString("created_at")));
 
+            if(!object.isNull("start_date"))
+                offer.setStartDate(df2.parse(object.getString("start_date")));
+            if(!object.isNull("end_date"))
+                offer.setEndDate(df2.parse(object.getString("end_date")));
             if(!object.isNull("daily_wage"))
                 offer.setDailyWage(object.getInt("daily_wage"));
             if(!object.isNull("hourly_wage"))
@@ -126,12 +136,12 @@ public class Offer implements Serializable {
         this.publisher = publisher;
     }
 
-    public Date getDate() {
-        return date;
+    public Date getCreationDate() {
+        return creationDate;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
     }
 
     public boolean isOpen() {
@@ -196,6 +206,38 @@ public class Offer implements Serializable {
 
     public void setRating(float rating) {
         this.rating = rating;
+    }
+
+    public String getCommune() {
+        return commune;
+    }
+
+    public void setCommune(String commune) {
+        this.commune = commune;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public Application getApplication() {
+        return application;
+    }
+
+    public void setApplication(Application application) {
+        this.application = application;
     }
 
     public enum OfferStatus {

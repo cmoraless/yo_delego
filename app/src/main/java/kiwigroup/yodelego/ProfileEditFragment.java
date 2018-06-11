@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,7 +13,6 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +22,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
@@ -40,13 +37,14 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import kiwigroup.yodelego.model.User;
 import kiwigroup.yodelego.server.ServerCommunication;
+
+import static android.view.View.GONE;
 
 public class ProfileEditFragment extends Fragment {
     private View mProgressView;
@@ -55,6 +53,7 @@ public class ProfileEditFragment extends Fragment {
     private TextInputEditText name;
     private TextInputEditText lastName;
     private TextInputEditText rut;
+    private TextInputEditText phone;
     private TextInputEditText mail;
     private TextInputEditText password;
     private TextInputEditText confirmPassword;
@@ -72,6 +71,7 @@ public class ProfileEditFragment extends Fragment {
 
     private Spinner bankSpinner;
     private Spinner accountSpinner;
+    private Spinner categorySpinner;
     private TextInputEditText account;
     private ArrayAdapter<String> bankAdapter;
     private ArrayAdapter<String> accountAdapter;
@@ -80,6 +80,7 @@ public class ProfileEditFragment extends Fragment {
     private OnUserFragmentsListener listener;
 
     private Map educationInstitutions;
+    private Map careerCategories;
 
     public static ProfileEditFragment newInstance(User user) {
         ProfileEditFragment fragment = new ProfileEditFragment();
@@ -114,17 +115,20 @@ public class ProfileEditFragment extends Fragment {
         name = view.findViewById(R.id.first_name);
         lastName = view.findViewById(R.id.last_name);
         rut = view.findViewById(R.id.rut);
+        phone = view.findViewById(R.id.phone);
         mail = view.findViewById(R.id.mail);
         password = view.findViewById(R.id.password);
         confirmPassword = view.findViewById(R.id.confirm_password);
 
         rutLayout = view.findViewById(R.id.id_layout);
-        rutLayout.setVisibility(View.GONE);
+        //rutLayout.setVisibility(View.GONE);
         mailLayout = view.findViewById(R.id.mail_layout);
-        mailLayout.setVisibility(View.GONE);
+        mailLayout.setVisibility(GONE);
 
         studentFormLayout = view.findViewById(R.id.academic_info);
+        studentFormLayout.setVisibility(GONE);
         universitySpinner = view.findViewById(R.id.spinner);
+        categorySpinner = view.findViewById(R.id.cat_spinner);
         careerTextView = view.findViewById(R.id.career);
         yearTextView = view.findViewById(R.id.enrollment_year);
 
@@ -134,60 +138,106 @@ public class ProfileEditFragment extends Fragment {
 
         editButton = view.findViewById(R.id.edit_btn);
 
-        showProgress(true);
-        listener.getEducationalInstitutions(new RegisterActivity.onEducationalInstitutionsListener() {
-            @Override
-            public void onEducationalInstitutionsResponse(Map<String, Integer> response) {
-                educationInstitutions = response;
-                List<String> values = new ArrayList<>(response.keySet());
-                values.add(0, "Universidad o Instituto");
-                showProgress(false);
-                universityAdapter = new ArrayAdapter<String>(getContext(),
-                        android.R.layout.simple_spinner_item, values){
-                    @Override
-                    public boolean isEnabled(int position){
-                        return position != 0;
-                    }
-                    @Override
-                    public View getDropDownView(int position, View convertView,
-                                                ViewGroup parent) {
-                        View view = super.getDropDownView(position, convertView, parent);
-                        TextView tv = (TextView) view;
-                        tv.setTextColor(position == 0 ? Color.GRAY : Color.BLACK);
-                        return view;
-                    }
-                };
-                universityAdapter.setDropDownViewResource(R.layout.spinner_layout);
-                universitySpinner.setAdapter(universityAdapter);
+        if(user.getEducationalInstitution() != null && !user.getEducationalInstitution().isEmpty()) {
+            showProgress(true);
+            careerTextView.setText(user.getCareer());
+            yearTextView.setText(String.valueOf(user.getEnrollmentYear()));
 
-                if(user.getEducationalInstitution() == null || user.getEducationalInstitution().isEmpty()){
-                    studentFormLayout.setVisibility(View.GONE);
-                } else {
-                    studentFormLayout.setVisibility(View.VISIBLE);
+            listener.getEducationalInstitutions(new RegisterActivity.OnEducationalInstitutionsListener() {
+                @Override
+                public void onEducationalInstitutionsResponse(LinkedHashMap<String, Integer> response) {
+                    educationInstitutions = response;
+                    List<String> values = new ArrayList<>(response.keySet());
+                    values.add(0, "Universidad o Instituto");
+
+                    universityAdapter = new ArrayAdapter<String>(getContext(),
+                            android.R.layout.simple_spinner_item, values) {
+                        @Override
+                        public boolean isEnabled(int position) {
+                            return position != 0;
+                        }
+
+                        @Override
+                        public View getDropDownView(int position, View convertView,
+                                                    ViewGroup parent) {
+                            View view = super.getDropDownView(position, convertView, parent);
+                            TextView tv = (TextView) view;
+                            tv.setTextColor(position == 0 ? Color.GRAY : Color.BLACK);
+                            return view;
+                        }
+                    };
+                    universityAdapter.setDropDownViewResource(R.layout.spinner_layout);
+                    universitySpinner.setAdapter(universityAdapter);
+
                     int spinnerPosition = universityAdapter.getPosition(user.getEducationalInstitution());
                     universitySpinner.setSelection(spinnerPosition);
                     careerTextView.setText(user.getCareer());
-                    yearTextView.setText(String.valueOf(user.getEnrollmentYear()))  ;
+                    yearTextView.setText(String.valueOf(user.getEnrollmentYear()));
+
+                    if (educationInstitutions != null && careerCategories != null){
+                        showProgress(false);
+                        studentFormLayout.setVisibility(View.VISIBLE);
+                    }
                 }
-            }
 
-            @Override
-            public void onError(String error) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle(getString(R.string.error_network));
-                builder.setMessage(getString(R.string.error_network_details));
-                builder.setPositiveButton(getString(R.string.message_ok),
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                builder.show();
-                showProgress(false);
-            }
-        });
+                @Override
+                public void onError(String error) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setTitle(getString(R.string.error_network));
+                    builder.setMessage(getString(R.string.error_network_details));
+                    builder.setPositiveButton(getString(R.string.message_ok),
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    builder.show();
+                    if (educationInstitutions != null && careerCategories != null)
+                        showProgress(false);
+                }
+            });
 
+
+            listener.getCareerCategories(new RegisterActivity.OnCareerCategoriesListener() {
+                @Override
+                public void onCareerCategoriesResponse(LinkedHashMap<String, Integer> response) {
+                    careerCategories = response;
+                    List<String> values = new ArrayList<>(response.keySet());
+                    values.add(0, "Áreas educacionales");
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+                            android.R.layout.simple_spinner_item, values) {
+                        @Override
+                        public boolean isEnabled(int position) {
+                            return position != 0;
+                        }
+
+                        @Override
+                        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                            View view = super.getDropDownView(position, convertView, parent);
+                            TextView tv = (TextView) view;
+                            tv.setTextColor(position == 0 ? Color.GRAY : Color.BLACK);
+                            return view;
+                        }
+                    };
+                    adapter.setDropDownViewResource(R.layout.spinner_layout);
+                    categorySpinner.setAdapter(adapter);
+
+                    int spinnerPosition = adapter.getPosition(user.getCareerCategory());
+                    categorySpinner.setSelection(spinnerPosition);
+
+                    if (educationInstitutions != null && careerCategories != null){
+                        showProgress(false);
+                        studentFormLayout.setVisibility(View.VISIBLE);
+                    }
+                }
+
+                @Override
+                public void onError(String error) {
+
+                }
+            });
+        }
         bankAdapter = new ArrayAdapter<String>(getContext(),
                 android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.banks_array)){
             @Override
@@ -237,35 +287,46 @@ public class ProfileEditFragment extends Fragment {
         name.setEnabled(true);
         lastName.setText(user.getLastName());
         lastName.setEnabled(true);
-        password.setVisibility(View.GONE);
-        confirmPassword.setVisibility(View.GONE);
+        rut.setText(user.getRut());
+        rut.setEnabled(true);
+        phone.setText(user.getPhone());
+        phone.setEnabled(true);
+        password.setEnabled(true);
+        confirmPassword.setEnabled(true);
+        password.setVisibility(GONE);
+        confirmPassword.setVisibility(GONE);
 
-        int spinnerBankPosition = bankAdapter.getPosition(user.getBank().toUpperCase());
         bankSpinner.setClickable(true);
-        bankSpinner.setSelection(spinnerBankPosition);
-
-        accountSpinner.setSelection(user.getAccountType());
+        if(user.getBank() != null){
+            int spinnerBankPosition = bankAdapter.getPosition(user.getBank().toUpperCase());
+            bankSpinner.setSelection(spinnerBankPosition);
+        }
         accountSpinner.setClickable(true);
-
+        if(user.getAccountType() != -1){
+            accountSpinner.setSelection(user.getAccountType());
+        }
         account.setEnabled(true);
-        account.setText(user.getAccountNumber());
+        if(user.getAccountNumber() != null){
+            account.setText(user.getAccountNumber());
+        }
+
     }
 
     private void showProgress(final boolean show) {
         for (int i = 0; i < formLayout.getChildCount(); i++) {
             View child = formLayout.getChildAt(i);
-            child.setVisibility(show ? View.GONE : View.VISIBLE);
+            child.setVisibility(show ? GONE : View.VISIBLE);
             child.setEnabled(!show);
         }
 
         int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        mProgressView.setVisibility(show ? View.VISIBLE : GONE);
         mProgressView.animate().setDuration(shortAnimTime).alpha(
                 show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                mProgressView.setVisibility(show ? View.VISIBLE : GONE);
             }
         });
     }
@@ -291,13 +352,17 @@ public class ProfileEditFragment extends Fragment {
         name.setError(null);
         lastName.setError(null);
         mail.setError(null);
-        password.setError(null);
-        confirmPassword.setError(null);
+        //password.setError(null);
+        //confirmPassword.setError(null);
         rut.setError(null);
+        phone.setError(null);
+
         ((TextView)bankSpinner.getSelectedView()).setError(null);
         ((TextView)accountSpinner.getSelectedView()).setError(null);
-        account.setError(null);
+
         if(studentFormLayout.getVisibility() == View.VISIBLE){
+            ((TextView)categorySpinner.getSelectedView()).setError(null);
+            account.setError(null);
             ((TextView)universitySpinner.getSelectedView()).setError(null);
             careerTextView.setError(null);
             yearTextView.setError(null);
@@ -305,12 +370,18 @@ public class ProfileEditFragment extends Fragment {
 
         String firstName = name.getText().toString();
         String lastN = lastName.getText().toString();
+        String rutText = rut.getText().toString();
+        String phoneText = phone.getText().toString();
+        //String passwordText = password.getText().toString();
+        //String passwordTextConfirm = confirmPassword.getText().toString();
+
         int bank = bankSpinner.getSelectedItemPosition();
         int accountType = accountSpinner.getSelectedItemPosition();
         String acc = account.getText().toString();
 
         String university = "";
         int universityId = -1;
+        int category = -1;
         String career = "";
         String year = "";
 
@@ -318,10 +389,12 @@ public class ProfileEditFragment extends Fragment {
             university = universitySpinner.getSelectedItem().toString();
             career = careerTextView.getText().toString();
             year = yearTextView.getText().toString();
+            category = categorySpinner.getSelectedItemPosition();
         }
 
         boolean cancel = false;
         View focusView = null;
+
 
         if(TextUtils.isEmpty(firstName)){
             name.setError(getString(R.string.error_field_required));
@@ -333,6 +406,34 @@ public class ProfileEditFragment extends Fragment {
             focusView = lastName;
             cancel = true;
         }
+        if(TextUtils.isEmpty(rutText)){
+            rut.setError(getString(R.string.error_field_required));
+            focusView = rut;
+            cancel = true;
+        } else if(!isValidRut(rutText)){
+            rut.setError("el Rut no es válido");
+            focusView = rut;
+            cancel = true;
+        }
+        if(TextUtils.isEmpty(phoneText)){
+            phone.setError(getString(R.string.error_field_required));
+            focusView = phone;
+            cancel = true;
+        }
+        /*if(!passwordText.isEmpty() && !passwordTextConfirm.isEmpty()){
+            if(!TextUtils.isEmpty(passwordText) && !isPasswordValid(passwordText)) {
+                password.setError(getString(R.string.error_invalid_password));
+                focusView = password;
+                cancel = true;
+            } else if(!TextUtils.isEmpty(passwordTextConfirm)) {
+                if(!passwordTextConfirm.equals(passwordText)){
+                    confirmPassword.setError(getString(R.string.error_password_must_be_same));
+                    focusView = confirmPassword;
+                    cancel = true;
+                }
+            }
+        }*/
+
         if(studentFormLayout.getVisibility() == View.VISIBLE){
             if(educationInstitutions != null){
                 try{
@@ -372,11 +473,15 @@ public class ProfileEditFragment extends Fragment {
             updateAccount(
                     firstName,
                     lastN,
+                    rutText,
+                    phoneText,
                     universityId,
                     career,
                     year,
                     bank,
+                    category,
                     accountType,
+                    /*passwordText*/"",
                     acc.replaceAll("-", ""));
         }
     }
@@ -384,21 +489,32 @@ public class ProfileEditFragment extends Fragment {
     private void updateAccount(
                               String name,
                               String lastName,
+                              String rut,
+                              final String phone,
                               int university,
                               String career,
                               String year,
                               int bank_id,
+                              int career_area,
                               int bank_account_type,
+                              String password,
                               String bank_account_number){
         final HashMap<String, Object> args = new HashMap<>();
         args.put("first_name", name);
         args.put("last_name", lastName);
+        args.put("rut", rut);
+        args.put("phone_number", phone);
         if (university >= 0)
             args.put("educational_institution_id", university);
         if (year != null && !year.isEmpty())
             args.put("enrollment_year", year);
         if (career != null && !career.isEmpty())
             args.put("career", career);
+        if (career_area >= 0)
+            args.put("career_category_id", career_area);
+        if (!password.isEmpty()) {
+            args.put("password", password);
+        }
 
         if (bank_id >= 1 && bank_account_type >= 1 && bank_account_number != null && !bank_account_number.isEmpty()) {
             args.put("bank_id", bank_id);
@@ -440,6 +556,7 @@ public class ProfileEditFragment extends Fragment {
                                     public void onClick(DialogInterface dialog, int which) {
                                         dialog.dismiss();
                                         getActivity().getSupportFragmentManager().popBackStack();
+
 
                                         listener.updateUser();
                                     }
@@ -550,6 +667,35 @@ public class ProfileEditFragment extends Fragment {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private static boolean isValidRut(String rut) {
+
+        boolean validacion = false;
+        try {
+            rut =  rut.toUpperCase();
+            rut = rut.replace(".", "");
+            rut = rut.replace("-", "");
+            int rutAux = Integer.parseInt(rut.substring(0, rut.length() - 1));
+
+            char dv = rut.charAt(rut.length() - 1);
+
+            int m = 0, s = 1;
+            for (; rutAux != 0; rutAux /= 10) {
+                s = (s + rutAux % 10 * (9 - m++ % 6)) % 11;
+            }
+            if (dv == (char) (s != 0 ? s + 47 : 75)) {
+                validacion = true;
+            }
+
+        } catch (java.lang.NumberFormatException e) {
+        } catch (Exception e) {
+        }
+        return validacion;
+    }
+
+    private boolean isPasswordValid(String password) {
+        return password.length() > 4;
     }
 
 

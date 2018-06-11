@@ -6,6 +6,6 @@ import kiwigroup.yodelego.model.Application;
 import kiwigroup.yodelego.model.Offer;
 
 public interface OnApplicationUpdateListener {
-    void onApplicationsResponse(List<Application> applications);
+    void onApplicationsResponse(List<Offer> applications);
     void onApplicationError(String error);
 }

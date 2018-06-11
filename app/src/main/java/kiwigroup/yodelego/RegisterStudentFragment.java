@@ -2,13 +2,11 @@ package kiwigroup.yodelego;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.app.DatePickerDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -16,13 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,17 +29,17 @@ public class RegisterStudentFragment extends Fragment {
 
     private View mProgressView;
     private RelativeLayout formLayout;
-    //private TextInputEditText universityTextView;
     private Spinner universitySpinner;
+    private Spinner categoriesSpinner;
     private TextInputEditText careerTextView;
     private TextInputEditText yearTextView;
-    private TextInputLayout yearLayout;
     private Button signUpButton;
     private Button cancelButton;
 
     private String firstName;
     private String lastName;
     private String rut;
+    private String phone_number;
     private String email;
     private String password;
     private int bank;
@@ -50,21 +47,25 @@ public class RegisterStudentFragment extends Fragment {
     private String account;
 
     private Map educationInstitutions;
+    private Map careerCategories;
 
-    public static RegisterStudentFragment newInstance(String firstName,
-                                                      String lastName,
-                                                      String rut,
-                                                      String email,
-                                                      String password,
-                                                      int bank,
-                                                      int accountType,
-                                                      String account) {
+    public static RegisterStudentFragment newInstance(
+            String firstName,
+            String lastName,
+            String rut,
+            String phone,
+            String email,
+            String password,
+            int bank,
+            int accountType,
+            String account) {
         RegisterStudentFragment fragment = new RegisterStudentFragment();
 
         Bundle bundle = new Bundle();
         bundle.putString("name", firstName);
         bundle.putString("lastName", lastName);
         bundle.putString("rut", rut);
+        bundle.putString("phone_number", phone);
         bundle.putString("email", email);
         bundle.putString("password", password);
 
@@ -83,6 +84,7 @@ public class RegisterStudentFragment extends Fragment {
             firstName = getArguments().getString("name");
             lastName = getArguments().getString("lastName");
             rut = getArguments().getString("rut");
+            phone_number = getArguments().getString("phone_number");
             email = getArguments().getString("email");
             password = getArguments().getString("password");
             bank = getArguments().getInt("bank");
@@ -104,6 +106,7 @@ public class RegisterStudentFragment extends Fragment {
         mProgressView = view.findViewById(R.id.login_progress);
 
         universitySpinner = view.findViewById(R.id.spinner);
+        categoriesSpinner = view.findViewById(R.id.cat_spinner);
         careerTextView = view.findViewById(R.id.career);
         yearTextView = view.findViewById(R.id.enrollment_year);
 
@@ -123,13 +126,12 @@ public class RegisterStudentFragment extends Fragment {
         });
 
         showProgress(true);
-        mListener.getEducationalInstitutions(new RegisterActivity.onEducationalInstitutionsListener() {
+        mListener.getEducationalInstitutions(new RegisterActivity.OnEducationalInstitutionsListener() {
             @Override
-            public void onEducationalInstitutionsResponse(Map<String, Integer> response) {
+            public void onEducationalInstitutionsResponse(LinkedHashMap<String, Integer> response) {
                 educationInstitutions = response;
                 List<String> values = new ArrayList<>(response.keySet());
                 values.add(0, "Universidad o Instituto");
-                showProgress(false);
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
                         android.R.layout.simple_spinner_item, values){
                     @Override
@@ -146,6 +148,9 @@ public class RegisterStudentFragment extends Fragment {
                 };
                 adapter.setDropDownViewResource(R.layout.spinner_layout);
                 universitySpinner.setAdapter(adapter);
+
+                if(educationInstitutions != null && careerCategories != null)
+                    showProgress(false);
             }
 
             @Override
@@ -154,6 +159,38 @@ public class RegisterStudentFragment extends Fragment {
             }
         });
 
+        mListener.getCareerCategories(new RegisterActivity.OnCareerCategoriesListener() {
+            @Override
+            public void onCareerCategoriesResponse(LinkedHashMap<String, Integer> response) {
+                careerCategories = response;
+                List<String> values = new ArrayList<>(response.keySet());
+                values.add(0, "Áreas educacionales");
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+                        android.R.layout.simple_spinner_item, values){
+                    @Override
+                    public boolean isEnabled(int position){
+                        return position != 0;
+                    }
+                    @Override
+                    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                        View view = super.getDropDownView(position, convertView, parent);
+                        TextView tv = (TextView) view;
+                        tv.setTextColor(position == 0 ? Color.GRAY : Color.BLACK);
+                        return view;
+                    }
+                };
+                adapter.setDropDownViewResource(R.layout.spinner_layout);
+                categoriesSpinner.setAdapter(adapter);
+
+                if(educationInstitutions != null && careerCategories != null)
+                    showProgress(false);
+            }
+
+            @Override
+            public void onError(String error) {
+
+            }
+        });
     }
 
     public void updateErrors(String errorUniversity,
@@ -171,6 +208,10 @@ public class RegisterStudentFragment extends Fragment {
 
         String university = universitySpinner.getSelectedItem().toString();
         int universityId;
+
+        String category = categoriesSpinner.getSelectedItem().toString();
+        int categoryId;
+
         String career = careerTextView.getText().toString();
         String year = yearTextView.getText().toString();
 
@@ -192,6 +233,22 @@ public class RegisterStudentFragment extends Fragment {
             focusView = universitySpinner.getSelectedView();
             cancel = true;
         }
+
+        if(careerCategories != null){
+            try{
+                categoryId = (Integer) careerCategories.get(category);
+            } catch(Exception ex){
+                ex.printStackTrace();
+                categoryId = 0;
+            }
+        } else {
+            categoryId = 0;
+        }
+        if(categoryId < 1){
+            ((TextView)categoriesSpinner.getSelectedView()).setError(getString(R.string.error_field_required));
+            focusView = categoriesSpinner.getSelectedView();
+            cancel = true;
+        }
         if(TextUtils.isEmpty(career)){
             careerTextView.setError(getString(R.string.error_field_required));
             focusView = careerTextView;
@@ -202,7 +259,6 @@ public class RegisterStudentFragment extends Fragment {
             focusView = yearTextView;
             cancel = true;
         }
-
         if (cancel) {
             focusView.requestFocus();
         } else {
@@ -212,16 +268,20 @@ public class RegisterStudentFragment extends Fragment {
             cancelButton.setEnabled(false);
             cancelButton.setAlpha(.5f);
             mListener.createAccount(
-                    true,
-                    firstName,
-                    lastName,
-                    rut,
-                    email,
-                    password,
-                    universityId,
-                    career,
-                    year
-                    , bank, accountType, account);
+                true,
+                firstName,
+                lastName,
+                rut,
+                email,
+                phone_number,
+                password,
+                universityId,
+                categoryId,
+                career,
+                year,
+                bank,
+                accountType,
+                account);
         }
     }
 

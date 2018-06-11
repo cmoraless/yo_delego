@@ -19,7 +19,9 @@ public class User implements Serializable {
     private String name;
     private String lastName;
     private String email;
+    private String phone;
     private String educationalInstitution;
+    private String careerCategory;
     private String career;
     private int enrollmentYear;
     private int semesters;
@@ -27,6 +29,8 @@ public class User implements Serializable {
     private String bank;
     private int accountType;
     private String accountNumber;
+    private float applicantRating;
+    private float publisherRating;
 
     public String getName() {
         return name;
@@ -145,5 +149,37 @@ public class User implements Serializable {
 
     public void setAccountNumber(String accountNumber) {
         this.accountNumber = accountNumber;
+    }
+
+    public float getApplicantRating() {
+        return applicantRating;
+    }
+
+    public void setApplicantRating(float applicantRating) {
+        this.applicantRating = applicantRating;
+    }
+
+    public float getPublisherRating() {
+        return publisherRating;
+    }
+
+    public void setPublisherRating(float publisherRating) {
+        this.publisherRating = publisherRating;
+    }
+
+    public String getCareerCategory() {
+        return careerCategory;
+    }
+
+    public void setCareerCategory(String careerCategory) {
+        this.careerCategory = careerCategory;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }

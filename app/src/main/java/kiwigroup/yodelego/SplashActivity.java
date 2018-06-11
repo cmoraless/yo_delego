@@ -33,19 +33,12 @@ public class SplashActivity extends BaseLoginActivity {
             startLoginProcess(username, password);
         } else {
             final Handler handler = new Handler();
-            TimerTask task = new TimerTask() {
+            handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            goToWelcome();
-                        }
-                    });
+                    goToWelcome();
                 }
-            };
-            Timer timer = new Timer();
-            timer.schedule(task, SPLASH_SCREEN_DELAY);
+            }, SPLASH_SCREEN_DELAY);
         }
     }
 

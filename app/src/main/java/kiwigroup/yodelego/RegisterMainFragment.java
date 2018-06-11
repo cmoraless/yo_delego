@@ -39,6 +39,7 @@ public class RegisterMainFragment extends Fragment {
     private TextInputEditText textViewLastName;
     private TextInputEditText textViewRut;
     private TextView textViewMail;
+    private TextView textViewPhone;
     private TextView textViewPassword;
     private TextView textViewConfirmPassword;
 
@@ -140,6 +141,7 @@ public class RegisterMainFragment extends Fragment {
                     textViewFirstName.setEnabled(true);
                     textViewLastName.setEnabled(true);
                     textViewRut.setEnabled(true);
+                    textViewPhone.setEnabled(true);
                     textViewMail.setEnabled(true);
                     textViewPassword.setEnabled(true);
                     textViewConfirmPassword.setEnabled(true);
@@ -155,6 +157,7 @@ public class RegisterMainFragment extends Fragment {
                     textViewFirstName.setEnabled(false);
                     textViewLastName.setEnabled(false);
                     textViewRut.setEnabled(false);
+                    textViewPhone.setEnabled(false);
                     textViewMail.setEnabled(false);
                     textViewPassword.setEnabled(false);
                     textViewConfirmPassword.setEnabled(false);
@@ -179,6 +182,7 @@ public class RegisterMainFragment extends Fragment {
                     textViewFirstName.setEnabled(true);
                     textViewLastName.setEnabled(true);
                     textViewRut.setEnabled(true);
+                    textViewPhone.setEnabled(true);
                     textViewMail.setEnabled(true);
                     textViewPassword.setEnabled(true);
                     textViewConfirmPassword.setEnabled(true);
@@ -194,6 +198,7 @@ public class RegisterMainFragment extends Fragment {
                     textViewFirstName.setEnabled(false);
                     textViewLastName.setEnabled(false);
                     textViewRut.setEnabled(false);
+                    textViewPhone.setEnabled(false);
                     textViewMail.setEnabled(false);
                     textViewPassword.setEnabled(false);
                     textViewConfirmPassword.setEnabled(false);
@@ -221,6 +226,7 @@ public class RegisterMainFragment extends Fragment {
             }
         });
         textViewMail = view.findViewById(R.id.mail);
+        textViewPhone = view.findViewById(R.id.phone);
         textViewPassword = view.findViewById(R.id.password);
         textViewConfirmPassword = view.findViewById(R.id.confirm_password);
 
@@ -282,6 +288,7 @@ public class RegisterMainFragment extends Fragment {
             textViewFirstName.setEnabled(true);
             textViewLastName.setEnabled(true);
             textViewRut.setEnabled(true);
+            textViewPhone.setEnabled(true);
             textViewMail.setEnabled(true);
             textViewPassword.setEnabled(true);
             textViewConfirmPassword.setEnabled(true);
@@ -396,6 +403,7 @@ public class RegisterMainFragment extends Fragment {
         String lastName = textViewLastName.getText().toString();
         String rut = textViewRut.getText().toString();
         String email = textViewMail.getText().toString();
+        String phone = textViewPhone.getText().toString();
         String password = textViewPassword.getText().toString();
         String passwordConfirm = textViewConfirmPassword.getText().toString();
         int bank = bankSpinner.getSelectedItemPosition();
@@ -422,6 +430,11 @@ public class RegisterMainFragment extends Fragment {
         } else if(!isValidRut(rut)){
             textViewRut.setError("el Rut no es válido");
             focusView = textViewRut;
+            cancel = true;
+        }
+        if(TextUtils.isEmpty(phone)){
+            textViewPhone.setError(getString(R.string.error_field_required));
+            focusView = textViewPhone;
             cancel = true;
         }
         if(TextUtils.isEmpty(email)){
@@ -491,8 +504,10 @@ public class RegisterMainFragment extends Fragment {
                     firstName,
                     lastName,
                     rut,
+                    phone,
                     email,
                     password,
+                    -1,
                     -1,
                     null,
                     null,
@@ -501,7 +516,7 @@ public class RegisterMainFragment extends Fragment {
                     account.replaceAll("-", ""));
             } else if(studentButton.isChecked()){
                 RegisterStudentFragment studentFragment = RegisterStudentFragment.newInstance(
-                        firstName, lastName, rut, email, password, bank, accountType, account.replaceAll("-", ""));
+                        firstName, lastName, rut, phone, email, password, bank, accountType, account.replaceAll("-", ""));
                 mListener.addFragmentToMainContent(studentFragment, true, getString(R.string.id_student_fragment));
             }
         }

@@ -39,9 +39,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:orientation="vertical"
-                android:padding="5dp">
+                android:paddingLeft="10dp">
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
@@ -49,14 +49,43 @@
 
                     <kiwigroup.yodelego.customui.DynamicTextView
                         android:id="@+id/user_type"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:maxLines="1"
                         android:text="Estudiante"
-                        android:layout_weight="1"
                         android:textColor="@color/colorPrimaryText"
-                        android:textSize="15sp"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:id="@+id/rating_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_toRightOf="@id/user_type"
+                        android:layout_centerVertical="true"
+                        android:background="@drawable/button_rating_background"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="15dp"
+                            android:layout_height="15dp"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="1dp"
+                            android:src="@drawable/ic_star"/>
+
+                        <TextView
+                            android:id="@+id/rating"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="7dp"
+                            android:text="5.0"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            android:textSize="12sp"/>
+
+                    </LinearLayout>
 
                     <kiwigroup.yodelego.customui.DynamicTextView
                         android:id="@+id/edit"
@@ -64,12 +93,13 @@
                         android:layout_height="wrap_content"
                         android:maxLines="1"
                         android:text="@string/edit"
+                        android:layout_alignParentRight="true"
                         android:textAllCaps="true"
                         android:textColor="@color/white"
                         android:textSize="15sp"
                         android:textStyle="bold" />
 
-                </LinearLayout>
+                </RelativeLayout>
 
                 <kiwigroup.yodelego.customui.DynamicTextView
                     android:id="@+id/name"
@@ -77,6 +107,7 @@
                     android:layout_height="wrap_content"
                     android:maxLines="1"
                     android:text="Lily Anguita"
+                    android:includeFontPadding="false"
                     android:textColor="@color/white"
                     android:textSize="26sp"
                     android:textStyle="bold" />
@@ -111,7 +142,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:gravity="center|top"
-            android:elevation="5dp"
+            android:elevation="4dp"
             android:orientation="vertical"
             android:background="@drawable/profile_academic_info_shape">
 
@@ -127,6 +158,7 @@
                 android:layout_height="wrap_content"
                 android:maxLines="5"
                 android:gravity="center"
+                android:lineSpacingMultiplier="1.2"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginTop="10dp"
@@ -144,7 +176,7 @@
             android:layout_gravity="center_horizontal"
             android:orientation="vertical"
             android:layout_marginTop="20dp"
-            android:elevation="5dp"
+            android:elevation="4dp"
             android:background="@drawable/profile_summary_info_shape">
 
             <LinearLayout
@@ -159,10 +191,10 @@
                 <ImageView
                     android:layout_width="22dp"
                     android:layout_height="22dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="2dp"
                     app:srcCompat="@drawable/ic_awarded_works"/>
 
-                <kiwigroup.yodelego.customui.DynamicTextView
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
@@ -170,11 +202,11 @@
                     android:maxLines="2"
                     android:text="Trabajos adjudicados"
                     android:textColor="@color/colorPrimary"
-                    android:textSize="16sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
-                <kiwigroup.yodelego.customui.DynamicTextView
-                    android:id="@+id/assigned_offers"
+                <TextView
+                    android:id="@+id/assigned_offers_amounts"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="0dp"
@@ -200,22 +232,22 @@
                 <ImageView
                     android:layout_width="22dp"
                     android:layout_height="22dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="2dp"
                     app:srcCompat="@drawable/ic_canceled_works"/>
 
-                <kiwigroup.yodelego.customui.DynamicTextView
-                    android:id="@+id/cancelled_offers"
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLines="2"
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="0dp"
-                    android:text="Trabajos cancelados"
+                    android:text="Trabajos completados"
                     android:textColor="@color/colorPrimaryDark"
                     android:textStyle="bold"
-                    android:textSize="16sp" />
+                    android:textSize="18sp" />
 
-                <kiwigroup.yodelego.customui.DynamicTextView
+                <TextView
+                    android:id="@+id/complete_offers_amount"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="0dp"

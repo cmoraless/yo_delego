@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
@@ -24,12 +23,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import kiwigroup.yodelego.model.User;
 import kiwigroup.yodelego.server.ServerCommunication;
 
 public class RegisterActivity extends AppCompatActivity implements OnRegisterFragmentListener{
@@ -48,31 +46,17 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         mainFragment = RegisterMainFragment.newInstance();
-        addFragmentToMainContent(mainFragment, false, getString(R.string.id_main_fragment));
-
-        /*RegisterStudentFragment studentFragment = RegisterStudentFragment.newInstance("", "", "", "", "");
-        addFragmentToMainContent(studentFragment, false, getString(R.string.id_student_fragment));*/
+        addFragmentToMainContent(mainFragment, true, getString(R.string.id_main_fragment));
     }
 
     @Override
     public boolean onSupportNavigateUp() {
-        goToLogin();
-
-        Fragment mainFragment = getSupportFragmentManager().findFragmentByTag(getString(R.string.id_main_fragment));
-        if (mainFragment != null && mainFragment.isVisible()) {
-            goToLogin();
-        }
-        Fragment studentFragment = getSupportFragmentManager().findFragmentByTag(getString(R.string.id_student_fragment));
-        if (studentFragment != null && studentFragment.isVisible()) {
+        if(getSupportFragmentManager().getFragments().size() > 1)
             getSupportFragmentManager().popBackStack();
-        }
-        Fragment registerEndFragment = getSupportFragmentManager().findFragmentByTag(getString(R.string.id_end_fragment));
-        if (registerEndFragment != null && registerEndFragment.isVisible()) {
+        else
             goToLogin();
-        }
         return true;
     }
-
 
     @Override
     public void addFragmentToMainContent(Fragment fragment, boolean addToBackStack, String fragmentId) {
@@ -89,7 +73,7 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
     }
 
     @Override
-    public void getEducationalInstitutions(final onEducationalInstitutionsListener listener) {
+    public void getEducationalInstitutions(final OnEducationalInstitutionsListener listener) {
         Log.d("RegisterActivity", "-call: getEducationalInstitutions");
         ServerCommunication sc = new ServerCommunication.ServerCommunicationBuilder(this, "/educational-institutions")
                 .GET()
@@ -98,7 +82,7 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
                     @Override
                     public void onResponse(JSONArray response) {
                         if(response != null) {
-                            Map<String, Integer> educational = new HashMap<>();
+                            LinkedHashMap<String, Integer> educational = new LinkedHashMap<>();
                             for (int i = 0; i < response.length(); i++) {
                                 try {
                                     JSONObject object = response.getJSONObject(i);
@@ -147,13 +131,73 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
     }
 
     @Override
+    public void getCareerCategories(final OnCareerCategoriesListener listener) {
+        Log.d("RegisterActivity", "-call: getCareerCategories");
+        ServerCommunication sc = new ServerCommunication.ServerCommunicationBuilder(this, "/career-categories")
+                .GET()
+                .tokenized(false)
+                .arrayReturnListener(new Response.Listener<JSONArray> (){
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        if(response != null) {
+                            LinkedHashMap<String, Integer> categories = new LinkedHashMap<>();
+                            for (int i = 0; i < response.length(); i++) {
+                                try {
+                                    JSONObject object = response.getJSONObject(i);
+                                    Log.d("RegisterActivity", "-call: getCareerCategories " + object.toString());
+                                    int id = object.getInt("id");
+                                    String name = object.getString("name");
+                                    categories.put(name, id);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                    listener.onError(getString(R.string.error_json_exception));
+                                    return;
+                                }
+                            }
+                            listener.onCareerCategoriesResponse(categories);
+                        }
+                    }
+                })
+                .errorListener(new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Log.d("RegisterActivity", "volleyError: " + volleyError.toString());
+                        String message = "";
+                        if (volleyError instanceof NetworkError) {
+                            message = getString(R.string.error_network);
+                        } else if (volleyError instanceof ServerError) {
+                            if(volleyError.networkResponse != null){
+                                try {
+                                    JSONObject responseObject = new JSONObject(new String(volleyError.networkResponse.data));
+                                    JSONObject errorsObject = responseObject.getJSONObject("error");
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        } else if (volleyError instanceof AuthFailureError) {
+                            message = getString(R.string.error_incorrect_password_or_login);
+                        } else if (volleyError instanceof ParseError) {
+                            message = getString(R.string.error_parser);
+                        } else if (volleyError instanceof TimeoutError) {
+                            message = getString(R.string.error_timeout);
+                        }
+                        listener.onError(message);
+                    }
+                })
+                .build();
+        sc.execute();
+    }
+
+    @Override
     public void createAccount(boolean student,
                               String name,
                               String lastName,
                               String rut,
                               final String email,
+                              final String phone,
                               final String password,
                               int university,
+                              int career_area,
                               String career,
                               String year,
                               int bank_id,
@@ -164,9 +208,12 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
         args.put("last_name", lastName);
         args.put("rut", rut);
         args.put("email", email);
+        args.put("phone_number", phone);
         args.put("password", password);
         if (university >= 0)
             args.put("educational_institution_id", university);
+        if (career_area >= 0)
+            args.put("career_category_id", career_area);
         if (year != null)
             args.put("enrollment_year", year);
         if (career != null)
@@ -194,6 +241,18 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
     }
 
     private void callServer(HashMap<String, Object> args, final String email, final String password){
+        for (Iterator i = args.keySet().iterator(); i.hasNext(); ) {
+            String key = (String) i.next();
+            if(args.get(key) instanceof String){
+                String value = (String) args.get(key);
+                Log.d("Register", key + " = " + value);
+            }
+            if(args.get(key) instanceof Integer){
+                Integer value = (Integer) args.get(key);
+                Log.d("Register", key + " = " + value);
+            }
+        }
+
         ServerCommunication sc = new ServerCommunication.ServerCommunicationBuilder(this, "users/")
                 .POST()
                 .tokenized(false)
@@ -207,7 +266,10 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
                         editor.putString("password", password);
                         editor.apply();
 
-                        AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
+                        endFragment = RegisterEndFragment.newInstance();
+                        addFragmentToMainContent(endFragment, false, getString(R.string.id_end_fragment));
+
+                        /*AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
                         builder.setTitle(getString(R.string.account_created_title));
                         builder.setMessage(getString(R.string.account_created));
                         builder.setPositiveButton("OK",
@@ -215,11 +277,10 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         dialog.dismiss();
-                                        endFragment = RegisterEndFragment.newInstance();
-                                        addFragmentToMainContent(endFragment, false, getString(R.string.id_end_fragment));
+
                                     }
                                 });
-                        builder.show();
+                        builder.show();*/
                     }
                 })
                 .errorListener(new Response.ErrorListener() {
@@ -351,9 +412,13 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
         return null;
     }
 
-    public interface onEducationalInstitutionsListener {
-        void onEducationalInstitutionsResponse(Map<String, Integer> response);
+    public interface OnEducationalInstitutionsListener {
+        void onEducationalInstitutionsResponse(LinkedHashMap<String, Integer> response);
         void onError(String error);
     }
 
+    public interface OnCareerCategoriesListener {
+        void onCareerCategoriesResponse(LinkedHashMap<String, Integer> response);
+        void onError(String error);
+    }
 }

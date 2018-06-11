@@ -1,13 +1,9 @@
 package kiwigroup.yodelego;
 
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.Context;
+import android.app.Activity;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -19,10 +15,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
@@ -44,23 +40,29 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 
-import angtrim.com.fivestarslibrary.FiveStarsDialog;
 import kiwigroup.yodelego.model.Application;
 import kiwigroup.yodelego.model.Offer;
-import kiwigroup.yodelego.model.User;
 import kiwigroup.yodelego.server.ServerCommunication;
+
+import static android.view.View.GONE;
 
 public class OfferDetailsActivity extends AppCompatActivity {
 
     private TextView publicationOwner;
-    private Button accept_button;
+    private LinearLayout accept_button;
+    private LinearLayout bottom_message;
+    private TextView bottom_message_text;
+    private TextView textViewButtonText;
+    private ImageView imageViewButton;
     private Offer offer;
-    private Application application;
-    private TextView TextViewTitle;
-    private TextView textViewDate;
+    private TextView textViewTitle;
+    private TextView textViewCreationDate;
+    private RelativeLayout taskDatesLayout;
+    private TextView textViewDates;
     private TextView textViewResume;
     private TextView textViewAmount;
     private TextView textViewRating;
+    private TextView textViewAddress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,12 +78,20 @@ public class OfferDetailsActivity extends AppCompatActivity {
         }
 
         publicationOwner = findViewById(R.id.publication_owner);
-        TextViewTitle = findViewById(R.id.title);
-        textViewDate = findViewById(R.id.date);
+        textViewTitle = findViewById(R.id.title);
+        textViewCreationDate = findViewById(R.id.creationDate);
+        taskDatesLayout = findViewById(R.id.task_dates_layout);
+        textViewDates = findViewById(R.id.dates);
         textViewResume = findViewById(R.id.publication_resume);
         textViewAmount = findViewById(R.id.dailyWage);
         accept_button = findViewById(R.id.accept_button);
+        bottom_message = findViewById(R.id.bottom_message_bar);
+        bottom_message_text = findViewById(R.id.bottom_message_text);
+        textViewButtonText = findViewById(R.id.button_text);
+        imageViewButton = findViewById(R.id.button_icon);
+
         textViewRating = findViewById(R.id.rating);
+        textViewAddress = findViewById(R.id.address);
 
         accept_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,11 +121,13 @@ public class OfferDetailsActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         if(getIntent().hasExtra("offer")){
             offer = (Offer) bundle.getSerializable("offer");
-            setUpForOffer(offer);
-        }
-        if(getIntent().hasExtra("application")){
-            application = (Application) bundle.getSerializable("application");
-            setUpForApplication(application);
+            if(offer != null)
+                if(offer.isApplied()) {
+                    setUpForOffer(offer);
+                    setUpForApplication(offer.getApplication());
+                } else {
+                    setUpForOffer(offer);
+                }
         }
     }
 
@@ -124,85 +136,74 @@ public class OfferDetailsActivity extends AppCompatActivity {
         otherSymbols.setDecimalSeparator(',');
         otherSymbols.setGroupingSeparator('.');
         publicationOwner.setText(Html.fromHtml(String.format("publicado por <b>%s</b>", offer.getPublisher())));
-        TextViewTitle.setText(offer.getTitle());
-        textViewDate.setText(DateUtils.getRelativeTimeSpanString(offer.getDate().getTime(), new Date().getTime(),0L, DateUtils.FORMAT_ABBREV_ALL));
+        textViewTitle.setText(offer.getTitle());
+        textViewCreationDate.setText(DateUtils.getRelativeTimeSpanString(offer.getCreationDate().getTime(), new Date().getTime(),0L, DateUtils.FORMAT_ABBREV_ALL));
         textViewResume.setText(offer.getSummary());
+        textViewAddress.setText(offer.getCommune());
+        if(offer.getStartDate() != null && offer.getEndDate() != null && !offer.getStartDate().equals(offer.getEndDate())){
+            textViewDates.setText(
+                    String.format(Locale.US, "%s a %s",
+                            DateUtils.getRelativeTimeSpanString(offer.getStartDate().getTime(), new Date().getTime(), 0L, DateUtils.FORMAT_ABBREV_ALL),
+                            DateUtils.getRelativeTimeSpanString(offer.getEndDate().getTime(), new Date().getTime(), 0L, DateUtils.FORMAT_ABBREV_ALL)));
+        } else if((offer.getStartDate() != null)){
+            textViewDates.setText(
+                    String.format(Locale.US, "%s",
+                            DateUtils.getRelativeTimeSpanString(offer.getStartDate().getTime(), new Date().getTime(), 0L, DateUtils.FORMAT_ABBREV_ALL)));
+        } else {
+            taskDatesLayout.setVisibility(GONE);
+        }
+        accept_button.setVisibility(View.VISIBLE);
+
         textViewAmount.setText(String.format("$%s", new DecimalFormat("#,###", otherSymbols).format(offer.getTotalWage())));
         if(offer.getStatus() != Offer.OfferStatus.ENTERED){
-            accept_button.setText("cerrada");
+            /*textViewButtonText.setText("Cerrado");
             accept_button.setEnabled(false);
             accept_button.getBackground().setColorFilter(
                     ContextCompat.getColor(getApplicationContext(),
                             R.color.colorLightGreyText),
                     PorterDuff.Mode.SRC);
-            for (Drawable drawable : accept_button.getCompoundDrawablesRelative()) {
-                if(drawable != null) {
-                    drawable.setColorFilter(ContextCompat.getColor(getApplicationContext(),
-                            R.color.colorLightGreyText), PorterDuff.Mode.SRC);
-                }
-            }
+            imageViewButton.setVisibility(GONE);*/
+            accept_button.setVisibility(GONE);
+            bottom_message.setVisibility(View.VISIBLE);
+            bottom_message_text.setText("Lamentablemente estas oferta ha sido cerrada.");
         }
         if(offer.getRating() == -1.0f)
             textViewRating.setText("");
         else
-            textViewRating.setText(String.format("%.1f", offer.getRating()));
+            textViewRating.setText(String.format(Locale.US, "%.1f", offer.getRating()));
     }
-
 
     DialogInterface currenRatingDialog;
 
     private void setUpForApplication(final Application application){
-        setUpForOffer(application.getOffer());
         if(application.getApplicationStatus() == Application.ApplicationStatus.ACCEPTED){
-            accept_button.setText("adjudicada");
             accept_button.setEnabled(false);
+            textViewButtonText.setText("adjudicada");
             accept_button.getBackground().setColorFilter(
                     ContextCompat.getColor(getApplicationContext(),
                             R.color.colorAdjudicated),
                     PorterDuff.Mode.SRC);
-            for (Drawable drawable : accept_button.getCompoundDrawablesRelative()) {
-                if(drawable != null) {
-                    drawable.setColorFilter(ContextCompat.getColor(getApplicationContext(),
-                            R.color.colorAdjudicated), PorterDuff.Mode.SRC);
-                }
-            }
+            imageViewButton.setVisibility(View.VISIBLE);
+            imageViewButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_accepted_offer));
         } else if(application.getApplicationStatus() == Application.ApplicationStatus.REJECTED) {
-            accept_button.setText("no adjudicada");
-            accept_button.setEnabled(false);
-            accept_button.getBackground().setColorFilter(
-                    ContextCompat.getColor(getApplicationContext(),
-                            R.color.colorLightGreyText),
-                    PorterDuff.Mode.SRC);
-            for (Drawable drawable : accept_button.getCompoundDrawablesRelative()) {
-                if(drawable != null) {
-                    drawable.setColorFilter(ContextCompat.getColor(getApplicationContext(),
-                            R.color.colorLightGreyText), PorterDuff.Mode.SRC);
-                }
-            }
+            accept_button.setVisibility(GONE);
+            bottom_message.setVisibility(View.VISIBLE);
+            bottom_message_text.setText("Lamentablemente no has sido seleccionado para esta tarea.");
         } else if(application.getApplicationStatus() == Application.ApplicationStatus.REVISION) {
-            accept_button.setText("en revisión");
-            accept_button.setEnabled(false);
-            accept_button.getBackground().setColorFilter(
-                    ContextCompat.getColor(getApplicationContext(),
-                            R.color.colorAcademicShape),
-                    PorterDuff.Mode.SRC);
-            for (Drawable drawable : accept_button.getCompoundDrawablesRelative()) {
-                if(drawable != null) {
-                    drawable.setColorFilter(ContextCompat.getColor(getApplicationContext(),
-                            R.color.colorAcademicShape), PorterDuff.Mode.SRC);
-                }
-            }
+            accept_button.setVisibility(GONE);
+            bottom_message.setVisibility(View.VISIBLE);
+            bottom_message_text.setText("Ya has postulado a esta tarea, te avisaremos cuando sea adjudicada.");
         }
         if(application.getRating() == -1.0f)
             textViewRating.setText("");
         else
-            textViewRating.setText(String.format("%.1f", application.getRating()));
+            textViewRating.setText(String.format(Locale.US, "%.1f", application.getRating()));
 
         View ratingLayout = findViewById(R.id.rating_layout);
         ratingLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(application.getRating() == -1.0f){
+                /*if(application.getRating() == -1.0f){
                     DialogInterface di = null;
                     final AlertDialog.Builder builder = new AlertDialog.Builder(OfferDetailsActivity.this);
                     LayoutInflater inflater = getLayoutInflater();
@@ -217,7 +218,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
                     });
                     builder.setView(view);
                     builder.setTitle("Calificación de postulación");
-                    builder.setMessage(Html.fromHtml("¿Qué calificación le das a <b>" + application.getOffer().getTitle()+ "</b>?"));
+                    builder.setMessage(Html.fromHtml("¿Qué calificación le das a <b>" + offer.getTitle()+ "</b>?"));
                     builder.setCancelable(false);
                     builder.setPositiveButton("Cancelar", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
@@ -225,10 +226,19 @@ public class OfferDetailsActivity extends AppCompatActivity {
                         }
                     });
                     currenRatingDialog = builder.show();
-                }
+                }*/
             }
         });
     }
+
+    @Override
+    public void onBackPressed() {
+        Intent returnIntent = new Intent();
+        setResult(accepted_offer ? Activity.RESULT_OK : Activity.RESULT_CANCELED, returnIntent);
+        super.onBackPressed();
+    }
+
+    boolean accepted_offer;
 
     protected void acceptOffer(){
         Log.d("OfferDetailsActivity", "--- accept offers process ---");
@@ -240,9 +250,9 @@ public class OfferDetailsActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d("OfferDetailsActivity", "onResponse: " + response.toString());
-                        accept_button.setBackgroundColor(getResources().getColor(R.color.colorAcademicShape));
-                        accept_button.setText(R.string.applicated);
-                        accept_button.setEnabled(false);
+                        accept_button.setVisibility(GONE);
+                        bottom_message.setVisibility(View.VISIBLE);
+                        accepted_offer = true;
                     }
                 })
                 .errorListener(new Response.ErrorListener() {
@@ -280,6 +290,8 @@ public class OfferDetailsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
+            Intent returnIntent = new Intent();
+            setResult(accepted_offer ? Activity.RESULT_OK : Activity.RESULT_CANCELED, returnIntent);
             finish();
         }
         return super.onOptionsItemSelected(item);
@@ -290,14 +302,14 @@ public class OfferDetailsActivity extends AppCompatActivity {
         args.put("rating", rating);
 
         ServerCommunication sc = new ServerCommunication.ServerCommunicationBuilder(this,
-            String.format(Locale.US,"applications/%d/reviews/", application.getId()))
+            String.format(Locale.US,"applications/%d/reviews/", offer.getId()))
             .POST()
             .tokenized(true)
             .parameters(args)
             .objectReturnListener(new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    application.setRating(rating);
+                    offer.setRating(rating);
                     textViewRating.setText(String.format("%.1f", rating));
                 }
             })
