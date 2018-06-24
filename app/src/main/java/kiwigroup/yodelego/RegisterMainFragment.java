@@ -493,13 +493,12 @@ public class RegisterMainFragment extends Fragment {
         if (cancel) {
             focusView.requestFocus();
         } else {
-            showProgress(true);
-            signUpButton.setEnabled(false);
-            signUpButton.setAlpha(.5f);
-            cancelButton.setEnabled(false);
-            cancelButton.setAlpha(.5f);
-
             if(noStudentButton.isChecked()) {
+                showProgress(true);
+                signUpButton.setEnabled(false);
+                signUpButton.setAlpha(.5f);
+                cancelButton.setEnabled(false);
+                cancelButton.setAlpha(.5f);
                 mListener.createAccount(false,
                     firstName,
                     lastName,

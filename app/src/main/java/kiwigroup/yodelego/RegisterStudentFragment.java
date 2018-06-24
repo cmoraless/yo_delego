@@ -18,6 +18,8 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,8 +31,8 @@ public class RegisterStudentFragment extends Fragment {
 
     private View mProgressView;
     private RelativeLayout formLayout;
-    private Spinner universitySpinner;
-    private Spinner categoriesSpinner;
+    private SearchableSpinner universitySpinner;
+    private SearchableSpinner categoriesSpinner;
     private TextInputEditText careerTextView;
     private TextInputEditText yearTextView;
     private Button signUpButton;
@@ -125,27 +127,20 @@ public class RegisterStudentFragment extends Fragment {
             }
         });
 
+        universitySpinner.setTitle("Universidad o Instituto");
+        universitySpinner.setPositiveButton("OK");
+
+        categoriesSpinner.setTitle("Área de estudio");
+        categoriesSpinner.setPositiveButton("OK");
+
         showProgress(true);
         mListener.getEducationalInstitutions(new RegisterActivity.OnEducationalInstitutionsListener() {
             @Override
             public void onEducationalInstitutionsResponse(LinkedHashMap<String, Integer> response) {
                 educationInstitutions = response;
                 List<String> values = new ArrayList<>(response.keySet());
-                values.add(0, "Universidad o Instituto");
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
-                        android.R.layout.simple_spinner_item, values){
-                    @Override
-                    public boolean isEnabled(int position){
-                        return position != 0;
-                    }
-                    @Override
-                    public View getDropDownView(int position, View convertView, ViewGroup parent) {
-                        View view = super.getDropDownView(position, convertView, parent);
-                        TextView tv = (TextView) view;
-                        tv.setTextColor(position == 0 ? Color.GRAY : Color.BLACK);
-                        return view;
-                    }
-                };
+                        android.R.layout.simple_spinner_item, values);
                 adapter.setDropDownViewResource(R.layout.spinner_layout);
                 universitySpinner.setAdapter(adapter);
 
@@ -164,21 +159,8 @@ public class RegisterStudentFragment extends Fragment {
             public void onCareerCategoriesResponse(LinkedHashMap<String, Integer> response) {
                 careerCategories = response;
                 List<String> values = new ArrayList<>(response.keySet());
-                values.add(0, "Áreas educacionales");
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
-                        android.R.layout.simple_spinner_item, values){
-                    @Override
-                    public boolean isEnabled(int position){
-                        return position != 0;
-                    }
-                    @Override
-                    public View getDropDownView(int position, View convertView, ViewGroup parent) {
-                        View view = super.getDropDownView(position, convertView, parent);
-                        TextView tv = (TextView) view;
-                        tv.setTextColor(position == 0 ? Color.GRAY : Color.BLACK);
-                        return view;
-                    }
-                };
+                        android.R.layout.simple_spinner_item, values);
                 adapter.setDropDownViewResource(R.layout.spinner_layout);
                 categoriesSpinner.setAdapter(adapter);
 

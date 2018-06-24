@@ -165,7 +165,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
             imageViewButton.setVisibility(GONE);*/
             accept_button.setVisibility(GONE);
             bottom_message.setVisibility(View.VISIBLE);
-            bottom_message_text.setText("Lamentablemente estas oferta ha sido cerrada.");
+            bottom_message_text.setText("Lamentablemente esta oferta ha sido cerrada.");
         }
         if(offer.getRating() == -1.0f)
             textViewRating.setText("");
@@ -192,7 +192,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
         } else if(application.getApplicationStatus() == Application.ApplicationStatus.REVISION) {
             accept_button.setVisibility(GONE);
             bottom_message.setVisibility(View.VISIBLE);
-            bottom_message_text.setText("Ya has postulado a esta tarea, te avisaremos cuando sea adjudicada.");
+            bottom_message_text.setText("Has postulado a esta tarea, te avisaremos cuando sea adjudicada.");
         }
         if(application.getRating() == -1.0f)
             textViewRating.setText("");

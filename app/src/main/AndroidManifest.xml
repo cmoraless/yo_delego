@@ -35,7 +35,7 @@
         <activity
             android:name=".RegisterActivity"
             android:label="Registro"
-            android:configChanges="orientation"
+            android:configChanges="orientation|keyboard"
             android:screenOrientation="portrait"
             android:theme="@style/YoDelegoThemeWithActionBar" />
         <activity

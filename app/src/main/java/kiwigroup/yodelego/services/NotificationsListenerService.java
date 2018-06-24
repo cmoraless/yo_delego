@@ -46,7 +46,7 @@ import kiwigroup.yodelego.server.ServerCommunication;
 public class NotificationsListenerService extends Service {
 
     public static final String NOTIFICATION_CHANNEL_ID = "my_channel_id_01";
-    private static final long DEFAULT_SYNC_INTERVAL = 2* 260 * 1000;
+    private static final long DEFAULT_SYNC_INTERVAL = 30 * 1000;
     private Handler mHandler;
     private NotificationListener listener;
     private final IBinder mBinder = new LocalBinder();
@@ -77,6 +77,7 @@ public class NotificationsListenerService extends Service {
     }
 
     private void syncData(){
+        Log.d("NotificationsService", "*** syncData()" );
         ServerCommunication userSC = new ServerCommunication.ServerCommunicationBuilder(getApplication(), "notifications/")
             .GET()
             .tokenized(true)

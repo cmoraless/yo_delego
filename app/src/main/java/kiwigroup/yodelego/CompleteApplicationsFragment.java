@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,16 +17,16 @@ import kiwigroup.yodelego.model.NotificationResume;
 import kiwigroup.yodelego.model.Offer;
 import kiwigroup.yodelego.model.WallItem;
 
-public class CloseApplicationsFragment extends Fragment implements OnWallUpdateListener, SwipeRefreshLayout.OnRefreshListener {
+public class CompleteApplicationsFragment extends Fragment implements OnWallUpdateListener, SwipeRefreshLayout.OnRefreshListener {
     private OnUserFragmentsListener mListener;
     private RecyclerView recyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ApplicationAdapter adapter;
 
-    public CloseApplicationsFragment() { }
+    public CompleteApplicationsFragment() { }
 
-    public static CloseApplicationsFragment newInstance() {
-        CloseApplicationsFragment fragment = new CloseApplicationsFragment();
+    public static CompleteApplicationsFragment newInstance() {
+        CompleteApplicationsFragment fragment = new CompleteApplicationsFragment();
         return fragment;
     }
 
@@ -101,7 +100,7 @@ public class CloseApplicationsFragment extends Fragment implements OnWallUpdateL
     @Override
     public void onApplicationsResponse(List<Offer> applications) {
         adapter.hideLoading();
-        adapter.update(applications);
+        //adapter.update(applications);
         mSwipeRefreshLayout.setRefreshing(false);
     }
 

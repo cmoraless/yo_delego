@@ -91,7 +91,7 @@ public class ApplicationsFragment extends Fragment {
 
         AdjudicatedApplicationsFragment mAdjudicatedApplicationsFragment;
         ReviewingApplicationsFragment mReviewingApplicationsFragment;
-        CloseApplicationsFragment mCloseApplicationsFragment;
+        CompleteApplicationsFragment mCompleteApplicationsFragment;
 
         PagerAdapter(FragmentManager fm, int NumOfTabs) {
             super(fm);
@@ -112,10 +112,10 @@ public class ApplicationsFragment extends Fragment {
                     mReviewingApplicationsFragment.updateData();
                     return mReviewingApplicationsFragment;
                 case 2:
-                    if(mCloseApplicationsFragment == null)
-                        mCloseApplicationsFragment = new CloseApplicationsFragment();
-                    mCloseApplicationsFragment.updateData();
-                    return mCloseApplicationsFragment;
+                    if(mCompleteApplicationsFragment == null)
+                        mCompleteApplicationsFragment = new CompleteApplicationsFragment();
+                    mCompleteApplicationsFragment.updateData();
+                    return mCompleteApplicationsFragment;
                 default:
                     return null;
             }

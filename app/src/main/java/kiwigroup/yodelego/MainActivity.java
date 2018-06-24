@@ -569,7 +569,7 @@ public class MainActivity
                 public void onResponse(JSONObject response) {
                     if (response != null) {
                         Offer offer = Offer.parseFromJson(response);
-                        offer.setApplied(true);
+                        offer.setApplied    (true);
                         offer.setApplication(application);
                         myApplications.add(offer);
 

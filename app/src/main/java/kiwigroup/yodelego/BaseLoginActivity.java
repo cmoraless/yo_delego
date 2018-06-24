@@ -73,8 +73,6 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
                 .errorListener(new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-
-
                         volleyError.printStackTrace();
                         if (volleyError instanceof NetworkError) {
                             onLoginError(getString(R.string.error_network));

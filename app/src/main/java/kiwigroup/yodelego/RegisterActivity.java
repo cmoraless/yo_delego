@@ -47,6 +47,7 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
 
         mainFragment = RegisterMainFragment.newInstance();
         addFragmentToMainContent(mainFragment, true, getString(R.string.id_main_fragment));
+
     }
 
     @Override
@@ -59,16 +60,24 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
     }
 
     @Override
+    public void onBackPressed() {
+        if(getSupportFragmentManager().getFragments().size() > 1)
+            super.onBackPressed();
+        else
+            goToLogin();
+    }
+
+    @Override
     public void addFragmentToMainContent(Fragment fragment, boolean addToBackStack, String fragmentId) {
         if (fragment != null) {
             currentFragment = fragment;
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            if(addToBackStack)
-                ft.addToBackStack(fragmentId);
-            //ft.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right);
-            ft.replace(R.id.container, fragment, fragmentId);
+            ft.add(R.id.container, fragment, fragmentId);
+            ft.addToBackStack(null);
+
             ft.commit();
             //getActionBar().setTitle(getString(R.string.title_dashboard));
+            Log.d("RegisterActivity", "------- > addFragmentToMainContent: " + getSupportFragmentManager().getFragments().size());
         }
     }
 
@@ -323,9 +332,8 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
                                         Log.d("createAccount", "-> showing RegisterMainFragment");
 
                                         RegisterMainFragment mainFragment = (RegisterMainFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.id_main_fragment));
-                                        if(!mainFragment.isResumed()){
-                                            getSupportFragmentManager().popBackStack();
-                                        }
+                                        getSupportFragmentManager().popBackStack();
+
                                         mainFragment.updateErrors(
                                                 firstNameError,
                                                 lastNameError,

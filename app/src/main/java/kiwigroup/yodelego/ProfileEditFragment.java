@@ -30,6 +30,7 @@ import com.android.volley.Response;
 import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
+import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,7 +62,7 @@ public class ProfileEditFragment extends Fragment {
     private RelativeLayout formLayout;
 
     private LinearLayout studentFormLayout;
-    private Spinner universitySpinner;
+    private SearchableSpinner universitySpinner;
     private TextInputEditText careerTextView;
     private TextInputEditText yearTextView;
     private ArrayAdapter<String> universityAdapter;
@@ -71,7 +72,7 @@ public class ProfileEditFragment extends Fragment {
 
     private Spinner bankSpinner;
     private Spinner accountSpinner;
-    private Spinner categorySpinner;
+    private SearchableSpinner categorySpinner;
     private TextInputEditText account;
     private ArrayAdapter<String> bankAdapter;
     private ArrayAdapter<String> accountAdapter;
@@ -138,6 +139,12 @@ public class ProfileEditFragment extends Fragment {
 
         editButton = view.findViewById(R.id.edit_btn);
 
+        universitySpinner.setTitle("Universidad o Instituto");
+        universitySpinner.setPositiveButton("OK");
+
+        categorySpinner.setTitle("Área de estudio");
+        categorySpinner.setPositiveButton("OK");
+
         if(user.getEducationalInstitution() != null && !user.getEducationalInstitution().isEmpty()) {
             showProgress(true);
             careerTextView.setText(user.getCareer());
@@ -148,24 +155,9 @@ public class ProfileEditFragment extends Fragment {
                 public void onEducationalInstitutionsResponse(LinkedHashMap<String, Integer> response) {
                     educationInstitutions = response;
                     List<String> values = new ArrayList<>(response.keySet());
-                    values.add(0, "Universidad o Instituto");
 
                     universityAdapter = new ArrayAdapter<String>(getContext(),
-                            android.R.layout.simple_spinner_item, values) {
-                        @Override
-                        public boolean isEnabled(int position) {
-                            return position != 0;
-                        }
-
-                        @Override
-                        public View getDropDownView(int position, View convertView,
-                                                    ViewGroup parent) {
-                            View view = super.getDropDownView(position, convertView, parent);
-                            TextView tv = (TextView) view;
-                            tv.setTextColor(position == 0 ? Color.GRAY : Color.BLACK);
-                            return view;
-                        }
-                    };
+                            android.R.layout.simple_spinner_item, values);
                     universityAdapter.setDropDownViewResource(R.layout.spinner_layout);
                     universitySpinner.setAdapter(universityAdapter);
 
@@ -204,22 +196,8 @@ public class ProfileEditFragment extends Fragment {
                 public void onCareerCategoriesResponse(LinkedHashMap<String, Integer> response) {
                     careerCategories = response;
                     List<String> values = new ArrayList<>(response.keySet());
-                    values.add(0, "Áreas educacionales");
                     ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
-                            android.R.layout.simple_spinner_item, values) {
-                        @Override
-                        public boolean isEnabled(int position) {
-                            return position != 0;
-                        }
-
-                        @Override
-                        public View getDropDownView(int position, View convertView, ViewGroup parent) {
-                            View view = super.getDropDownView(position, convertView, parent);
-                            TextView tv = (TextView) view;
-                            tv.setTextColor(position == 0 ? Color.GRAY : Color.BLACK);
-                            return view;
-                        }
-                    };
+                            android.R.layout.simple_spinner_item, values);
                     adapter.setDropDownViewResource(R.layout.spinner_layout);
                     categorySpinner.setAdapter(adapter);
 

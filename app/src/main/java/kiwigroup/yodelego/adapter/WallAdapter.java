@@ -139,9 +139,9 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             R.color.colorAcademicShape),
                             PorterDuff.Mode.SRC);
                 } else if (offer.getApplication().getApplicationStatus() == ACCEPTED){
-                    offerViewHolder.status.setText("aceptada");
+                    offerViewHolder.status.setText("adjudicada");
                     offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
-                            R.color.green),
+                            R.color.colorAdjudicated),
                             PorterDuff.Mode.SRC);
                 }
             }

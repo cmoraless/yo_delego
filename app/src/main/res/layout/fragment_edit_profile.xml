@@ -140,7 +140,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="30dp"
             android:layout_below="@id/bank_info"
-            android:text="editar"
+            android:text="guardar"
             android:background="@drawable/button_secondary_background"
             android:textColor="@color/colorPrimary"
             android:textAllCaps="true"
