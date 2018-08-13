@@ -22,7 +22,7 @@
             android:id="@+id/profile_image"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@drawable/profile_image"
+            android:src="@drawable/ic_profile"
             app:civ_border_width="0dp"
             android:paddingStart="10dp"
             android:paddingTop="10dp"

@@ -2,6 +2,7 @@ package kiwigroup.yodelego.model;
 
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -10,7 +11,9 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -37,8 +40,10 @@ public class Offer implements Serializable, WallItem {
     private String schedule;
     private OfferStatus status;
     private boolean applied;
-    private Application application;
+    private boolean isPaid;
 
+    private Application application;
+    private List<String> images;
     public Offer(){}
 
     public static Offer parseFromJson(JSONObject object){
@@ -66,9 +71,10 @@ public class Offer implements Serializable, WallItem {
                 offer.setHourlyWage(object.getInt("hourly_wage"));
             if(!object.isNull("total_wage"))
                 offer.setTotalWage(object.getInt("total_wage"));
+            if(!object.isNull("images"))
+                offer.setImages(object.getJSONArray("images"));
 
             offer.setStatus(Offer.OfferStatus.fromInteger(object.getInt("status")));
-
 
             if(!object.isNull("rating")){
                 try {
@@ -240,13 +246,39 @@ public class Offer implements Serializable, WallItem {
         this.application = application;
     }
 
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(JSONArray JSONArrayImages) {
+        this.images = new ArrayList<>();
+        for(int i = 0; i < JSONArrayImages.length(); i++){
+            try {
+                this.images.add(JSONArrayImages.getString(i));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    public boolean isPaid() {
+        return isPaid;
+    }
+
+    public void setPaid(boolean paid) {
+        isPaid = paid;
+    }
+
     public enum OfferStatus {
         CANCELED,
         ENTERED,
-        PUBLISHED,
-        PAUSED,
+        REVISION,
+        ACCEPTED_APPLICATION,
         FILLED,
-        CLOSED;
+        PAUSED,
+        CLOSED,
+        DEACTIVATED;
 
         public static OfferStatus fromInteger(int number) {
             switch(number) {
@@ -255,13 +287,17 @@ public class Offer implements Serializable, WallItem {
                 case 0:
                     return ENTERED;
                 case 1:
-                    return PUBLISHED;
+                    return REVISION;
                 case 2:
-                    return PAUSED;
+                    return ACCEPTED_APPLICATION;
                 case 3:
                     return FILLED;
                 case 4:
+                    return PAUSED;
+                case 5:
                     return CLOSED;
+                case 6:
+                    return DEACTIVATED;
             }
             return null;
         }

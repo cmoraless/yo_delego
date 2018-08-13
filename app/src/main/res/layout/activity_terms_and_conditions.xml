@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:padding="25dp"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Términos y Condiciones" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|right"
+            android:text="Los presentes Términos y Condiciones rigen el uso que toda persona natural o jurídica, o representante de los mismos, hace de la Plataforma y de cualquier Servicio que sea de propiedad o esté controlado por YoDelego.com. Este documento contiene información legal que le recomendamos leer completamente en conjunto con la Política de Privacidad. Por medio de la aprobación de los presentes Términos y Condiciones, se entiende que el Usuario los ha leído y aceptado, en todas sus partes, y entiende que estos le son legalmente vinculantes y obligatorios. Por tanto, acepta las condiciones de utilización y aprovechamiento de la Plataforma, Contenido y los Servicios. En caso contrario, el Usuario deberá abstenerse de acceder a la Plataforma y Servicios, ya sea directa o indirectamente, y de utilizar cualquier información o servicio provisto por la misma." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="1. DEFINICIONES." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Los términos cuya primera letra figura en mayúscula (salvo cuando se deba exclusivamente a que inician una oración o se trate de un nombre propio), tienen el significado que se les asigna a continuación, o el que se les asigne expresamente en estos Términos de Uso o en la Política de Privacidad:
+    Usuario(s) significa toda persona natural o jurídica, o representante en cualquier forma de los mismos, que utilice o que se encuentra registrado como tal en la Plataforma, y que podrán clasificarse en Navegadores, Participantes, incluyendo los postulantes a desempeñar servicios ofrecidos en la plataforma, y Clientes, de acuerdo a lo señalado en los presentes Términos y Condiciones. El término “Usuario” abarca todas y cualquiera de las referidas categorías ya sean Usuario Cliente o Usuario Estudiante.
+    Usuario Cliente (s) se refiere a toda persona natural o jurídica que requiera le desempeñen algún servicio en su hogar, empresa o lugar determinado por éste mismo, quienes podrán publicar a través de la Plataforma Web “YoDelego.com”
+    dichos requerimientos de servicios y a los cuales los Usuarios Estudiantes de la aplicación APP YoDelego.com podrán postular y ser adjudicados a desempeñar dichos servicios.
+    Usuario Estudiante(s) corresponde a aquella persona natural que postulará a una oferta de servicio por intermedio de YoDelego.com y que es quien efectúa la entrega del Servicio ofertado por un Cliente.
+    Contenido significa todo tipo de información, ya sea gráfica o escrita, imágenes, audio y video, incluyendo pero no limitándose a la ubicación, anuncios, comentarios, noticias, datos, guiones, gráficos, dibujos o imágenes, textos, diseño, esquemas, mapas y características interactivas presentadas por YoDelego.com en la Plataforma Web y/o la APP móvil (y cualquier software y códigos informáticos subyacentes), así como también programas o algoritmos computacionales, módulos de programación, manuales de operación, sea que dicho Contenido es generado, provisto o de cualquier otra forma producido o suministrado por YoDelego.com a los Usuarios o terceros.
+    YoDelego.com significa Kiwi Gorup SpA.
+    Equipo significa los teléfonos móviles y smartphones, tablets, computadores y cualquier otro aparato electrónico por el cual se pueda acceder a la Plataforma Web y/o APP.
+    Material de Usuarios significa toda clase de fotografías, videos, comentarios, comunicaciones u otros contenidos generado por Usuarios, que hayan sido subidos o cargados a la Plataforma Web y/o APP.
+    Oferta publicada significa el pedido particular de un Usuario Cliente para la publicación de un determinado servicio.
+    Perfil significa la cuenta personal creada por cada Usuario que acredita el registro en la Plataforma Web y/o APP, en base a la información personal proveída por el mismo a YoDelego.com, la cual incluye su nombre, apellidos, rol único tributario,
+
+    fecha de nacimiento, dirección, teléfono, nombre de usuario, Universidad, semestre de estudio, carrera, correo electrónico y contraseña. La veracidad e integridad de dicha información es de exclusiva responsabilidad del Usuario, eximiéndose Yo delego.com de cualquier error u omisión en que éste hubiera incurrido en la descripción de su Perfil.
+    Plataforma significa el sitio web, aplicaciones móviles y/o plataforma operada por YoDelego.com, por los cuales los Usuarios podrán acceder a los Servicios.
+    Política de Privacidad significa las políticas de privacidad de YoDelego.com, las cuales se encuentran debidamente publicadas en la Plataforma.
+    Servicios significa todos los servicios ofrecidos por medio de la Plataforma, así como los demás servicios provistos por YoDelego.com, a los cuales los Usuarios pueden acceder por medio de la Plataforma y sus Equipos.
+    Términos y Condiciones, Términos de Uso o Acuerdo significa los presentes Términos y Condiciones de YoDelego.com." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="2. ACEPTACIÓN DE LOS TÉRMINOS DE USO." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Mediante la creación de un Perfil y/o la utilización en cualquier forma de los Servicios y Plataforma, el Usuario acepta todos los Términos de Uso aquí contenidos y la Política de Privacidad. Asimismo, se entiende que acepta todas las demás reglas de operación, políticas y procedimientos que puedan ser publicados por YoDelego.com en la Plataforma, cada uno de los cuales se incorpora por referencia.
+    Sin perjuicio de lo anterior, algunos servicios que se ofrecen en la Plataforma pueden estar sujetos a términos y condiciones adicionales. En ese caso, el uso que el Usuario haga de dichos servicios estará sujeto, además, a los referidos términos y condiciones adicionales, que se incorporan a los presentes Términos de Uso por medio de esta referencia. En caso que el Usuario no los acepte, deberá abstenerse de utilizar en cualquier forma dichos servicios." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="3. SOBRE YoDelego.com." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="YoDelego.com es una plataforma de comunicaciones que facilita la conexión entre Usuarios que buscan hacer trabajos esporádicos, y los Clientes que materializan las ofertas de servicios en la plataforma. El valor pagado por los servicios corresponde al pago de los servicios prestados por el Usuario Estudiante más la comisión de YoDelego.com. El Usuario Cliente reconoce y acepta que el Estudiante actúa por cuenta del Usuario Cliente en el desarrollo y ejecución del servicio, y que YoDelego.com sólo tiene relación con él en lo que se refiere a proporcionar el soporte que se establece expresamente en el presente documento, salvo los casos en que los Estudiantes prestan sus servicios bajo vínculo de subordinación y dependencia de YoDelego.com. El Usuario acepta que YoDelego.com podría cobrar comisiones por los servicios prestados a éstos.
+    YoDelego.com no tiene control alguno sobre la calidad, tiempo, legalidad, fallas o cualquier otro aspecto que se encuentre comprendido dentro de los servicios de los Usuarios Estudiantes, sino sólo de aquellos que sean contratados por YoDelego.com." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="4. LIBERACIÓN DE RESPONSABILIDAD DE YoDelego.com POR ACTOS DE TERCEROS." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="La responsabilidad del cumplimiento de las obligaciones de los Usuarios Estudiante recaerá en YoDelego.com solamente respecto a quienes presten sus servicios bajo subordinación y dependencia de YoDelego.com. En el resto de los casos, dicha responsabilidad recaerá en el Usuario Cliente o Usuario Estudiante según sea correspondiente. En caso de ser necesario y de ser posible , YoDelego.com cederá al Usuario los derechos que pudiere tener en contra de los Usuarios Cliente o Usuario Estudiante, según corresponda, por los perjuicios que éstos pudieren haberse provocado, pero en ningún caso asumirá responsabilidad alguna respecto de dichos actos y sus consecuenciasy/ o perjuicios.
+
+    Ni YoDelego.com, ni sus afiliados o licenciantes serán responsables ante cualquier reclamo, lesión o daño que surja en relación con los actos u omisiones de cualquier Usuario Cliente o Usuario Estudiante, salvo lo indicado en el párrafo anterior. En caso de presentarse una disputa con uno o más Usuario Cliente o Usuario Estudiante, el Usuario libera a YoDelego.com, sus directores, empleados, subsidiarias, afiliados, agentes y representantes de todos los reclamos, responsabilidades, costos, incluyendo sin limitación honorarios de abogados, pérdidas o daños de cualquier clase o naturaleza, directos o indirectos, que surjan a consecuencia de tales disputas.
+    En este sentido, el Usuario declara entender que YoDelego.com no es más que un mero facilitador que pone a disposición de éstos el uso de una Plataforma por medio de la cual interactúa directamente con el o los Usuarios; que en ningún caso entiende comprar los servicios ofertados y/o prestados a YoDelego.com y que, en caso de existir cualquier tipo de daño o vulneración de derechos del consumidor, esto será materia a reclamar directamente en contra del Usuario Cliente o Usuario Estudiante, según corresponda, no afectando de manera alguna a YoDelego.com." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="5. NORMAS ESPECÍFICAS SOBRE SERVICIOS EN LOS QUE SE INCLUYA BEBIDAS ALCOHÓLICAS Y CIGARRILLOS." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Todo Servicio ofertado que incluya bebidas alcohólicas o cigarrillos sólo podrá ser requerida por Usuarios mayores de 18 años de edad. El Usuario Estudiante que efectúe la entrega del servicio adjudicado, que incluyan dichos productos exigirá, para su entrega, la identificación del Usuario que efectuó la oferta del servicio, exigiendo la presentación de una cédula de identidad o pasaporte vigente, liberando de toda responsabilidad, tanto a YoDelego.com, sus directores, empleados, subsidiarias, afiliados, agentes y representantes, como también al Usuario Estudiante, en caso de no producirse la entrega por la falta de acreditación de identidad del Usuario Cliente." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="6. USO DE MATERIALES." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Salvo que se disponga lo contrario, todos los derechos sobre el Contenido son de propiedad de YoDelego.com. Los Usuarios se encuentran autorizados para utilizar la Plataforma, así como para descargar material exhibido en ella, pero únicamente para uso personal, estando expresamente prohibido su copia, reproducción, publicación, descarga, codificación, modificación, traducción, interpretación, exhibición, distribución, transmisión, transmisión o difusión en medios de comunicación, sin la autorización previa, expresa y por escrito de YoDelego.com. Los derechos de autor y otros derechos de propiedad sobre el Contenido, con independencia de su descarga por parte de los Usuarios, son de propiedad de YoDelego.com, haciendo expresa reserva del ejercicio de todas las acciones tanto civiles como penales destinadas al resguardo de sus legítimos derechos de propiedad intelectual e industrial." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="7. MATERIAL GENERADO POR USUARIOS." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="En caso que la Plataforma permitiera la publicación, subida o carga de Material de Usuarios, éstos serán considerados en todo momento como no confidenciales. Esta prerrogativa depende exclusivamente de la voluntad de la Plataforma y queda a su exclusiva discrecionalidad Además, mediante la publicación o carga de los mismos a YoDelego.com, el Usuario otorga a YoDelego.com un derecho perpetuo, mundial, no exclusivo, libre de regalías, sublicenciable y transferible para usar, reproducir, distribuir, modificar, mostrar y realizar el envío de Material de Usuarios, para la promoción y apoyo de YoDelego.com. El Usuario otorga a cada Usuario una licencia no exclusiva para acceder a su Material de Usuario a través de la Plataforma y de mostrar y representar públicamente dicho Material de Usuario, en virtud de estos Términos y Condiciones.
+    En relación con lo anterior, el Usuario declara acerca del Material de Usuario que: (i) es titular de los derechos de autor sobre los mismos, o que tiene la autorización del propietario de los mismos para su publicación en YoDelego.com; (ii) no es ilegal, obsceno, difamatorio, injurioso, pornográfico, odioso, racista, o inadecuado
+
+    por cualquier motivo; (iii) no dañará la reputación de YoDelego.com o cualquier tercero; y (iv) no se hace pasar por otra persona. YoDelego.com se reserva el derecho de eliminar cualquier Material de Usuario a su entera discreción y sin previo aviso ni responsabilidad hacia el Usuario o cualquier otra persona.
+    YoDelego.com no avala ni apoya ninguna clase de Material de Usuario, recomendación o consejo en la misma, renunciando el Usuario a seguir cualquier clase de responsabilidad de YoDelego.com con relación a cualquier Material de Usuario. El Usuario entiende y acepta que el Material de Usuario puede contener información que es inexacta u ofensiva, renunciando, desde ya, a reclamar o presentar cualquier clase de recurso en contra YoDelego.com con respecto a la misma.
+    YoDelego.com puede proporcionar enlaces a sitios web pertenecientes o gestionados por terceros, sin que por este hecho pueda entenderse, bajo ninguna circunstancia, que YoDelego.com respalda el contenido, productos o servicios disponibles en dichos sitios web, y que no es responsable de su contenido o su seguridad. El enlace o conexión del Usuario a cualquier otro sitio web es de su exclusiva responsabilidad." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="8. CUENTA DE USUARIO." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Se podrá crear una sola cuenta por persona y la persona que crea un Usuario es la única persona autorizada para el acceso a la plataforma por intermedio de dicho Usuario. El Usuario es responsable de mantener la confidencialidad de cualquier contraseña o número de cuenta proporcionado por el Usuario o YoDelego.com para acceder a la Plataforma. Cada Usuario es el único y absoluto responsable de todas las actividades que ocurran bajo su contraseña o cuenta. YoDelego.com no tiene control sobre el uso de la cuenta de un Usuario y renuncia expresamente a cualquier responsabilidad derivada de la misma. En caso de que un Usuario sospeche que un tercero pudiera estar accediendo a la plataforma bajo su cuenta de Usuario o utilizando su contraseña, notificará a YoDelego.com inmediatamente.
+
+    Usted puede optar por no recibir mensajes de texto desde YoDelego.com, enviando un correo electrónico a contacto@yodelego.com. Si usted proporciona su número de teléfono celular, por ese hecho entrega expresamente su consentimiento para que YoDelego.com haga uso del mismo para llamadas y envío de mensajes de textos con el fin de ofrecer los Servicios." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="9. YODELEGO.COM COMISIONES." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="YoDelego.com aplicará a los Usuarios una comisión por el uso de su plataforma que corresponderá al valor que el Usuario Cliente publique en una oferta de servicio multiplicado por un 20%, es decir el Usuario Estudiante que sea adjudicado para desarrollar determinado servicio ofertado por un Usuario Cliente y que efectivamente sea ejecutado dicho servicio en tiempo y forma, recibirá finalmente un 80% del valor total de la publicación adjudicada, donde YoDelego.com procederá a emitir la correspondiente boleta o factura, según corresponda, con el total del valor de la comisión aplicada, respaldando así el cobro del uso de la plataforma por cada vez que se concrete efectivamente un servicio entre el Usuario Cliente y el Usuario Estudiante, según se expresa anteriormente.
+    YoDelego.com se reserva el derecho de cancelar el cobro de dicha comisión por razones promocionales u otros a su entera discreción, cancelando dicha opción cuando lo estime conveniente, sin que haberla otorgado genere ningún derecho al beneficiario eventual del mismo." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="10. OLIGACIÓN USUARIOS ESTUDIANTE." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Será obligación irrenunciable para cada Usuario Estudiante tener realizado su trámite de inicio de actividades en el Servicio de Impuestos internos y por tanto contar con las respectivas boletas de honorarios por la prestación de sus servicios al Usuario Cliente, todo Usuario Estudiante que no cuente con dicho documento tributario u otro similar como boleta o factura si fuese el caso, no tendrá derecho a recibir el pago por dichos servicios, los que serán retenidos por YoDelego.com
+
+    hasta que el Usuario Estudiante cuente con dicho documento y lo haga llegar a YoDelego.com en copia vía email, para después de comprobar la emisión del correspondiente documento tributario al Usuario Cliente, se le pueda liberar el pago por el servicio. Esta retención no dará derecho al pago de intereses ni reajuste alguno hasta la fecha de cumplimiento del pago. No obstante lo anterior, si transcurrido el plazo de 60 días no ha regularizado su situación tributaria caducará su derecho a obtener el pago correspondiente." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="11. RENUNCIA." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="El uso de YoDelego.com es bajo el propio riesgo del Usuario. Los Servicios se prestan tal como son ofrecidos, sin garantías de ningún tipo, explícita o implícita, incluyendo, pero no limitada a, las garantías de comercialización, idoneidad del Servicio para un propósito particular y no infracción. YoDelego.com no efectúa ninguna clase de representación o garantía relativa a la exactitud o totalidad del contenido ofrecido a través del uso de YoDelego.com o sobre el contenido de cualquier sitio web vinculado al uso de YoDelego.com, ni de los Comercios. YoDelego.com no asume ninguna responsabilidad derivada de (i) errores o imprecisiones del contenido; (ii) lesiones personales o daños a la propiedad, de cualquier naturaleza, como resultado de su acceso y uso de la Plataforma; (iii) acceso no autorizado o uso de servidores seguros de YoDelego.com y/o cualquier información personal y/o financiera almacenada en ellos; (iv) la negativa de un Usuario Cliente de efectuar los servicios adjudicados a un Usuario Estudiante.
+    YoDelego.com no garantiza que la Plataforma funcionará libre de errores o que esté libre de virus u otros productos peligrosos. Si el uso de la Plataforma deriva en la necesidad de servicio técnico o reemplazo de equipo o datos, YoDelego.com no será responsable de dichos costos. YoDelego.com, en la medida máxima permitida por la ley, renuncia a toda garantía, explícita o implícita, incluyendo sin limitación las garantías de comercialización, no violación de derechos de terceros y la garantía de idoneidad para un propósito particular. YoDelego.com no garantiza, bajo ninguna circunstancia, la exactitud, confiabilidad, exhaustividad y
+
+    actualidad de los contenidos, servicios, soporte, software, textos, gráficos o vínculos. YoDelego.com y sus filiales y proveedores de licencias no garantizan, bajo ninguna circunstancia, que la información personal suministrada por el Usuario pueda ser objeto de apropiación indebida, interceptada, borrada, destruida o usada por terceros." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="12. REPORTES Y DENUNCIAS." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Los Usuarios podrán reportar a YoDelego.com cualquier conducta o contenido que pueda infringir estos Términos de Uso, la Política de Privacidad o la legislación aplicable. Para tal efecto, los Usuarios deberán enviar un correo electrónico a contacto@yodelego.com indicando los detalles de dicha conducta o contenido que pueda estar infringiendo los términos y/o política de privacidad o legales aplicables, dentro del plazo de 60 días de conocido el hecho que reporta
+    Recibido un reporte, YoDelego.com, a su entera discreción, determinará si corresponde la eliminación o modificación del Contenido." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="13. LIMITACIÓN DE RESPONSABILIDAD." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="El Usuario acepta que YoDelego.com no se hace responsable por ningún daño directo, indirecto, lucro cesante, daño emergente, daño incidental, especial o consecuencial, proveniente de o en relación con (i) el uso de la Plataforma; (ii) la responsabilidad de cualquier Usuario, Cliente o Estudiante que no preste sus servicios bajo subordinación y dependencia de YoDelego.com; (iii) en relación con el rendimiento o navegación en la Plataforma o sus enlaces a otros sitios web, incluso si YoDelego.com ha sido informado de la posibilidad de tales daños; (iv) la calidad y cantidad de los Servicios entregados al Usuario; (v) la seguridad de la ejecución de los Servicios ejecutados; o (vi) la información errónea, incompleta o incorrecta sobre los Servicios ofrecidos por un Usuario Cliente.
+    Además, el Usuario acepta que YoDelego.com no se hace responsable de los daños derivados de la interrupción, suspensión o terminación de los Servicios, incluyendo sin limitación daño directo, indirecto, lucro cesante, daño emergente,
+
+    daño incidental, especial o consecuencial, aun cuando dicha interrupción, suspensión o terminación estuviera o no justificada. En ningún caso la responsabilidad total de YoDelego.com ante el Usuario por cualquier clase de pérdidas podrá exceder los montos pagados por éste a YoDelego.com." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="14. INDEMNIDAD." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="El Usuario se obliga a defender, indemnizar y mantener indemne a YoDelego.com, sus funcionarios, directores, empleados, agentes y afiliados, de y contra cualquier pérdida, reclamos, acciones, costos, daños, sanciones, multas y gastos, incluyendo sin limitación honorarios de abogados u otros, que surjan de, relacionados con o resultantes del uso no autorizado de la Plataforma por parte del Usuario, o de cualquier incumplimiento de estos Términos y Condiciones, incluyendo sin limitación, cualquier violación de cualquier ley, ordenanza, orden administrativa, norma o reglamento. YoDelego.com dará aviso, a la brevedad, de cualquier reclamación, demanda o procedimiento, y tendrá derecho a asumir la defensa respecto de cualquier reclamación, demanda o procedimiento." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="15. TERMINACIÓN." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="A su sola discreción, YoDelego.com puede modificar o interrumpir la Plataforma, o puede modificar, suspender o interrumpir su acceso o el soporte, por cualquier razón, con o sin previo aviso y sin ninguna responsabilidad los Usuarios o cualquier tercero. Aun cuando un Usuario pierda el derecho a utilizar la Plataforma, los presentes Términos y Condiciones serán ejecutables en su contra.
+    El Usuario podrá terminar estos Términos y Condiciones en cualquier momento, dejando de utilizar la Plataforma, sobreviviendo todas las disposiciones que por su naturaleza debieran sobrevivir para surtir efecto.
+    La terminación de los Servicios y/o el cierre de la cuenta del Usuario, por cualquier causa, no generará compensación ni indemnización en su favor por parte de YoDelego.com." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="16. RESOLUCIÓN DE CONFLICTOS." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Cualquier dificultad o controversia que se produzca entre los contratantes respecto de la aplicación, interpretación, duración, validez o ejecución de este Acuerdo será sometida a arbitraje, conforme al Reglamento Procesal de Arbitraje del Centro de Arbitraje y Mediación de Santiago, vigente al momento de solicitarlo.
+    Las partes confieren poder especial irrevocable a la Cámara de Comercio de Santiago A.G., para que, a petición escrita de cualquiera de ellas, designe a un árbitro arbitrador de entre los integrantes del cuerpo arbitral del Centro de Arbitraje y Mediación de Santiago.
+    En contra de las resoluciones del arbitrador no procederá recurso alguno, renunciando las partes expresamente a ellos. El árbitro queda especialmente facultado para resolver todo asunto relacionado con su competencia y/o jurisdicción." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="17. LEY APLICABLE Y DIVISIBILIDAD." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Estos Términos y Condiciones estarán regidos por las leyes de la República de Chile.
+    Los Términos de Uso y la Política de Privacidad constituyen el acuerdo completo entre el Usuario y YoDelego.com con respecto a los Servicios, uso de la Plataforma y del contenido, y sustituyen todas las comunicaciones y propuestas previas o contemporáneas (ya sean escritas, orales o electrónicas) entre el Usuario y YoDelego.com con respecto a la Plataforma y a los Servicios." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="18. NO AGENCIA." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Por el presente Acuerdo no se crea ninguna relación contractual de agencia, asociación, empresa conjunta, empleado-empleador o franquiciador-franquiciado" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="19. MODIFICACIONES." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="YoDelego.com podrá, a su sola y absoluta discreción, cambiar por sí y sin aviso previo estos Términos y Condiciones. Sin embargo, tales cambios sólo se aplicarán desde el momento en que sean publicados en la Plataforma y regirán para las transacciones que se celebren con posterioridad a su entrada en vigor, sin alterar las transacciones celebradas con anterioridad." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="20. VARIOS." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Estos Términos de Uso son personales, y no se pueden ceder, transferir ni sublicenciar, excepto con el consentimiento previo por escrito de YoDelego.com. YoDelego.com podrá ceder, transferir o delegar cualquiera de sus derechos y obligaciones en virtud de estos Términos de Uso sin el consentimiento del Usuario.
+    A menos que se especifique lo contrario en estos Términos de Uso, todos los avisos o modificaciones serán considerados debidamente entregados desde el momento de su publicación en la Plataforma, o bien desde el momento en que sea notificado al Usuario, según corresponda." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="21. CONTACTO." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Si el Usuario tiene alguna duda respecto de los Términos y Condiciones, Política de Privacidad, uso de la Plataforma o de su Perfil, podrá ponerse en contacto con YoDelego.com vía el correo electrónico contacto@YoDelego.com. Los mensajes serán atendidos a la mayor brevedad posible." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="22. TÉRMINOS Y CONDICIONES DE PAGO." />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Los usuarios de YoDelego.com podrán acceder a la modalidad de pago mediante transferencia electrónica bancaria que se deberá hacer al momento de la adjudicación de la oferta de servicio, los datos de dicha transferencia serán según se especifiqué en la plataforma o se notifiqué mediante correo electrónico a cada usuario, el no cumplimiento de éste pago significará la cancelación de la prestación del servicio por parte del Usuario estudiante, es decir no se ejecutará
+
+    de manera alguna la entrega del servicio, y cualquier pago por fuera de estos términos y condiciones de pago, se considerará un incumplimiento grave y se aplicarán las medidas legales que correspondan en contra del Usuario infractor." />
+
+    </LinearLayout>
+</ScrollView>

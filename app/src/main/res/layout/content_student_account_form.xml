@@ -1,13 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/email_login_form"
-    android:layout_width="350dp"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center_horizontal"
     android:orientation="vertical">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/colorBlackText"
+        android:layout_marginTop="10dp"
+        android:text="Universidad o Instituto" />
+
     <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+        android:id="@+id/spinner"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:spinnerMode="dialog"
+        android:textColor="@color/colorBlackText"
+        android:textColorHighlight="@color/colorBlackText"
+        android:textColorHint="@color/colorPrimary" />
+
+    <!--<com.toptoche.searchablespinnerlibrary.SearchableSpinner
         android:id="@+id/spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,11 +36,32 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:spinnerMode="dialog"
+        app:hintText="Universidad o Instituto"
+        android:textColor="@color/colorBlackText"
+        android:textColorHighlight="@color/colorBlackText"
+        android:textColorHint="@color/colorPrimary" />-->
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/colorBlackText"
+        android:layout_marginTop="5dp"
+        android:text="Área de estudio" />
+
+    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+        android:id="@+id/cat_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:spinnerMode="dialog"
         android:textColor="@color/colorBlackText"
         android:textColorHighlight="@color/colorBlackText"
         android:textColorHint="@color/colorPrimary" />
 
-    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+    <!--<com.toptoche.searchablespinnerlibrary.SearchableSpinner
         android:id="@+id/cat_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,20 +69,19 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:spinnerMode="dialog"
+        app:hintText="Área de estudio"
         android:layout_below="@id/spinner"
         android:textColor="@color/colorBlackText"
         android:textColorHighlight="@color/colorBlackText"
-        android:textColorHint="@color/colorPrimary" />
+        android:textColorHint="@color/colorPrimary" />-->
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/last_name_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/cat_spinner"
         android:textColorHint="@color/colorBlackText"
-        android:paddingStart="5dp"
-        android:paddingEnd="5dp"
-        android:layout_marginTop="20dp">
+        android:padding="5dp"
+        android:layout_marginTop="2dp">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/career"
@@ -63,11 +103,9 @@
         android:id="@+id/year_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/last_name_layout"
         android:textColorHint="@color/colorBlackText"
-        android:paddingStart="5dp"
-        android:paddingEnd="5dp"
-        android:layout_marginTop="15dp">
+        android:padding="5dp"
+        android:layout_marginTop="2dp">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/enrollment_year"
@@ -85,4 +123,4 @@
 
     </android.support.design.widget.TextInputLayout>
 
-</RelativeLayout>
+</LinearLayout>

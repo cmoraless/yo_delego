@@ -41,7 +41,7 @@ public class CompleteApplicationsFragment extends Fragment implements OnWallUpda
                 R.color.colorPrimary,
                 R.color.colorPrimaryDark,
                 R.color.colorPrimary);
-        adapter = new ApplicationAdapter(mListener, Application.ApplicationStatus.CANCELED);
+        adapter = new ApplicationAdapter(mListener, true);
         recyclerView.setAdapter(adapter);
         updateData();
         return view;
@@ -100,7 +100,7 @@ public class CompleteApplicationsFragment extends Fragment implements OnWallUpda
     @Override
     public void onApplicationsResponse(List<Offer> applications) {
         adapter.hideLoading();
-        //adapter.update(applications);
+        adapter.update(applications);
         mSwipeRefreshLayout.setRefreshing(false);
     }
 

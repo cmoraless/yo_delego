@@ -8,8 +8,8 @@ public interface OnRegisterFragmentListener {
     void getCareerCategories(RegisterActivity.OnCareerCategoriesListener listener);
     void createAccount(boolean student,
                        String name,
-                       String rut,
                        String lastName,
+                       String rut,
                        String email,
                        final String phone,
                        String password,

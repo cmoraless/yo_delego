@@ -144,6 +144,7 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
 
         if(jsonObjectListener != null){
             if(withToken){
+                Log.d("******", "*********** enters");
                 JsonObjectRequest request = new JsonObjectRequest(
                     method,
                     mContext.getString(R.string.server_base_url) + service,
@@ -154,9 +155,13 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
                         public Map<String, String> getHeaders() throws AuthFailureError {
                             Map<String, String> headers = new HashMap<>();
                             headers.put("Authorization", "Token " + TOKEN);
-                            //headers.put("Content-Type", "application/json");
+                            //headers.put("Content-Type", "application/json; charset=utf-8");
                             return headers;
                         }
+                    @Override
+                    public String getBodyContentType() {
+                        return "application/json; charset=utf-8";
+                    }
                 };
                 mQueue.add(request);
             } else {
@@ -178,6 +183,7 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
                         public Map<String, String> getHeaders() throws AuthFailureError {
                             Map<String, String> headers = new HashMap<>();
                             headers.put("Authorization", "Token " + TOKEN);
+                            //headers.put("Content-Type", "application/json; charset=utf-8");
                             return headers;
                         }
 
@@ -200,6 +206,7 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
                         public Map<String, String> getHeaders() throws AuthFailureError {
                             Map<String, String> headers = new HashMap<>();
                             headers.put("Authorization", "Token " + TOKEN);
+                            //headers.put("Content-Type", "application/json; charset=utf-8");
                             return headers;
                         }
                 };

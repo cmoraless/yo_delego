@@ -70,8 +70,8 @@ public class ProfileEditFragment extends Fragment {
     private TextInputLayout rutLayout;
     private TextInputLayout mailLayout;
 
-    private Spinner bankSpinner;
-    private Spinner accountSpinner;
+    private SearchableSpinner bankSpinner;
+    private SearchableSpinner accountSpinner;
     private SearchableSpinner categorySpinner;
     private TextInputEditText account;
     private ArrayAdapter<String> bankAdapter;
@@ -122,7 +122,7 @@ public class ProfileEditFragment extends Fragment {
         confirmPassword = view.findViewById(R.id.confirm_password);
 
         rutLayout = view.findViewById(R.id.id_layout);
-        //rutLayout.setVisibility(View.GONE);
+        rutLayout.setVisibility(View.GONE);
         mailLayout = view.findViewById(R.id.mail_layout);
         mailLayout.setVisibility(GONE);
 
@@ -147,6 +147,7 @@ public class ProfileEditFragment extends Fragment {
 
         if(user.getEducationalInstitution() != null && !user.getEducationalInstitution().isEmpty()) {
             showProgress(true);
+            //studentFormLayout.setVisibility(View.VISIBLE);
             careerTextView.setText(user.getCareer());
             yearTextView.setText(String.valueOf(user.getEnrollmentYear()));
 
@@ -156,19 +157,19 @@ public class ProfileEditFragment extends Fragment {
                     educationInstitutions = response;
                     List<String> values = new ArrayList<>(response.keySet());
 
-                    universityAdapter = new ArrayAdapter<String>(getContext(),
+                    universityAdapter = new ArrayAdapter<>(getContext(),
                             android.R.layout.simple_spinner_item, values);
-                    universityAdapter.setDropDownViewResource(R.layout.spinner_layout);
                     universitySpinner.setAdapter(universityAdapter);
+                    for(int i = 0; i < universitySpinner.getCount(); i++){
+                        if(universitySpinner.getAdapter().getItem(i).equals(user.getEducationalInstitution()))
+                            universitySpinner.setSelection(i);
+                    }
 
-                    int spinnerPosition = universityAdapter.getPosition(user.getEducationalInstitution());
-                    universitySpinner.setSelection(spinnerPosition);
                     careerTextView.setText(user.getCareer());
                     yearTextView.setText(String.valueOf(user.getEnrollmentYear()));
 
                     if (educationInstitutions != null && careerCategories != null){
                         showProgress(false);
-                        studentFormLayout.setVisibility(View.VISIBLE);
                     }
                 }
 
@@ -190,23 +191,22 @@ public class ProfileEditFragment extends Fragment {
                 }
             });
 
-
             listener.getCareerCategories(new RegisterActivity.OnCareerCategoriesListener() {
                 @Override
                 public void onCareerCategoriesResponse(LinkedHashMap<String, Integer> response) {
                     careerCategories = response;
                     List<String> values = new ArrayList<>(response.keySet());
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                             android.R.layout.simple_spinner_item, values);
-                    adapter.setDropDownViewResource(R.layout.spinner_layout);
                     categorySpinner.setAdapter(adapter);
 
-                    int spinnerPosition = adapter.getPosition(user.getCareerCategory());
-                    categorySpinner.setSelection(spinnerPosition);
+                    for(int i = 0; i < categorySpinner.getCount(); i++){
+                        if(categorySpinner.getAdapter().getItem(i).equals(user.getCareerCategory()))
+                            categorySpinner.setSelection(i);
+                    }
 
                     if (educationInstitutions != null && careerCategories != null){
                         showProgress(false);
-                        studentFormLayout.setVisibility(View.VISIBLE);
                     }
                 }
 
@@ -216,37 +216,13 @@ public class ProfileEditFragment extends Fragment {
                 }
             });
         }
-        bankAdapter = new ArrayAdapter<String>(getContext(),
-                android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.banks_array)){
-            @Override
-            public boolean isEnabled(int position){
-                return position != 0;
-            }
-            @Override
-            public View getDropDownView(int position, View convertView, ViewGroup parent) {
-                View view = super.getDropDownView(position, convertView, parent);
-                TextView tv = (TextView) view;
-                tv.setTextColor(position == 0 ? Color.GRAY : Color.BLACK);
-                return view;
-            }
-        };
+        bankAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.banks_array));
         bankAdapter.setDropDownViewResource(R.layout.spinner_layout);
         bankSpinner.setAdapter(bankAdapter);
 
-        accountAdapter = new ArrayAdapter<String>(getContext(),
-                android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.account_array)){
-            @Override
-            public boolean isEnabled(int position){
-                return position != 0;
-            }
-            @Override
-            public View getDropDownView(int position, View convertView, ViewGroup parent) {
-                View view = super.getDropDownView(position, convertView, parent);
-                TextView tv = (TextView) view;
-                tv.setTextColor(position == 0 ? Color.GRAY : Color.BLACK);
-                return view;
-            }
-        };
+        accountAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.account_array));
         accountAdapter.setDropDownViewResource(R.layout.spinner_layout);
         accountSpinner.setAdapter(accountAdapter);
 
@@ -275,19 +251,20 @@ public class ProfileEditFragment extends Fragment {
         confirmPassword.setVisibility(GONE);
 
         bankSpinner.setClickable(true);
-        if(user.getBank() != null){
-            int spinnerBankPosition = bankAdapter.getPosition(user.getBank().toUpperCase());
-            bankSpinner.setSelection(spinnerBankPosition);
+        if(user.getBank() != null && !user.getBank().isEmpty()){
+            for(int i = 0; i < bankSpinner.getCount(); i++){
+                if(bankSpinner.getAdapter().getItem(i).equals(user.getBank().toUpperCase()))
+                    bankSpinner.setSelection(i);
+            }
         }
         accountSpinner.setClickable(true);
         if(user.getAccountType() != -1){
             accountSpinner.setSelection(user.getAccountType());
         }
         account.setEnabled(true);
-        if(user.getAccountNumber() != null){
+        if(user.getAccountNumber() != null && !user.getBank().isEmpty()){
             account.setText(user.getAccountNumber());
         }
-
     }
 
     private void showProgress(final boolean show) {
@@ -324,7 +301,6 @@ public class ProfileEditFragment extends Fragment {
         super.onDetach();
         listener = null;
     }
-
 
     private void attemptUpdateAccount() {
         name.setError(null);
@@ -649,7 +625,7 @@ public class ProfileEditFragment extends Fragment {
 
     private static boolean isValidRut(String rut) {
 
-        boolean validacion = false;
+        boolean validate = false;
         try {
             rut =  rut.toUpperCase();
             rut = rut.replace(".", "");
@@ -663,13 +639,13 @@ public class ProfileEditFragment extends Fragment {
                 s = (s + rutAux % 10 * (9 - m++ % 6)) % 11;
             }
             if (dv == (char) (s != 0 ? s + 47 : 75)) {
-                validacion = true;
+                validate = true;
             }
 
-        } catch (java.lang.NumberFormatException e) {
         } catch (Exception e) {
+            return false;
         }
-        return validacion;
+        return validate;
     }
 
     private boolean isPasswordValid(String password) {

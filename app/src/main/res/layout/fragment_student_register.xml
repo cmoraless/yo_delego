@@ -9,58 +9,65 @@
     android:background="@color/white"
     tools:context=".RegisterMainFragment">
 
-    <RelativeLayout
-        android:id="@+id/email_login_form"
-        android:layout_width="350dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal"
-        android:orientation="vertical"
-        android:paddingEnd="20dp"
-        android:paddingStart="20dp"
-        android:paddingBottom="10dp"
-        android:paddingTop="10dp"
-        android:padding="10dp">
+    <ScrollView
+        android:id="@+id/login_form"
+        android:fillViewport="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <ProgressBar
-            android:id="@+id/login_progress"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_marginBottom="8dp"
-            android:visibility="gone" />
-
-        <include
-            android:id="@+id/form"
+        <LinearLayout
+            android:id="@+id/email_login_form"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/type"
-            layout="@layout/content_student_account_form"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:paddingBottom="10dp"
+            android:paddingEnd="20dp"
+            android:paddingStart="20dp"
+            android:paddingTop="10dp">
 
-        <Button
-            android:id="@+id/create_account_button"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_above="@id/cancel_button"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/button_primary_background"
-            android:text="@string/action_create_account"
-            android:textAllCaps="true"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
+            <ProgressBar
+                android:id="@+id/login_progress"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_centerInParent="true"
+                android:layout_marginBottom="8dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:visibility="gone" />
 
-        <Button
-            android:id="@+id/cancel_button"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_alignParentBottom="true"
-            android:background="@drawable/button_secondary_background"
-            android:text="@string/cancel"
-            android:textAllCaps="true"
-            android:textColor="@color/colorTextSecondaryButton"
-            android:textSize="16sp" />
+            <include
+                android:id="@+id/form"
+                layout="@layout/content_student_account_form"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
-    </RelativeLayout>
+            <Button
+                android:id="@+id/create_account_button"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/button_primary_background"
+                android:text="@string/action_create_account"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
 
+            <Button
+                android:id="@+id/cancel_button"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/button_secondary_background"
+                android:text="@string/cancel"
+                android:textAllCaps="true"
+                android:textColor="@color/colorTextSecondaryButton"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

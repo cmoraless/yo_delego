@@ -25,14 +25,11 @@ public class Application implements Serializable {
     private float rating;
     private ApplicationStatus status;
     private Date date;
-    private Offer offer;
 
     public static Application parseFromJson(JSONObject object){
         Application application = new Application();
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", Locale.US);
         try {
-            Log.d("Application", "****** " + object.toString());
-
             application.setId(object.getLong("id"));
             application.setOfferTitle(object.getString("offer"));
             application.setOfferId(object.getLong("offer_id"));
@@ -69,23 +66,42 @@ public class Application implements Serializable {
     }
 
     public enum ApplicationStatus {
+        CANCELED_BY_PUBLISHER,
+        CANCELED_BY_APPLICANT,
         REJECTED,
-        CANCELED,
         REVISION,
         ACCEPTED;
 
         public static ApplicationStatus fromInteger(int number) {
             switch(number) {
+                case -3:
+                    return CANCELED_BY_PUBLISHER;
                 case -2:
-                    return REJECTED;
+                    return CANCELED_BY_APPLICANT;
                 case -1:
-                    return CANCELED;
+                    return REJECTED;
                 case 0:
                     return REVISION;
                 case 1:
                     return ACCEPTED;
             }
             return null;
+        }
+
+        public static int toInt(ApplicationStatus status) {
+            switch(status) {
+                case CANCELED_BY_PUBLISHER:
+                    return -3;
+                case CANCELED_BY_APPLICANT:
+                    return -2;
+                case REJECTED:
+                    return -1;
+                case REVISION:
+                    return 0;
+                case ACCEPTED:
+                    return 1;
+            }
+            return -4;
         }
     }
 

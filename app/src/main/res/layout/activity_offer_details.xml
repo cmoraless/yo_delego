@@ -138,7 +138,6 @@
 
                 </RelativeLayout>
 
-
             </LinearLayout>
 
         </android.support.design.widget.CollapsingToolbarLayout>
@@ -150,7 +149,7 @@
         android:layout_height="wrap_content"
         tools:context=".objectDetailsFragment"
         android:clipToPadding="false"
-        android:paddingBottom="80dp"
+        android:paddingBottom="100dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <android.support.v7.widget.LinearLayoutCompat
@@ -197,7 +196,7 @@
                     android:layout_toEndOf="@id/transaction_title"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="10dp"
-                    android:text="Precio a pagar"
+                    android:text="Precio de la oferta"
                     android:textStyle="bold"
                     android:textSize="18sp" />
 
@@ -210,7 +209,49 @@
                     android:layout_centerVertical="true"
                     android:text="45.000"
                     android:textStyle="bold"
-                    android:textSize="24sp" />
+                    android:textSize="18sp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dip"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="10dip">
+
+                <ImageView
+                    android:id="@+id/real_transaction_title"
+                    android:layout_width="27dp"
+                    android:layout_height="27dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_alignParentStart="true"
+                    android:src="@drawable/ic_money"/>
+
+                <TextView
+                    android:id="@+id/real_transaction_detail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorPrimary"
+                    android:layout_toEndOf="@id/real_transaction_title"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:text="Precio a pagar (-10%)"
+                    android:textStyle="bold"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/realWage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorPrimary"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:text="40.500"
+                    android:textStyle="bold"
+                    android:textSize="22sp" />
 
             </RelativeLayout>
 
@@ -295,13 +336,13 @@
                     android:layout_toEndOf="@id/date_icon"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="10dp"
-                    android:text="6 horas diarias"
+                    android:text="25 de diciembre"
                     android:textStyle="bold"
                     android:textSize="16sp" />
 
             </RelativeLayout>
 
-            <!--<TextView
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorPrimary"
@@ -338,11 +379,43 @@
                     android:layout_toEndOf="@id/schedule_icon"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="10dp"
-                    android:text="6 horas diarias"
+                    android:text="hora inicio: 18:00 / hora fin: 20:00"
                     android:textStyle="bold"
                     android:textSize="16sp" />
 
-            </RelativeLayout>-->
+            </RelativeLayout>
+
+            <RelativeLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/second_schedule"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:paddingTop="10dip"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="10dip">
+
+                <ImageView
+                    android:id="@+id/schedule_icon2"
+                    android:layout_width="27dp"
+                    android:layout_height="27dp"
+                    android:layout_alignParentStart="true"
+                    android:src="@drawable/ic_schedule"/>
+
+                <TextView
+                    android:id="@+id/schedule2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorGreyText"
+                    android:layout_toEndOf="@id/schedule_icon2"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:text="hora inicio: sab 18:00 / hora fin: dom 20:00"
+                    android:textStyle="bold"
+                    android:textSize="16sp" />
+
+            </RelativeLayout>
 
         </android.support.v7.widget.LinearLayoutCompat>
 
@@ -404,7 +477,7 @@
         android:background="@color/colorPrimary"
         android:layout_gravity="bottom"
         android:gravity="center"
-        android:padding="12dp"
+        android:padding="8dp"
         android:visibility="gone"
         android:layout_alignParentBottom="true" >
 
@@ -414,8 +487,32 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textColor="@color/white"
-            android:textSize="16sp"
-            android:text="Ya has postulado a esta tarea, te avisaremos cuando sea adjudicada." />
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:id="@+id/cancel_button"
+            android:layout_width="match_parent"
+            android:background="@drawable/button_secondary_background"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_height="35dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:layout_marginStart="45dp"
+            android:layout_marginEnd="45dp"
+            android:clickable="true">
+
+            <TextView
+                android:id="@+id/cancel_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/colorRed"
+                android:textAllCaps="true"
+                android:textSize="15sp"
+                android:text="cancelar postulación" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

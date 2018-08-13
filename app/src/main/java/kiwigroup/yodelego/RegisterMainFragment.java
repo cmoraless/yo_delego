@@ -3,7 +3,10 @@ package kiwigroup.yodelego;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.content.Intent;
+import android.content.res.AssetManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
@@ -26,6 +29,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 public class RegisterMainFragment extends Fragment {
 
     private OnRegisterFragmentListener mListener;
@@ -42,6 +51,7 @@ public class RegisterMainFragment extends Fragment {
     private TextView textViewPhone;
     private TextView textViewPassword;
     private TextView textViewConfirmPassword;
+    private TextView textViewTermsConditions;
 
     private Spinner bankSpinner;
     private Spinner accountSpinner;
@@ -145,8 +155,8 @@ public class RegisterMainFragment extends Fragment {
                     textViewMail.setEnabled(true);
                     textViewPassword.setEnabled(true);
                     textViewConfirmPassword.setEnabled(true);
-                    bankSpinner.setClickable(true);
-                    accountSpinner.setClickable(true);
+                    bankSpinner.setEnabled(true);
+                    accountSpinner.setEnabled(true);
                     TextViewAccount.setEnabled(true);
                     checkBoxAgree.setEnabled(true);
                     signUpButton.setEnabled(true);
@@ -161,8 +171,8 @@ public class RegisterMainFragment extends Fragment {
                     textViewMail.setEnabled(false);
                     textViewPassword.setEnabled(false);
                     textViewConfirmPassword.setEnabled(false);
-                    bankSpinner.setClickable(false);
-                    accountSpinner.setClickable(false);
+                    bankSpinner.setEnabled(false);
+                    accountSpinner.setEnabled(false);
                     TextViewAccount.setEnabled(false);
                     checkBoxAgree.setEnabled(false);
                     signUpButton.setEnabled(false);
@@ -187,8 +197,8 @@ public class RegisterMainFragment extends Fragment {
                     textViewPassword.setEnabled(true);
                     textViewConfirmPassword.setEnabled(true);
                     checkBoxAgree.setEnabled(true);
-                    bankSpinner.setClickable(true);
-                    accountSpinner.setClickable(true);
+                    bankSpinner.setEnabled(true);
+                    accountSpinner.setEnabled(true);
                     TextViewAccount.setEnabled(true);
                     signUpButton.setEnabled(true);
                     cancelButton.setEnabled(true);
@@ -203,8 +213,8 @@ public class RegisterMainFragment extends Fragment {
                     textViewPassword.setEnabled(false);
                     textViewConfirmPassword.setEnabled(false);
                     checkBoxAgree.setEnabled(false);
-                    bankSpinner.setClickable(false);
-                    accountSpinner.setClickable(false);
+                    bankSpinner.setEnabled(false);
+                    accountSpinner.setEnabled(false);
                     TextViewAccount.setEnabled(false);
                     signUpButton.setEnabled(false);
                     cancelButton.setEnabled(false);
@@ -229,41 +239,24 @@ public class RegisterMainFragment extends Fragment {
         textViewPhone = view.findViewById(R.id.phone);
         textViewPassword = view.findViewById(R.id.password);
         textViewConfirmPassword = view.findViewById(R.id.confirm_password);
-
+        textViewTermsConditions = view.findViewById(R.id.terms_text);
+        textViewTermsConditions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainIntent = new Intent().setClass(getContext(), TermsAndConditionsActivity.class);
+                startActivity(mainIntent);
+            }
+        });
         bankSpinner = view.findViewById(R.id.bank_spinner);
         accountSpinner = view.findViewById(R.id.account_spinner);
         TextViewAccount = view.findViewById(R.id.account_number);
-        bankAdapter = new ArrayAdapter<String>(getContext(),
-                android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.banks_array)){
-            @Override
-            public boolean isEnabled(int position){
-                return position != 0;
-            }
-            @Override
-            public View getDropDownView(int position, View convertView, ViewGroup parent) {
-                View view = super.getDropDownView(position, convertView, parent);
-                TextView tv = (TextView) view;
-                tv.setTextColor(position == 0 ? Color.GRAY : Color.BLACK);
-                return view;
-            }
-        };
+        bankAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.banks_array));
         bankAdapter.setDropDownViewResource(R.layout.spinner_layout);
         bankSpinner.setAdapter(bankAdapter);
 
-        accountAdapter = new ArrayAdapter<String>(getContext(),
-                android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.account_array)){
-            @Override
-            public boolean isEnabled(int position){
-                return position != 0;
-            }
-            @Override
-            public View getDropDownView(int position, View convertView, ViewGroup parent) {
-                View view = super.getDropDownView(position, convertView, parent);
-                TextView tv = (TextView) view;
-                tv.setTextColor(position == 0 ? Color.GRAY : Color.BLACK);
-                return view;
-            }
-        };
+        accountAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.account_array));
         accountAdapter.setDropDownViewResource(R.layout.spinner_layout);
         accountSpinner.setAdapter(accountAdapter);
 
@@ -284,6 +277,9 @@ public class RegisterMainFragment extends Fragment {
             }
         });
 
+        bankSpinner.setEnabled(false);
+        accountSpinner.setEnabled(false);
+
         if(student || noStudent){
             textViewFirstName.setEnabled(true);
             textViewLastName.setEnabled(true);
@@ -294,8 +290,8 @@ public class RegisterMainFragment extends Fragment {
             textViewConfirmPassword.setEnabled(true);
             bankSpinner.setEnabled(true);
             accountSpinner.setEnabled(true);
-            bankSpinner.setClickable(true);
-            accountSpinner.setClickable(true);
+            bankSpinner.setEnabled(true);
+            accountSpinner.setEnabled(true);
             TextViewAccount.setEnabled(true);
             checkBoxAgree.setEnabled(true);
             signUpButton.setEnabled(true);
@@ -321,14 +317,15 @@ public class RegisterMainFragment extends Fragment {
         }
     }
 
-    public void updateErrors(String firstNameError,
-                             String lastNameError,
-                             String mailError,
-                             String passwordError,
-                             String rutError,
-                             String bankError,
-                             String accountTypeError,
-                             String accountError){
+    public void updateErrors(
+            String firstNameError,
+            String lastNameError,
+            String mailError,
+            String passwordError,
+            String rutError,
+            String bankError,
+            String accountTypeError,
+            String accountError){
 
         this.firstNameError = firstNameError;
         this.lastNameError = lastNameError;
@@ -406,10 +403,9 @@ public class RegisterMainFragment extends Fragment {
         String phone = textViewPhone.getText().toString();
         String password = textViewPassword.getText().toString();
         String passwordConfirm = textViewConfirmPassword.getText().toString();
-        int bank = bankSpinner.getSelectedItemPosition();
+        int bank = bankSpinner.getSelectedItemPosition() ;
         int accountType = accountSpinner.getSelectedItemPosition();
         String account = TextViewAccount.getText().toString();
-
         boolean cancel = false;
         View focusView = null;
 
@@ -503,8 +499,8 @@ public class RegisterMainFragment extends Fragment {
                     firstName,
                     lastName,
                     rut,
-                    phone,
                     email,
+                    phone,
                     password,
                     -1,
                     -1,

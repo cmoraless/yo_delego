@@ -16,7 +16,7 @@
     <string name="app_name">YoDelego</string>
     <string name="cancel">Cancelar</string>
     <string name="confirm">Confirm</string>
-    <string name="agree_terms">Agree to the terms &amp; condition loreim ipsum must explain to you how all this mistaken idea of denouncing pleasure.</string>
+    <string name="agree_terms"><u>He leído y acepto los términos y condiciones</u>.</string>
     <string name="send_email">Enviar correo</string>
     <string name="login_in">Ingresar</string>
     <string name="create_account">Crear tu cuenta</string>
@@ -73,6 +73,9 @@
     <string name="application">Postulación</string>
     <string name="ask_application">Estas postulando al trabajo &lt;b>%1$s&lt;/b>, luego de postular te notificaremos si te lo has adjudicado. ¿Quieres postular?</string>
 
+    <string name="cancel_application">Estas postulando al trabajo &lt;b>%1$s&lt;/b> ¿Quieres cancelar tu postulación?</string>
+
+
     <string name="applicated">Postulando</string>
 
     <string name="error_recovering_password">Error mientras recuperas tu contraseña</string>
@@ -100,7 +103,7 @@
     <string name="edit_photo">editar foto</string>
 
     <string-array name="banks_array">
-        <item>Banco (Opcional)</item>
+        <item></item>
         <item>BANCO ESTADO</item>
         <item>BANCO SANTANDER</item>
         <item>BANCO DE CHILE / EDWARDS - CITI</item>
@@ -120,7 +123,7 @@
     </string-array>
 
     <string-array name="account_array">
-        <item>Tipo de cuenta (Opcional)</item>
+        <item></item>
         <item>Cuenta Corriente</item>
         <item>Cuenta de Ahorro</item>
         <item>Cuenta Vista</item>

@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -27,7 +29,7 @@ import kiwigroup.yodelego.model.Offer;
 import kiwigroup.yodelego.model.WallItem;
 
 import static kiwigroup.yodelego.model.Application.ApplicationStatus.ACCEPTED;
-import static kiwigroup.yodelego.model.Application.ApplicationStatus.CANCELED;
+import static kiwigroup.yodelego.model.Application.ApplicationStatus.CANCELED_BY_APPLICANT;
 import static kiwigroup.yodelego.model.Application.ApplicationStatus.REJECTED;
 import static kiwigroup.yodelego.model.Application.ApplicationStatus.REVISION;
 
@@ -117,18 +119,65 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             offerViewHolder.resume.setText(Html.fromHtml("<b>" + offer.getPublisher() + "</b>  publicó un nuevo trabajo"));
             offerViewHolder.date.setText(DateUtils.getRelativeTimeSpanString(offer.getCreationDate().getTime(), new Date().getTime(),0L, DateUtils.FORMAT_ABBREV_ALL));
 
-            offerViewHolder.status.setText(offer.getStatus() == Offer.OfferStatus.ENTERED ? "abierto" : "cerrado");
+            /*offerViewHolder.status.setText(offer.getStatus() == Offer.OfferStatus.ENTERED ? "abierto" : "cerrado");
             offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
                     offer.getStatus() == Offer.OfferStatus.ENTERED ? R.color.colorGreenText : R.color.colorRed),
                     PorterDuff.Mode.SRC);
+            if(offer.getImages() != null && offer.getImages().size() > 0){
+                offerViewHolder.image.setVisibility(View.VISIBLE);
+                Picasso.get().load(offer.getImages().get(0)).into(offerViewHolder.image);
+            } else {
+                offerViewHolder.image.setVisibility(View.GONE);
+            }*/
 
-            if(offer.isApplied()){
-                if(offer.getApplication().getApplicationStatus() == REJECTED){
-                    offerViewHolder.status.setText("rechazada");
+            if(offer.getImages() != null && offer.getImages().size() > 0){
+                offerViewHolder.image.setVisibility(View.VISIBLE);
+                Picasso.get().load(offer.getImages().get(0)).into(offerViewHolder.image);
+            } else {
+                offerViewHolder.image.setVisibility(View.GONE);
+            }
+
+            if(!offer.isApplied()){
+                if (offer.getStatus() == Offer.OfferStatus.ENTERED ){
+                    offerViewHolder.status.setText("abierto");
+                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                            R.color.colorGreenText),
+                            PorterDuff.Mode.SRC);
+                } else if (offer.getStatus() == Offer.OfferStatus.REVISION ){
+                    offerViewHolder.status.setText("en revisión");
+                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                            R.color.colorAcademicShape),
+                            PorterDuff.Mode.SRC);
+                } else if (offer.getStatus() == Offer.OfferStatus.ACCEPTED_APPLICATION ){
+                    offerViewHolder.status.setText("adjudicada");
+                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                            R.color.colorAdjudicated),
+                            PorterDuff.Mode.SRC);
+                } else if (offer.getStatus() == Offer.OfferStatus.FILLED ){
+                    offerViewHolder.status.setText("sin vacantes");
+                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                            R.color.colorGreyButton),
+                            PorterDuff.Mode.SRC);
+                    offerViewHolder.status.setTextColor(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                            R.color.colorPrimaryDark));
+                } else if(offer.getStatus() == Offer.OfferStatus.CLOSED ){
+                    offerViewHolder.status.setText("cerrada");
                     offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
                             R.color.colorRed),
                             PorterDuff.Mode.SRC);
-                } else if (offer.getApplication().getApplicationStatus() == CANCELED){
+                }
+            } else {
+                if(offer.getApplication().getApplicationStatus() == REJECTED){
+                    offerViewHolder.status.setText("no califica");
+                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                            R.color.colorRed),
+                            PorterDuff.Mode.SRC);
+                } else if (offer.getApplication().getApplicationStatus() == CANCELED_BY_APPLICANT){
+                    offerViewHolder.status.setText("cancelada");
+                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                            R.color.colorRed),
+                            PorterDuff.Mode.SRC);
+                } else if (offer.getApplication().getApplicationStatus() == CANCELED_BY_APPLICANT){
                     offerViewHolder.status.setText("cancelada");
                     offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
                             R.color.colorRed),
@@ -241,27 +290,5 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         void closeNotifications();
         void onNotificationSelected();
     }
-
-    /*public enum RowType {
-        LIST_ITEM(1), HEADER_ITEM(2);
-
-        private int _value;
-
-        RowType(int Value) {
-            this._value = Value;
-        }
-
-        public int getValue() {
-            return _value;
-        }
-
-        @Nullable
-        public static RowType fromInt(int i) {
-            for (RowType b : RowType.values()) {
-                if (b.getValue() == i) { return b; }
-            }
-            return null;
-        }
-    }*/
 
 }

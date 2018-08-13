@@ -3,7 +3,6 @@ package kiwigroup.yodelego;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
@@ -14,8 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.RelativeLayout;
-import android.widget.Spinner;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
@@ -30,7 +28,7 @@ public class RegisterStudentFragment extends Fragment {
     private OnRegisterFragmentListener mListener;
 
     private View mProgressView;
-    private RelativeLayout formLayout;
+    private LinearLayout formLayout;
     private SearchableSpinner universitySpinner;
     private SearchableSpinner categoriesSpinner;
     private TextInputEditText careerTextView;
@@ -139,6 +137,7 @@ public class RegisterStudentFragment extends Fragment {
             public void onEducationalInstitutionsResponse(LinkedHashMap<String, Integer> response) {
                 educationInstitutions = response;
                 List<String> values = new ArrayList<>(response.keySet());
+                values.add(0, "");
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
                         android.R.layout.simple_spinner_item, values);
                 adapter.setDropDownViewResource(R.layout.spinner_layout);
@@ -159,6 +158,7 @@ public class RegisterStudentFragment extends Fragment {
             public void onCareerCategoriesResponse(LinkedHashMap<String, Integer> response) {
                 careerCategories = response;
                 List<String> values = new ArrayList<>(response.keySet());
+                values.add(0, "");
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
                         android.R.layout.simple_spinner_item, values);
                 adapter.setDropDownViewResource(R.layout.spinner_layout);

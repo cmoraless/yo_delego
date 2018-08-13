@@ -16,7 +16,7 @@
 
         <RelativeLayout
             android:id="@+id/email_login_form"
-            android:layout_width="350dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:orientation="vertical"
@@ -92,9 +92,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/form"
+                android:layout_marginTop="30dp"
                 layout="@layout/content_bank_form"/>
 
-            <CheckBox
+            <!--<CheckBox
                 android:id="@+id/terms"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -102,13 +103,38 @@
                 android:layout_marginTop="30dp"
                 android:checked="false"
                 android:enabled="false"
-                android:text="@string/agree_terms" />
+                android:text="@string/agree_terms" />-->
+
+            <RelativeLayout
+                android:id="@+id/terms_layout"
+                android:layout_width="wrap_content"
+                android:layout_below="@id/form2"
+                android:layout_marginTop="10dp"
+                android:layout_height="wrap_content">
+
+                <CheckBox
+                    android:id="@+id/terms"
+                    android:text=""
+                    android:enabled="false"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/terms_text"
+                    android:layout_toRightOf="@id/terms"
+                    android:text="@string/agree_terms"
+                    android:layout_marginLeft="10dp"
+                    android:textColor="@color/primary_text_dark_focused"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </RelativeLayout>
 
             <Button
                 android:id="@+id/create_account_button"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
-                android:layout_below="@id/terms"
+                android:layout_below="@id/terms_layout"
                 android:layout_marginBottom="20dp"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/button_primary_background"

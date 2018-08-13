@@ -3,6 +3,7 @@ package kiwigroup.yodelego.adapter;
 import android.graphics.PorterDuff;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,8 @@ import kiwigroup.yodelego.model.Offer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -31,6 +34,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private final OnUserFragmentsListener mListener;
     private List<Offer> applications;
     private Application.ApplicationStatus statusFilter;
+    private boolean completeFilter;
 
     public ApplicationAdapter(OnUserFragmentsListener listener, Application.ApplicationStatus filter) {
         applications = new ArrayList<>();
@@ -38,10 +42,26 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         statusFilter = filter;
     }
 
+    public ApplicationAdapter(OnUserFragmentsListener listener, boolean completeFilter) {
+        applications = new ArrayList<>();
+        mListener = listener;
+        this.completeFilter = completeFilter;
+    }
+
     public void update(List<Offer> applications) {
         this.applications.clear();
         for(Offer offer : applications){
-            if(offer.getApplication().getApplicationStatus() == statusFilter)
+            if(completeFilter){
+                Log.d("********* Offer: ", offer.getTitle());
+                Date currentTime = Calendar.getInstance().getTime();
+                if((offer.getEndDate() == null || currentTime.after(offer.getEndDate())) &&
+                    //offer.getStatus() != Offer.OfferStatus.CANCELED &&
+                    //offer.getStatus() != Offer.OfferStatus.DEACTIVATED &&
+                    //offer.getStatus() != Offer.OfferStatus.PAUSED &&
+                    offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED) {
+                    this.applications.add(offer);
+                }
+            } else if(offer.getApplication().getApplicationStatus() == statusFilter)
                 this.applications.add(offer);
         }
         notifyDataSetChanged();
@@ -92,7 +112,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             ApplicationViewHolder offerViewHolder = (ApplicationViewHolder) holder;
             final Offer offer = applications.get(position);
             switch(offer.getApplication().getApplicationStatus()){
-                case CANCELED:
+                case CANCELED_BY_APPLICANT:
                     offerViewHolder.status.setText("cerrado");
                     offerViewHolder.status.getBackground().setColorFilter(
                             ContextCompat.getColor(offerViewHolder.status.getContext(),
@@ -133,7 +153,12 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             loadingViewHolder.progressBar.setIndeterminate(true);
         } else if(holder instanceof EmptyViewHolder) {
             EmptyViewHolder emptyViewHolder = (EmptyViewHolder) holder;
-            emptyViewHolder.resume.setText(statusFilter == ACCEPTED ? "no tienes postulaciones adjudicadas" : statusFilter == REVISION ? "no tienes postulaciones en revisión" : "no tienes postulaciones completadas");
+            if(completeFilter)
+                emptyViewHolder.resume.setText("no tienes postulaciones completadas");
+            else if(statusFilter == ACCEPTED)
+                emptyViewHolder.resume.setText("no tienes postulaciones adjudicadas");
+            else if(statusFilter == REVISION)
+                emptyViewHolder.resume.setText("no tienes postulaciones en revisión");
         }
     }
 

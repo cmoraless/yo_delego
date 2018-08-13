@@ -26,6 +26,7 @@ import com.android.volley.Response;
 import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,6 +46,11 @@ import kiwigroup.yodelego.model.User;
 import kiwigroup.yodelego.model.WallItem;
 import kiwigroup.yodelego.server.ServerCommunication;
 import kiwigroup.yodelego.services.NotificationsListenerService;
+
+import static kiwigroup.yodelego.model.Offer.OfferStatus.CANCELED;
+import static kiwigroup.yodelego.model.Offer.OfferStatus.CLOSED;
+import static kiwigroup.yodelego.model.Offer.OfferStatus.DEACTIVATED;
+import static kiwigroup.yodelego.model.Offer.OfferStatus.PAUSED;
 
 public class MainActivity
     extends
@@ -108,25 +114,25 @@ public class MainActivity
     boolean alreadyAsked = false;
 
     public void handleProfileEditionBack(final int viewId) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Edición de perfil");
-            builder.setMessage("¿Quieres volver sin guardar los cambios?");
-            builder.setPositiveButton("Sí",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        alreadyAsked = true;
-                        bottomNavigationView.setSelectedItemId(viewId);
-                    }
-                });
-            builder.setNegativeButton("No",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Edición de perfil");
+        builder.setMessage("¿Quieres volver sin guardar los cambios?");
+        builder.setPositiveButton("Sí",
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    alreadyAsked = true;
+                    bottomNavigationView.setSelectedItemId(viewId);
+                }
+            });
+        builder.setNegativeButton("No",
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
             builder.show();
     }
 
@@ -454,7 +460,11 @@ public class MainActivity
                                             offer.setApplication(application.getApplication());
                                         }
                                     }
-                                    newWallOffers.add(offer);
+                                    /* update WallAdapter if this status are supported */
+                                    if(!(offer.getStatus() == CANCELED ||
+                                        offer.getStatus() == PAUSED ||
+                                        offer.getStatus() == DEACTIVATED))
+                                            newWallOffers.add(offer);
                                 }
                                 if(wallOffers != null){
                                     listener.onWallItemsResponse(newWallOffers);
