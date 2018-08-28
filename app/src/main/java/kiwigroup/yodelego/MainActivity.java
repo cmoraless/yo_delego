@@ -8,8 +8,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -18,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
@@ -32,6 +38,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -58,6 +65,8 @@ public class MainActivity
     implements
         OnUserFragmentsListener,
         NotificationsListenerService.NotificationListener {
+
+    public static final int PICK_IMAGE = 1;
 
     private User user;
     private NotificationsListenerService notificationService;
@@ -556,12 +565,25 @@ public class MainActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
             if(resultCode == Activity.RESULT_OK){
                 Log.d("MAIN", "****  Activity.RESULT_OK");
+                //displayView(R.id.action_wall);
                 refreshWall(listener);
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 Log.d("MAIN", "****  Activity.RESULT_CANCELED");
+            }
+        }
+        if (requestCode == PICK_IMAGE) {
+            if(resultCode == Activity.RESULT_OK) {
+                Uri selectedImage = data.getData();
+                try {
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
+                    onGalleryImageListener.onImageSelected(bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -578,6 +600,7 @@ public class MainActivity
                 @Override
                 public void onResponse(JSONObject response) {
                     if (response != null) {
+
                         Offer offer = Offer.parseFromJson(response);
                         offer.setApplied    (true);
                         offer.setApplication(application);
@@ -729,6 +752,23 @@ public class MainActivity
 
     }
 
+    private OnGalleryImageListener onGalleryImageListener;
+
+    @Override
+    public void getImageFromGallery(String message, OnGalleryImageListener listener) {
+        this.onGalleryImageListener = listener;
+        /*Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, message), PICK_IMAGE);*/
+
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, message), PICK_IMAGE);
+    }
+
     private void startPolling(){
         /*Calendar cal = Calendar.getInstance();
         AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
@@ -815,5 +855,9 @@ public class MainActivity
             }
         }, true);*/
 
+    }
+
+    public interface OnGalleryImageListener {
+        void onImageSelected(Bitmap bitmap);
     }
 }

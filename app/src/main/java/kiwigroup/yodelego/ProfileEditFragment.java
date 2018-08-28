@@ -5,6 +5,8 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -42,6 +44,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import kiwigroup.yodelego.model.User;
 import kiwigroup.yodelego.server.ServerCommunication;
 
@@ -67,6 +70,9 @@ public class ProfileEditFragment extends Fragment {
     private TextInputEditText yearTextView;
     private ArrayAdapter<String> universityAdapter;
 
+    private LinearLayout imageLayout;
+
+    private CircleImageView image;
     private TextInputLayout rutLayout;
     private TextInputLayout mailLayout;
 
@@ -112,6 +118,20 @@ public class ProfileEditFragment extends Fragment {
 
         mProgressView = view.findViewById(R.id.login_progress);
         formLayout = view.findViewById(R.id.email_login_form);
+
+        imageLayout = view.findViewById(R.id.imageLayout);
+        imageLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.getImageFromGallery("Selecciona tu imagen de perfil", new MainActivity.OnGalleryImageListener() {
+                    @Override
+                    public void onImageSelected(Bitmap bitmap) {
+                        image.setImageBitmap(bitmap);
+                    }
+                });
+            }
+        });
+        image = view.findViewById(R.id.profile_image);
 
         name = view.findViewById(R.id.first_name);
         lastName = view.findViewById(R.id.last_name);

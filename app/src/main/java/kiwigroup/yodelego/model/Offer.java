@@ -254,7 +254,11 @@ public class Offer implements Serializable, WallItem {
         this.images = new ArrayList<>();
         for(int i = 0; i < JSONArrayImages.length(); i++){
             try {
-                this.images.add(JSONArrayImages.getString(i));
+                String path = JSONArrayImages.getString(i);
+                if(!path.contains("/web.yodelego.com")){
+                    path = "http://web.yodelego.com/" + path;
+                }
+                this.images.add(path);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

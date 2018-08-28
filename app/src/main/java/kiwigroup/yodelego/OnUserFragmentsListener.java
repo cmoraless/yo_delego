@@ -19,4 +19,5 @@ public interface OnUserFragmentsListener {
     void updateUser();
     void closeNotifications();
     void onNotificationSelected();
+    void getImageFromGallery(String message, MainActivity.OnGalleryImageListener listener);
 }

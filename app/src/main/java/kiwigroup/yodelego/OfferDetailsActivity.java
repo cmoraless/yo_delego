@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Response;
 import com.android.volley.ServerError;
@@ -152,9 +153,6 @@ public class OfferDetailsActivity extends AppCompatActivity {
                                 });
                             builder.show();
                         } else if(complete){
-                            checkOffers(offer.getApplication());
-
-
                             final AlertDialog.Builder builder = new AlertDialog.Builder(OfferDetailsActivity.this);
                             LayoutInflater inflater = getLayoutInflater();
                             View view = inflater.inflate(R.layout.dialog_rank2, null);
@@ -245,6 +243,10 @@ public class OfferDetailsActivity extends AppCompatActivity {
             bottom_message.setVisibility(View.VISIBLE);
             bottom_message_text.setText("Lamentablemente esta oferta ha sido cerrada");
         }
+
+        if(!offer.isApplied()) {
+            bottom_message.setVisibility(View.GONE);
+        }
         if(offer.getRating() == -1.0f)
             textViewRating.setText("");
         else
@@ -289,8 +291,6 @@ public class OfferDetailsActivity extends AppCompatActivity {
         else
             textViewRating.setText(String.format(Locale.US, "%.1f", application.getRating()));
 
-        Log.d("OfferDetailsActivity", "status::::" + application.getApplicationStatus());
-        Log.d("OfferDetailsActivity", "status::::" + (application.getApplicationStatus() == Application.ApplicationStatus.ACCEPTED));
         Date currentTime = Calendar.getInstance().getTime();
         /*if((offer.getEndDate() == null || currentTime.after(offer.getEndDate()) &&
             offer.getStatus() != Offer.OfferStatus.CANCELED &&
@@ -307,12 +307,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
                 offer.getStatus() != Offer.OfferStatus.PAUSED &&
                 offer.getStatus() != Offer.OfferStatus.CLOSED &&
                 application.getApplicationStatus() == Application.ApplicationStatus.ACCEPTED){
-            complete = true;
-            accept_button.setVisibility(GONE);
-            bottom_message.setVisibility(View.VISIBLE);
-            bottom_message_text.setText("Debes calificar esta oferta");
-            action_button.setVisibility(View.VISIBLE);
-            cancel_text.setText("Calificar");
+            checkReviews(offer.getApplication());
         }
     }
 
@@ -337,6 +332,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
                         Log.d("OfferDetailsActivity", "onResponse: " + response.toString());
                         accept_button.setVisibility(GONE);
                         bottom_message.setVisibility(View.VISIBLE);
+                        bottom_message_text.setText("Has postulado a esta tarea, te avisaremos cuando sea adjudicada");
                         accepted_offer = true;
                     }
                 })
@@ -387,15 +383,12 @@ public class OfferDetailsActivity extends AppCompatActivity {
         args.put("rating", Math.round(rating));
         args.put("text", text);
 
-        Log.d("rating***", String.valueOf(Math.round(rating)));
-        Log.d("text***", text);
-
         ServerCommunication sc = new ServerCommunication.ServerCommunicationBuilder(this,
             String.format(Locale.US,"applications/%d/reviews/", application_id))
             .POST()
             .tokenized(true)
             .parameters(args)
-            .objectReturnListener(new Response.Listener<JSONObject>() {
+            /*.nullableListener(new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(OfferDetailsActivity.this);
@@ -410,6 +403,27 @@ public class OfferDetailsActivity extends AppCompatActivity {
                             });
                     builder.show();
                 }
+            })*/
+            .objectReturnListener(new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(OfferDetailsActivity.this);
+                    builder.setTitle(getString(R.string.application));
+                    builder.setMessage("Hemos calificado exitosamente la oferta");
+                    builder.setNegativeButton("Ok",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                    builder.show();
+
+                    bottom_message.setVisibility(GONE);
+                    accept_button.setVisibility(View.VISIBLE);
+                    accept_button.setEnabled(false);
+                    textViewButtonText.setText("Completado");
+                }
             })
             .errorListener(new Response.ErrorListener() {
                 @Override
@@ -419,6 +433,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
                     } else if (volleyError instanceof ServerError) {
                         try {
                             JSONObject responseObject = new JSONObject(new String(volleyError.networkResponse.data));
+                            Log.d("OfferDetail", "----------------->" + new String(volleyError.networkResponse.data));
                             String genericError = "";
                             Iterator<String> iter = responseObject.keys();
                             while (iter.hasNext()) {
@@ -456,6 +471,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
                 public void onResponse(JSONObject response) {
                     Intent returnIntent = new Intent();
                     setResult(Activity.RESULT_OK, returnIntent);
+                    finish();
                 }
             })
             .errorListener(new Response.ErrorListener() {
@@ -490,26 +506,41 @@ public class OfferDetailsActivity extends AppCompatActivity {
     }
 
 
-    private void checkOffers(Application application){
+    private void checkReviews(Application application){
         ServerCommunication MyApplicationsWS = new ServerCommunication.ServerCommunicationBuilder(this,
-                String.format(Locale.US,"applications/%d/reviews/", application.getId()))
-                .GET()
-                .tokenized(true)
-                .arrayReturnListener(new Response.Listener<JSONArray> () {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        if (response != null) {
-                            Log.d("MainActivity", "**** reviews response: " + response.toString());
-                        }
+            String.format(Locale.US,"applications/%d/reviews/", application.getId()))
+            .GET()
+            .tokenized(true)
+            .objectReturnListener(new Response.Listener<JSONObject> () {
+                @Override
+                public void onResponse(JSONObject response) {
+                    if (response != null) {
+                        Log.d("MainActivity", "**** reviews response: " + response.toString());
+                        bottom_message.setVisibility(GONE);
+                        accept_button.setEnabled(false);
+                        textViewButtonText.setText("Completado");
                     }
-                })
-                .errorListener(new Response.ErrorListener() {
-                   @Override
-                   public void onErrorResponse(VolleyError error) {
-                       error.printStackTrace();
+                }
+            })
+            .errorListener(new Response.ErrorListener() {
+               @Override
+               public void onErrorResponse(VolleyError error) {
+                   error.printStackTrace();
 
+                   NetworkResponse networkResponse = error.networkResponse;
+                   if (networkResponse != null) {
+                       Log.e("Status code", String.valueOf(networkResponse.statusCode));
+
+                       complete = true;
+                       accept_button.setVisibility(GONE);
+                       bottom_message.setVisibility(View.VISIBLE);
+                       bottom_message_text.setText("Puedes calificar esta oferta");
+                       action_button.setVisibility(View.VISIBLE);
+                       cancel_text.setText("Calificar");
                    }
-               }).build();
+
+               }
+           }).build();
         MyApplicationsWS.execute();
     }
 

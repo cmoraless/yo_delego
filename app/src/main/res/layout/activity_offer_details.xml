@@ -478,7 +478,7 @@
         android:layout_gravity="bottom"
         android:gravity="center"
         android:padding="8dp"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_alignParentBottom="true" >
 
         <TextView

@@ -78,6 +78,7 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
                             onLoginError(getString(R.string.error_network));
                         } else if (volleyError instanceof ServerError) {
                             try {
+                                Log.d("startLoginProcess", "---> onErrorResponse " + new String(volleyError.networkResponse.data));
                                 JSONObject responseObject = new JSONObject(new String(volleyError.networkResponse.data));
                                 Log.d("startLoginProcess", "---> onErrorResponse " + responseObject.toString());
                                 String genericError = "";

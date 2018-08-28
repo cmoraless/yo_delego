@@ -52,7 +52,6 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         this.applications.clear();
         for(Offer offer : applications){
             if(completeFilter){
-                Log.d("********* Offer: ", offer.getTitle());
                 Date currentTime = Calendar.getInstance().getTime();
                 if((offer.getEndDate() == null || currentTime.after(offer.getEndDate())) &&
                     //offer.getStatus() != Offer.OfferStatus.CANCELED &&
@@ -111,6 +110,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         if (holder instanceof ApplicationViewHolder) {
             ApplicationViewHolder offerViewHolder = (ApplicationViewHolder) holder;
             final Offer offer = applications.get(position);
+
             switch(offer.getApplication().getApplicationStatus()){
                 case CANCELED_BY_APPLICANT:
                     offerViewHolder.status.setText("cerrado");

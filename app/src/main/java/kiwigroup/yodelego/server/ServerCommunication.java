@@ -143,8 +143,9 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
         mQueue = Volley.newRequestQueue(mContext);
 
         if(jsonObjectListener != null){
-            if(withToken){
-                Log.d("******", "*********** enters");
+                if(withToken){
+                if(parameters != null)
+                    Log.d("******", "*********** parameters" + new JSONObject(parameters));
                 JsonObjectRequest request = new JsonObjectRequest(
                     method,
                     mContext.getString(R.string.server_base_url) + service,
@@ -155,18 +156,24 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
                         public Map<String, String> getHeaders() throws AuthFailureError {
                             Map<String, String> headers = new HashMap<>();
                             headers.put("Authorization", "Token " + TOKEN);
-                            //headers.put("Content-Type", "application/json; charset=utf-8");
                             return headers;
                         }
-                    @Override
-                    public String getBodyContentType() {
-                        return "application/json; charset=utf-8";
-                    }
+
+                        /*@Override
+                        public String getBodyContentType(){
+                            return "application/json";
+                        }*/
+
                 };
                 mQueue.add(request);
             } else {
                 Log.d("startLoginProcess", "jsonObjectListener == null");
-                JsonObjectRequest request = new JsonObjectRequest(method, mContext.getString(R.string.server_base_url) + service, parameters != null ? new JSONObject(parameters) : null, jsonObjectListener, errorListener);
+                JsonObjectRequest request = new JsonObjectRequest(
+                    method,
+                    mContext.getString(R.string.server_base_url) + service,
+                    parameters != null ? new JSONObject(parameters) : null,
+                    jsonObjectListener,
+                    errorListener);
                 //CustomRequest request = new CustomRequest(Request.Method.POST, mContext.getString(R.string.server_base_url) + service, parameters, jsonObjectListener, errorListener);
                 mQueue.add(request);
                 return "";
