@@ -11,14 +11,19 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 import java.util.Locale;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import kiwigroup.yodelego.model.Application;
 import kiwigroup.yodelego.model.Offer;
 import kiwigroup.yodelego.model.User;
 
 public class ProfileFragment extends Fragment {
+    private CircleImageView image;
+
     private TextView userType;
     private TextView name;
     private TextView rut;
@@ -67,7 +72,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        image = view.findViewById(R.id.profile_image);
         userType = view.findViewById(R.id.user_type);
         edit = view.findViewById(R.id.edit);
         edit.setOnClickListener(new View.OnClickListener() {
@@ -92,7 +97,7 @@ public class ProfileFragment extends Fragment {
         assigned_offers = view.findViewById(R.id.assigned_offers_amounts);
         complete_offers = view.findViewById(R.id.complete_offers_amount);
 
-        textViewRating = view.findViewById(R.id.rating);
+        textViewRating = view.findViewById(R.id.publisherRating);
 
         loadData(user);
 
@@ -121,7 +126,7 @@ public class ProfileFragment extends Fragment {
 
     private void loadData(User user){
         name.setText(String.format(Locale.US, "%s %s", user.getName(), user.getLastName()));
-        rut.setText(user.getRut());
+        rut.setText(RUTformat(user.getRut()));
         mail.setText(user.getEmail());
         userType.setText(user.getEducationalInstitution() == null ? "Trabajador" : "Estudiante");
 
@@ -135,6 +140,13 @@ public class ProfileFragment extends Fragment {
             textViewRating.setText("");
         else
             textViewRating.setText(String.format(Locale.US, "%.1f", user.getApplicantRating()));
+
+        if(user.getProfileImage() != null && !user.getProfileImage().isEmpty()){
+            Picasso.get()
+                .load(user.getProfileImage())
+                .placeholder(R.drawable.ic_profile)
+                .into(image);
+        }
     }
 
     @Override
@@ -151,5 +163,22 @@ public class ProfileFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         listener = null;
+    }
+
+    public String RUTformat(String rut) {
+        int cont = 0;
+        String format;
+        rut = rut.replace(".", "");
+        rut = rut.replace("-", "");
+        format = "-" + rut.substring(rut.length() - 1);
+        for (int i = rut.length() - 2; i >= 0; i--) {
+            format = rut.substring(i, i + 1) + format;
+            cont++;
+            if (cont == 3 && i != 0) {
+                format = "." + format;
+                cont = 0;
+            }
+        }
+        return format;
     }
 }

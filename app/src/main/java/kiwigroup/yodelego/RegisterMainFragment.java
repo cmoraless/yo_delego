@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,6 +36,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class RegisterMainFragment extends Fragment {
 
     private OnRegisterFragmentListener mListener;
@@ -52,6 +55,8 @@ public class RegisterMainFragment extends Fragment {
     private TextView textViewPassword;
     private TextView textViewConfirmPassword;
     private TextView textViewTermsConditions;
+    private LinearLayout imageLayout;
+    private CircleImageView image;
 
     private Spinner bankSpinner;
     private Spinner accountSpinner;
@@ -75,6 +80,8 @@ public class RegisterMainFragment extends Fragment {
 
     private boolean student;
     private boolean noStudent;
+
+    private Bitmap profileBitmap = null;
 
     public static RegisterMainFragment newInstance() {
         RegisterMainFragment fragment = new RegisterMainFragment();
@@ -222,6 +229,22 @@ public class RegisterMainFragment extends Fragment {
                 }
             }
         });
+
+        imageLayout = view.findViewById(R.id.imageLayout);
+        imageLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.getImageFromGallery("Selecciona tu imagen de perfil", new MainActivity.OnGalleryImageListener() {
+                    @Override
+                    public void onImageSelected(Bitmap bitmap) {
+                        image.setImageBitmap(bitmap);
+                        profileBitmap = bitmap;
+                    }
+                });
+            }
+        });
+        image = view.findViewById(R.id.profile_image);
+
         textViewFirstName = view.findViewById(R.id.first_name);
         textViewLastName = view.findViewById(R.id.last_name);
         textViewRut = view.findViewById(R.id.rut);
@@ -384,6 +407,7 @@ public class RegisterMainFragment extends Fragment {
     }
 
     private void attemptCreateAccount() {
+
         textViewFirstName.setError(null);
         textViewLastName.setError(null);
         textViewMail.setError(null);
@@ -430,6 +454,10 @@ public class RegisterMainFragment extends Fragment {
         }
         if(TextUtils.isEmpty(phone)){
             textViewPhone.setError(getString(R.string.error_field_required));
+            focusView = textViewPhone;
+            cancel = true;
+        } else if(!isValidPhone(phone)){
+            textViewPhone.setError(getString(R.string.error_phone_not_valid));
             focusView = textViewPhone;
             cancel = true;
         }
@@ -496,22 +524,32 @@ public class RegisterMainFragment extends Fragment {
                 cancelButton.setEnabled(false);
                 cancelButton.setAlpha(.5f);
                 mListener.createAccount(false,
-                    firstName,
-                    lastName,
-                    rut,
-                    email,
-                    phone,
-                    password,
-                    -1,
-                    -1,
-                    null,
-                    null,
-                    bank,
-                    accountType,
-                    account.replaceAll("-", ""));
+                        firstName,
+                        lastName,
+                        rut,
+                        email,
+                        phone,
+                        password,
+                        -1,
+                        -1,
+                        null,
+                        null,
+                        bank,
+                        accountType,
+                        account.replaceAll("-", ""),
+                        profileBitmap);
             } else if(studentButton.isChecked()){
                 RegisterStudentFragment studentFragment = RegisterStudentFragment.newInstance(
-                        firstName, lastName, rut, phone, email, password, bank, accountType, account.replaceAll("-", ""));
+                        firstName,
+                        lastName,
+                        rut,
+                        phone,
+                        email,
+                        password,
+                        bank,
+                        accountType,
+                        account.replaceAll("-", ""),
+                        profileBitmap);
                 mListener.addFragmentToMainContent(studentFragment, true, getString(R.string.id_student_fragment));
             }
         }
@@ -536,8 +574,8 @@ public class RegisterMainFragment extends Fragment {
                 validacion = true;
             }
 
-        } catch (java.lang.NumberFormatException e) {
         } catch (Exception e) {
+            validacion = false;
         }
         return validacion;
     }
@@ -563,12 +601,16 @@ public class RegisterMainFragment extends Fragment {
         return false;
     }
 
+    private boolean isValidPhone(String phone){
+        return phone.length() <= 12 && android.util.Patterns.PHONE.matcher(phone).matches();
+    }
+
     private boolean isEmailValid(String email) {
         return email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
-        return password.length() > 4;
+        return password.length() > 6;
     }
 
     @Override

@@ -94,15 +94,25 @@ public class NotificationsListenerService extends Service {
                                 int kind = object.getInt("kind");
                                 String offer = object.getString("offer");
 
+                                /*OFFER_AVAILABLE = 0
+                                APPLICATION_ACCEPTED = 1
+                                APPLICATION_REJECTED = 2
+                                APPLICATION_CANCELED_BY_APPLICANT = 3
+                                OFFER_PAUSED = 4
+                                OFFER_CANCELED = 5*/
+
                                 // Offer available
                                 if(kind == 0){
                                     available_offers ++;
+                                    sendNotification(String.format("Existe una nueva oferta disponible", offer));
                                 // Application accepted
                                 } else if (kind == 1){
                                     sendNotification(String.format("Tu postulación a %s ha sido aceptada", offer));
                                 // Application rejected
                                 } else if (kind == 2){
                                     sendNotification(String.format("Tu postulación a %s ha sido rechazada", offer));
+                                } else if (kind == 3){
+                                    sendNotification(String.format("Tu postulación a %s ha sido cancelada por su creador", offer));
                                 }
 
                                 kiwigroup.yodelego.model.Notification notification = kiwigroup.yodelego.model.Notification.parseFromJson(object);

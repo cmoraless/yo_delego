@@ -151,6 +151,12 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
                                 if(response.has("bank_account_number") && !response.isNull("bank_account_number") && !response.getString("bank_account_number").isEmpty())
                                     user.setAccountNumber(response.getString("bank_account_number"));
 
+                                if(response.has("profile_picture") && !response.isNull("profile_picture") && !response.getString("profile_picture").isEmpty())
+                                    user.setProfileImage(response.getString("profile_picture"));
+
+                                if(response.has("publisher_rating") && !response.isNull("publisher_rating") && !response.getString("publisher_rating").isEmpty())
+                                    user.setPublisherRating(Float.parseFloat(response.getString("publisher_rating")));
+
                                 SharedPreferences sharedPref = getSharedPreferences("login", Context.MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sharedPref.edit();
                                 editor.putString("username", username);
@@ -165,6 +171,7 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
                                 Log.e("LoginActivity", "SCUser getEmail " + user.getEmail());
                                 Log.e("LoginActivity", "SCUser getRut " + user.getRut());
                                 Log.e("LoginActivity", "SCUser getEnrollmentYear " + user.getEnrollmentYear());
+                                Log.e("LoginActivity", "SCUser setProfileImage " + user.getProfileImage());
 
                                 onLoginSuccess(user);
 

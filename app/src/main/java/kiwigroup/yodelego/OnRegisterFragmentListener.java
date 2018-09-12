@@ -1,5 +1,6 @@
 package kiwigroup.yodelego;
 
+import android.graphics.Bitmap;
 import android.support.v4.app.Fragment;
 
 public interface OnRegisterFragmentListener {
@@ -19,7 +20,9 @@ public interface OnRegisterFragmentListener {
                        String semester,
                        int bank,
                        int bank_account_type,
-                       String bank_account_number);
+                       String bank_account_number,
+                       Bitmap profileBitmap);
+    void getImageFromGallery(String message, MainActivity.OnGalleryImageListener listener);
     void finish();
     void goToWall();
     void goToLogin();

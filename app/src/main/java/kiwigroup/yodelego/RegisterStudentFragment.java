@@ -2,11 +2,16 @@ package kiwigroup.yodelego;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,11 +19,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 
 import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,9 +40,11 @@ public class RegisterStudentFragment extends Fragment {
     private SearchableSpinner categoriesSpinner;
     private TextInputEditText careerTextView;
     private TextInputEditText yearTextView;
+    private TextInputLayout yearLayout;
     private Button signUpButton;
     private Button cancelButton;
 
+    private Bitmap profileBitmap;
     private String firstName;
     private String lastName;
     private String rut;
@@ -58,7 +67,8 @@ public class RegisterStudentFragment extends Fragment {
             String password,
             int bank,
             int accountType,
-            String account) {
+            String account,
+            Bitmap profileBitmap) {
         RegisterStudentFragment fragment = new RegisterStudentFragment();
 
         Bundle bundle = new Bundle();
@@ -72,6 +82,7 @@ public class RegisterStudentFragment extends Fragment {
         bundle.putInt("bank", bank);
         bundle.putInt("accountType", accountType);
         bundle.putString("account", account);
+        bundle.putParcelable("profile", profileBitmap);
 
         fragment.setArguments(bundle);
         return fragment;
@@ -90,6 +101,7 @@ public class RegisterStudentFragment extends Fragment {
             bank = getArguments().getInt("bank");
             accountType = getArguments().getInt("accountType");
             account = getArguments().getString("account");
+            profileBitmap = getArguments().getParcelable("profile");
         }
     }
 
@@ -109,6 +121,39 @@ public class RegisterStudentFragment extends Fragment {
         categoriesSpinner = view.findViewById(R.id.cat_spinner);
         careerTextView = view.findViewById(R.id.career);
         yearTextView = view.findViewById(R.id.enrollment_year);
+        yearLayout = view.findViewById(R.id.year_layout);
+        yearTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final NumberPicker numPicker = new NumberPicker(getActivity());
+                numPicker.setMaxValue(Calendar.getInstance().get(Calendar.YEAR));
+                numPicker.setValue(Calendar.getInstance().get(Calendar.YEAR));
+                numPicker.setMinValue(1920);
+                numPicker.setWrapSelectorWheel(false);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setView(numPicker);
+                builder.setTitle("Año de ingreso");
+                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        yearTextView.setText(String.valueOf(numPicker.getValue()));
+                    }
+                });
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        yearTextView.setText("");
+                    }
+                });
+                builder.create();
+                builder.show();
+            }
+        });
 
         signUpButton = view.findViewById(R.id.create_account_button);
         signUpButton.setOnClickListener(new View.OnClickListener() {
@@ -263,7 +308,8 @@ public class RegisterStudentFragment extends Fragment {
                 year,
                 bank,
                 accountType,
-                account);
+                account,
+                profileBitmap);
         }
     }
 

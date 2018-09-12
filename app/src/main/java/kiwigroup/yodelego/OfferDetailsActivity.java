@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
@@ -99,7 +100,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
         textViewButtonText = findViewById(R.id.button_text);
         imageViewButton = findViewById(R.id.button_icon);
 
-        textViewRating = findViewById(R.id.rating);
+        textViewRating = findViewById(R.id.publisherRating);
         textViewAddress = findViewById(R.id.address);
 
         accept_button.setOnClickListener(new View.OnClickListener() {
@@ -155,13 +156,44 @@ public class OfferDetailsActivity extends AppCompatActivity {
                         } else if(complete){
                             final AlertDialog.Builder builder = new AlertDialog.Builder(OfferDetailsActivity.this);
                             LayoutInflater inflater = getLayoutInflater();
-                            View view = inflater.inflate(R.layout.dialog_rank2, null);
+                            final View view = inflater.inflate(R.layout.dialog_rank2, null);
                             final RatingBar ratingBar = view.findViewById(R.id.dialog_ratingbar);
                             final TextView text = view.findViewById(R.id.text);
+                            text.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                                @Override
+                                public void onFocusChange(View v, boolean hasFocus) {
+                                    if (!hasFocus) {
+                                        InputMethodManager inputMethodManager =
+                                                (InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
+                                        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                                    }
+                                }
+                            });
                             ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
                                 @Override
                                 public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                                    ((AlertDialog) currenRatingDialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                                    ((AlertDialog) currenRatingDialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(rating > 0);
+                                    InputMethodManager inputMethodManager =
+                                            (InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
+                                    inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                                }
+                            });
+                            ratingBar.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    InputMethodManager inputMethodManager =
+                                            (InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
+                                    inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                                }
+                            });
+                            ratingBar.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                                @Override
+                                public void onFocusChange(View v, boolean hasFocus) {
+                                    if(hasFocus){
+                                        InputMethodManager inputMethodManager =
+                                                (InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
+                                        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                                    }
                                 }
                             });
                             builder.setView(view);
@@ -171,7 +203,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
                             builder.setPositiveButton("Calificar", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     if(ratingBar.getRating() > 0){
-                                        rateApplication(offer.getApplication().getId() , ratingBar.getRating() , text.getText().toString());
+                                        //rateApplication(offer.getApplication().getId() , ratingBar.getPublisherRating() , text.getText().toString());
                                         dialog.dismiss();
                                     }
                                 }
@@ -247,10 +279,10 @@ public class OfferDetailsActivity extends AppCompatActivity {
         if(!offer.isApplied()) {
             bottom_message.setVisibility(View.GONE);
         }
-        if(offer.getRating() == -1.0f)
+        if(offer.getPublisherRating() == -1.0f)
             textViewRating.setText("");
         else
-            textViewRating.setText(String.format(Locale.US, "%.1f", offer.getRating()));
+            textViewRating.setText(String.format(Locale.US, "%.1f", offer.getPublisherRating()));
     }
 
     DialogInterface currenRatingDialog;
@@ -292,23 +324,22 @@ public class OfferDetailsActivity extends AppCompatActivity {
             textViewRating.setText(String.format(Locale.US, "%.1f", application.getRating()));
 
         Date currentTime = Calendar.getInstance().getTime();
-        /*if((offer.getEndDate() == null || currentTime.after(offer.getEndDate()) &&
-            offer.getStatus() != Offer.OfferStatus.CANCELED &&
-            offer.getStatus() != Offer.OfferStatus.DEACTIVATED &&
-            offer.getStatus() != Offer.OfferStatus.PAUSED &&
-            offer.getStatus() != Offer.OfferStatus.CLOSED &&
-            application.getApplicationStatus() == Application.ApplicationStatus.ACCEPTED)
-            //&& offer.isPaid()
-            ){*/
 
-        if((offer.getEndDate() == null || currentTime.after(offer.getEndDate())) &&
+        /*if((offer.getEndDate() == null || currentTime.after(offer.getEndDate())) &&
                 offer.getStatus() != Offer.OfferStatus.CANCELED &&
                 offer.getStatus() != Offer.OfferStatus.DEACTIVATED &&
                 offer.getStatus() != Offer.OfferStatus.PAUSED &&
                 offer.getStatus() != Offer.OfferStatus.CLOSED &&
                 application.getApplicationStatus() == Application.ApplicationStatus.ACCEPTED){
             checkReviews(offer.getApplication());
-        }
+        }*/
+
+        /*complete = true;
+        accept_button.setVisibility(GONE);
+        bottom_message.setVisibility(View.VISIBLE);
+        bottom_message_text.setText("Puedes calificar esta oferta");
+        action_button.setVisibility(View.VISIBLE);
+        cancel_text.setText("Calificar");*/
     }
 
     @Override

@@ -23,7 +23,7 @@
     <string name="first_name">Nombre</string>
     <string name="last_name">Apellido</string>
     <string name="email">Tu correo</string>
-    <string name="phone">Número de teléfono</string>
+    <string name="phone">Número de teléfono (ej.+56999999999)</string>
     <string name="password">Contraseña</string>
     <string name="confirm_password">Confirmar Contraseña</string>
     <string name="country">País</string>
@@ -46,16 +46,19 @@
     <string name="action_sign_in">Iniciar sesión</string>
     <string name="action_create_account">Crear cuenta</string>
     <string name="error_invalid_email">El correo es inválido</string>
-    <string name="error_invalid_password">La contraseña es muy corta</string>
+    <string name="error_invalid_password">La contraseña debe tener al menos 6 caracteres</string>
     <string name="error_incorrect_password_or_login">Oops, credenciales incorrectas</string>
     <string name="error_field_required">Este campo es necesario</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
 
+    <string name="error_phone_not_valid">El teléfono no es válido</string>
+
     <string name="error_login">Problema al iniciar sesión</string>
     <string name="error_network">Por favor verifica tu conexión a Internet</string>
-    <string name="error_server">Oops, server error, please contact us for support</string>
-    <string name="error_parser">Oops, an error occurred while processing your information</string>
-    <string name="error_timeout">Oops, The server is taking too long to respond</string>
+    <string name="error_server">Oops, error del servidor</string>
+    <string name="error_parser">Oops, ocurrió un error mientras procesabamos tu información</string>
+    <string name="error_timeout">Oops, el servidor está tardando en responder</string>
+    <string name="error_form">Por favor revisa los errores en los campos del formulario</string>
     <string name="error_json_exception">Json exception</string>
 
     <string name="error_creating_account">Problema al crear la cuenta</string>
@@ -79,8 +82,8 @@
     <string name="applicated">Postulando</string>
 
     <string name="error_recovering_password">Error mientras recuperas tu contraseña</string>
-    <string name="password_recovery_message">Password recovery success</string>
-    <string name="password_recovery">Password recovery</string>
+    <string name="password_recovery_message">Recuperación de la contraseña exitosa</string>
+    <string name="password_recovery">Recuperación de contraseña</string>
 
     <string name="inactive_account_title">Inactive account</string>
     <string name="inactive_account_message">Your account is not yet active. We\'ll send you an email with instructions.</string>
@@ -92,7 +95,7 @@
 
     <string name="account_number">Número de cuenta (Opcional)</string>
 
-    <string name="rut">Rut (1111111k)</string>
+    <string name="rut">Rut (ej.1111111k)</string>
     <string name="rut_hint">1111111k</string>
 
     <string name="text_wall">Muro</string>

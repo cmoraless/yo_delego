@@ -33,7 +33,8 @@ public class Offer implements Serializable, WallItem {
     private int dailyWage;
     private int hourlyWage;
     private int totalWage;
-    private float rating;
+    private float publisherRating;
+    private String publisherProfilePicture;
     private String summary;
     private String commune;
     private String address;
@@ -73,18 +74,20 @@ public class Offer implements Serializable, WallItem {
                 offer.setTotalWage(object.getInt("total_wage"));
             if(!object.isNull("images"))
                 offer.setImages(object.getJSONArray("images"));
+            if(!object.isNull("publisher_profile_picture"))
+                offer.setPublisherProfilePicture(object.getString("publisher_profile_picture"));
 
             offer.setStatus(Offer.OfferStatus.fromInteger(object.getInt("status")));
 
-            if(!object.isNull("rating")){
+            if(!object.isNull("publisher_rating")){
                 try {
-                    offer.setRating(BigDecimal.valueOf(object.getDouble("rating")).floatValue());
+                    offer.setPublisherRating(BigDecimal.valueOf(object.getDouble("publisher_rating")).floatValue());
                 } catch(Exception ex){
                     ex.printStackTrace();
-                    offer.setRating(-1.0f);
+                    offer.setPublisherRating(-1.0f);
                 }
             } else {
-                offer.setRating(-1.0f);
+                offer.setPublisherRating(-1.0f);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -206,12 +209,12 @@ public class Offer implements Serializable, WallItem {
         this.applied = applied;
     }
 
-    public float getRating() {
-        return rating;
+    public float getPublisherRating() {
+        return publisherRating;
     }
 
-    public void setRating(float rating) {
-        this.rating = rating;
+    public void setPublisherRating(float publisherRating) {
+        this.publisherRating = publisherRating;
     }
 
     public String getCommune() {
@@ -272,6 +275,14 @@ public class Offer implements Serializable, WallItem {
 
     public void setPaid(boolean paid) {
         isPaid = paid;
+    }
+
+    public void setPublisherProfilePicture(String publisherProfilePicture) {
+        this.publisherProfilePicture = publisherProfilePicture;
+    }
+
+    public String getPublisherProfilePicture(){
+        return this.publisherProfilePicture;
     }
 
     public enum OfferStatus {

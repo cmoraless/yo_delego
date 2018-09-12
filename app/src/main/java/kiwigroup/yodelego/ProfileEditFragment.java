@@ -32,6 +32,7 @@ import com.android.volley.Response;
 import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
+import com.squareup.picasso.Picasso;
 import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
 import org.json.JSONArray;
@@ -88,6 +89,7 @@ public class ProfileEditFragment extends Fragment {
 
     private Map educationInstitutions;
     private Map careerCategories;
+
 
     public static ProfileEditFragment newInstance(User user) {
         ProfileEditFragment fragment = new ProfileEditFragment();
@@ -269,6 +271,10 @@ public class ProfileEditFragment extends Fragment {
         confirmPassword.setEnabled(true);
         password.setVisibility(GONE);
         confirmPassword.setVisibility(GONE);
+
+        if(user.getProfileImage() != null && !user.getProfileImage().isEmpty()){
+            Picasso.get().load(user.getProfileImage()).placeholder(R.drawable.ic_profile).into(image);
+        }
 
         bankSpinner.setClickable(true);
         if(user.getBank() != null && !user.getBank().isEmpty()){

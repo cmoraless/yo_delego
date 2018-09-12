@@ -66,7 +66,7 @@ public class MainActivity
         OnUserFragmentsListener,
         NotificationsListenerService.NotificationListener {
 
-    public static final int PICK_IMAGE = 1;
+    public static final int PICK_IMAGE = 888;
 
     private User user;
     private NotificationsListenerService notificationService;
@@ -447,8 +447,8 @@ public class MainActivity
                     @Override
                     public void onResponse(JSONObject response) {
                         if(response != null) {
+                            Log.d("MainActivity", "**** WALL: " + response.toString());
                             try {
-                                Log.d("MainActivity", "**** WALL: " + response.toString());
                                 Log.d("MainActivity", "**** myApplications: " + myApplications.size());
                                 String url = response.getString("next");
                                 if(response.isNull("next")){
@@ -469,7 +469,7 @@ public class MainActivity
                                             offer.setApplication(application.getApplication());
                                         }
                                     }
-                                    /* update WallAdapter if this status are supported */
+                                    // update WallAdapter if this status are supported
                                     if(!(offer.getStatus() == CANCELED ||
                                         offer.getStatus() == PAUSED ||
                                         offer.getStatus() == DEACTIVATED))
@@ -814,24 +814,46 @@ public class MainActivity
             return;
         }
 
+        int available_offers = 0;
         int accepted_offers = 0;
         int rejected_offers = 0;
+        int cancelled_by_applicant_offers = 0;
+        int paused_offers = 0;
+        int cancelled_offers = 0;
+
+        /*OFFER_AVAILABLE = 0
+        APPLICATION_ACCEPTED = 1
+        APPLICATION_REJECTED = 2
+        APPLICATION_CANCELED_BY_APPLICANT = 3
+        OFFER_PAUSED = 4
+        OFFER_CANCELED = 5*/
+
         for(kiwigroup.yodelego.model.Notification notification : this.notifications){
-            // Offer accepted
-            if (notification.getKind() == 1){
+            if (notification.getKind() == 0){
+                available_offers ++;
+            } if (notification.getKind() == 1){
                 accepted_offers ++;
-            // Application rejected
             } else if (notification.getKind() == 2){
                 rejected_offers ++;
+            } else if (notification.getKind() == 3){
+                cancelled_by_applicant_offers ++;
+            } else if (notification.getKind() == 4){
+                paused_offers ++;
+            } else if (notification.getKind() == 5){
+                cancelled_offers ++;
             }
         }
 
-        if(accepted_offers > 0 && rejected_offers > 0){
+        if( available_offers > 0){
+            this.notificationResume = new NotificationResume(String.format(Locale.US, "Tienes %d oferta nueva", available_offers));
+        } else if(accepted_offers > 0 && rejected_offers > 0){
             this.notificationResume = new NotificationResume(String.format(Locale.US, "Tienes %d postulaciones adjudicadas y %d rechazadas", accepted_offers, rejected_offers));
         } else if (accepted_offers > 0) {
             this.notificationResume = new NotificationResume(String.format(Locale.US, "Tienes %d postulaciones adjudicadas", accepted_offers));
         } else if (rejected_offers > 0) {
             this.notificationResume = new NotificationResume(String.format(Locale.US, "Tienes %d postulaciones rechazadas", rejected_offers));
+        } else if (cancelled_by_applicant_offers > 0) {
+            this.notificationResume = new NotificationResume(String.format(Locale.US, "%d postulaciones han sido canceladas por su creador", cancelled_by_applicant_offers));
         } else
             return;
 

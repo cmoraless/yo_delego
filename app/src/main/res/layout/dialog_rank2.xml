@@ -1,36 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/custom_dialog_layout_design_user_input"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:paddingLeft="20dp"
-    android:paddingRight="20dp">
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/login_form"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <RatingBar
-        android:id="@+id/dialog_ratingbar"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/custom_dialog_layout_design_user_input"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         android:clickable="true"
-        android:numStars="5"
-        android:stepSize="1.0"
-        android:isIndicator="false"/>
+        android:focusableInTouchMode="true">
 
-    <EditText
-        android:id="@+id/text"
-        android:inputType="textMultiLine"
-        android:maxLines="6"
-        android:lines="6"
-        android:maxLength="160"
-        android:padding="8dp"
-        android:hint="comentario (160 caracteres)"
-        android:gravity="top|start"
-        android:background="@drawable/button_quota_status_background"
-        android:scrollbars="vertical"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"/>
-</LinearLayout>
+        <RatingBar
+            android:id="@+id/dialog_ratingbar"
+            android:layout_marginBottom="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:progressTint="@color/colorAcademicShape"
+            android:secondaryProgressTint="@color/white"
+            android:numStars="5"
+            android:stepSize="1.0"
+            android:isIndicator="false"/>
+
+        <EditText
+            android:id="@+id/text"
+            android:inputType="textMultiLine"
+            android:maxLines="6"
+            android:lines="6"
+            android:maxLength="160"
+            android:padding="8dp"
+            android:hint="comentario (160 caracteres)"
+            android:gravity="top|start"
+            android:windowSoftInputMode="stateVisible|adjustResize"
+            android:background="@drawable/button_quota_status_background"
+            android:scrollbars="vertical"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"/>
+
+    </LinearLayout>
+
+</ScrollView>

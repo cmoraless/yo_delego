@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -23,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import kiwigroup.yodelego.R;
 import kiwigroup.yodelego.model.NotificationResume;
 import kiwigroup.yodelego.model.Offer;
@@ -113,7 +115,7 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         if (holder instanceof OfferViewHolder) {
-            OfferViewHolder offerViewHolder = (OfferViewHolder)holder;
+            final OfferViewHolder offerViewHolder = (OfferViewHolder)holder;
             final Offer offer = (Offer) offers.get(position);
             Log.d("WallAdpater**** " , " ***** offer: " + offer.isApplied());
             offerViewHolder.resume.setText(Html.fromHtml("<b>" + offer.getPublisher() + "</b>  publicó un nuevo trabajo"));
@@ -135,6 +137,10 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 Picasso.get().load(offer.getImages().get(0)).into(offerViewHolder.image);
             } else {
                 offerViewHolder.image.setVisibility(View.GONE);
+            }
+
+            if(offer.getPublisherProfilePicture() != null && !offer.getPublisherProfilePicture().isEmpty()){
+                Picasso.get().load(offer.getPublisherProfilePicture()).into(offerViewHolder.profileImage);
             }
 
             if(!offer.isApplied()){
@@ -247,6 +253,7 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public TextView description;
         public TextView details;
         public View layout;
+        public CircleImageView profileImage;
 
         OfferViewHolder(View view) {
             super(view);
@@ -259,6 +266,7 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             amount = view.findViewById(R.id.totalWage);
             description = view.findViewById(R.id.description);
             details = view.findViewById(R.id.details);
+            profileImage = view.findViewById(R.id.profile_image);
         }
     }
 

@@ -31,6 +31,7 @@ public class User implements Serializable {
     private String accountNumber;
     private float applicantRating;
     private float publisherRating;
+    private String profileImage;
 
     public String getName() {
         return name;
@@ -182,4 +183,13 @@ public class User implements Serializable {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
+
 }
