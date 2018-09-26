@@ -119,59 +119,14 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
                         if(response != null) {
                             Log.e("LoginActivity", "SCUser response " + response.toString());
                             try {
-                                user = new User();
-                                user.setName(response.getString("first_name"));
-                                user.setLastName(response.getString("last_name"));
-                                user.setEmail(response.getString("email"));
 
-                                if(response.has("rut") && !response.isNull("rut") && !response.getString("rut").isEmpty())
-                                    user.setRut(response.getString("rut"));
-
-                                if(response.has("phone_number") && !response.isNull("phone_number") && !response.getString("phone_number").isEmpty())
-                                    user.setPhone(response.getString("phone_number"));
-
-                                if(response.has("educational_institution") && !response.isNull("educational_institution") && !response.getString("educational_institution").isEmpty())
-                                    user.setEducationalInstitution(response.getString("educational_institution"));
-
-                                if(response.has("career_category") && !response.isNull("career_category") && !response.getString("career_category").isEmpty())
-                                    user.setCareerCategory(response.getString("career_category"));
-
-                                if(response.has("career") && !response.isNull("career") && !response.getString("career").isEmpty())
-                                    user.setCareer(response.getString("career"));
-
-                                if(response.has("enrollment_year") && !response.isNull("enrollment_year") && !response.getString("enrollment_year").isEmpty())
-                                    user.setEnrollmentYear(Integer.parseInt(response.getString("enrollment_year")));
-
-                                if(response.has("bank") && !response.isNull("bank") && !response.getString("bank").isEmpty())
-                                    user.setBank(response.getString("bank"));
-
-                                if(response.has("bank_account_kind") && !response.isNull("bank_account_kind"))
-                                    user.setAccountType(response.getInt("bank_account_kind"));
-
-                                if(response.has("bank_account_number") && !response.isNull("bank_account_number") && !response.getString("bank_account_number").isEmpty())
-                                    user.setAccountNumber(response.getString("bank_account_number"));
-
-                                if(response.has("profile_picture") && !response.isNull("profile_picture") && !response.getString("profile_picture").isEmpty())
-                                    user.setProfileImage(response.getString("profile_picture"));
-
-                                if(response.has("publisher_rating") && !response.isNull("publisher_rating") && !response.getString("publisher_rating").isEmpty())
-                                    user.setPublisherRating(Float.parseFloat(response.getString("publisher_rating")));
+                                user = User.parseFromJson(response);
 
                                 SharedPreferences sharedPref = getSharedPreferences("login", Context.MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sharedPref.edit();
                                 editor.putString("username", username);
                                 editor.putString("password", password);
                                 editor.apply();
-
-                                Log.e("LoginActivity", "SCUser getName " + user.getName());
-                                Log.e("LoginActivity", "SCUser getLastName " + user.getLastName());
-                                Log.e("LoginActivity", "SCUser getSemesters " + user.getSemesters());
-                                Log.e("LoginActivity", "SCUser getCareer " + user.getCareer());
-                                Log.e("LoginActivity", "SCUser getEducationalInstitution " + user.getEducationalInstitution());
-                                Log.e("LoginActivity", "SCUser getEmail " + user.getEmail());
-                                Log.e("LoginActivity", "SCUser getRut " + user.getRut());
-                                Log.e("LoginActivity", "SCUser getEnrollmentYear " + user.getEnrollmentYear());
-                                Log.e("LoginActivity", "SCUser setProfileImage " + user.getProfileImage());
 
                                 onLoginSuccess(user);
 

@@ -24,7 +24,6 @@ import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
-import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Response;
 import com.android.volley.ServerError;
@@ -36,8 +35,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -54,21 +55,30 @@ public class OfferDetailsActivity extends AppCompatActivity {
     private ImageView imageViewHeader;
     private TextView publicationOwner;
     private LinearLayout accept_button;
-    private LinearLayout bottom_message;
+    private LinearLayout bottom_message_bar;
     private TextView bottom_message_text;
-    private LinearLayout action_button;
+    private LinearLayout bottom_message_bar_button;
     private TextView cancel_text;
     private TextView textViewButtonText;
     private ImageView imageViewButton;
     private Offer offer;
     private TextView textViewTitle;
     private TextView textViewCreationDate;
-    private RelativeLayout taskDatesLayout;
-    private TextView textViewDates;
+    private TextView textViewJobDates;
     private TextView textViewResume;
     private TextView textViewAmount;
     private TextView textViewRating;
     private TextView textViewAddress;
+
+    private TextView textViewContactTitle;
+    private RelativeLayout textViewPhoneLayout;
+    private TextView textViewPhone;
+    private RelativeLayout textViewEmailLayout;
+    private TextView textViewEmail;
+
+    private TextView textViewStartHour;
+    private TextView textViewJobHour;
+
     private boolean complete;
 
     @Override
@@ -88,20 +98,27 @@ public class OfferDetailsActivity extends AppCompatActivity {
         publicationOwner = findViewById(R.id.publication_owner);
         textViewTitle = findViewById(R.id.title);
         textViewCreationDate = findViewById(R.id.creationDate);
-        taskDatesLayout = findViewById(R.id.task_dates_layout);
-        textViewDates = findViewById(R.id.dates);
+        textViewJobDates = findViewById(R.id.jobDate);
         textViewResume = findViewById(R.id.publication_resume);
         textViewAmount = findViewById(R.id.dailyWage);
         accept_button = findViewById(R.id.accept_button);
-        bottom_message = findViewById(R.id.bottom_message_bar);
+        bottom_message_bar = findViewById(R.id.bottom_message_bar);
         bottom_message_text = findViewById(R.id.bottom_message_text);
-        action_button = findViewById(R.id.cancel_button);
+        bottom_message_bar_button = findViewById(R.id.cancel_button);
         cancel_text = findViewById(R.id.cancel_text);
         textViewButtonText = findViewById(R.id.button_text);
         imageViewButton = findViewById(R.id.button_icon);
-
         textViewRating = findViewById(R.id.publisherRating);
         textViewAddress = findViewById(R.id.address);
+
+        textViewContactTitle = findViewById(R.id.contact_title);
+        textViewPhoneLayout = findViewById(R.id.phone_layout);
+        textViewEmailLayout = findViewById(R.id.email_layout);
+        textViewPhone = findViewById(R.id.phone);
+        textViewEmail = findViewById(R.id.email);
+
+        textViewStartHour = findViewById(R.id.start_hour);
+        textViewJobHour = findViewById(R.id.job_hours);
 
         accept_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,11 +145,11 @@ public class OfferDetailsActivity extends AppCompatActivity {
             }
         });
 
-        action_button.setOnClickListener(new View.OnClickListener() {
+        bottom_message_bar_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(offer != null)
-                    if(offer.isApplied()) {
+                    if(offer.isAppliedByMe()) {
                         if(offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.REVISION && !complete){
                             AlertDialog.Builder builder = new AlertDialog.Builder(OfferDetailsActivity.this);
                             builder.setTitle(getString(R.string.application));
@@ -172,7 +189,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
                             ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
                                 @Override
                                 public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                                    ((AlertDialog) currenRatingDialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(rating > 0);
+                                    ((AlertDialog) currentRatingDialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(rating > 0);
                                     InputMethodManager inputMethodManager =
                                             (InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
                                     inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
@@ -203,7 +220,10 @@ public class OfferDetailsActivity extends AppCompatActivity {
                             builder.setPositiveButton("Calificar", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     if(ratingBar.getRating() > 0){
-                                        //rateApplication(offer.getApplication().getId() , ratingBar.getPublisherRating() , text.getText().toString());
+                                        rateApplication(
+                                                offer.getApplication().getId(),
+                                                ratingBar.getRating(),
+                                                text.getText().toString());
                                         dialog.dismiss();
                                     }
                                 }
@@ -213,8 +233,8 @@ public class OfferDetailsActivity extends AppCompatActivity {
                                     dialog.dismiss();
                                 }
                             });
-                            currenRatingDialog = builder.show();
-                            ((AlertDialog) currenRatingDialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                            currentRatingDialog = builder.show();
+                            ((AlertDialog) currentRatingDialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
                         }
                     }
             }
@@ -223,13 +243,12 @@ public class OfferDetailsActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         if(getIntent().hasExtra("offer")){
             offer = (Offer) bundle.getSerializable("offer");
-            if(offer != null)
-                if(offer.isApplied()) {
-                    setUpForOffer(offer);
+            if(offer != null) {
+                setUpForOffer(offer);
+                if (offer.isAppliedByMe()) {
                     setUpForApplication(offer.getApplication());
-                } else {
-                    setUpForOffer(offer);
                 }
+            }
         }
     }
 
@@ -237,7 +256,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
         DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.US);
         otherSymbols.setDecimalSeparator(',');
         otherSymbols.setGroupingSeparator('.');
-        publicationOwner.setText(Html.fromHtml(String.format("publicado por <b>%s</b>", offer.getPublisher())));
+        publicationOwner.setText(Html.fromHtml(String.format("publicado por <b>%s</b>", offer.getPublisher().getName())));
         if(offer.getImages() != null && offer.getImages().size() > 0){
             imageViewHeader.setVisibility(View.VISIBLE);
             Picasso.get().load(offer.getImages().get(0)).into(imageViewHeader);
@@ -247,45 +266,89 @@ public class OfferDetailsActivity extends AppCompatActivity {
         textViewTitle.setText(offer.getTitle());
         textViewCreationDate.setText(DateUtils.getRelativeTimeSpanString(offer.getCreationDate().getTime(), new Date().getTime(),0L, DateUtils.FORMAT_ABBREV_ALL));
         textViewResume.setText(offer.getSummary());
-        textViewAddress.setText(offer.getCommune());
+        if(offer.getLocation() != null && !offer.getLocation().isEmpty()){
+            textViewAddress.setText(String.format(Locale.US, "%s, %s", offer.getLocation(), offer.getCommune()));
+        } else {
+            textViewAddress.setText(offer.getCommune());
+        }
+
         if(offer.getStartDate() != null && offer.getEndDate() != null && !offer.getStartDate().equals(offer.getEndDate())){
-            textViewDates.setText(
+            textViewJobDates.setText(
                     String.format(Locale.US, "%s a %s",
                             DateUtils.getRelativeTimeSpanString(offer.getStartDate().getTime(), new Date().getTime(), 0L, DateUtils.FORMAT_ABBREV_ALL),
                             DateUtils.getRelativeTimeSpanString(offer.getEndDate().getTime(), new Date().getTime(), 0L, DateUtils.FORMAT_ABBREV_ALL)));
         } else if((offer.getStartDate() != null)){
-            textViewDates.setText(
+            textViewJobDates.setText(
                     String.format(Locale.US, "%s",
                             DateUtils.getRelativeTimeSpanString(offer.getStartDate().getTime(), new Date().getTime(), 0L, DateUtils.FORMAT_ABBREV_ALL)));
-        } else {
-            taskDatesLayout.setVisibility(GONE);
         }
+        bottom_message_bar.setVisibility(View.GONE);
         accept_button.setVisibility(View.VISIBLE);
 
         textViewAmount.setText(String.format("$%s", new DecimalFormat("#,###", otherSymbols).format(offer.getTotalWage())));
-        if(offer.getStatus() != Offer.OfferStatus.ENTERED){
-            /*textViewButtonText.setText("Cerrado");
-            accept_button.setEnabled(false);
-            accept_button.getBackground().setColorFilter(
-                    ContextCompat.getColor(getApplicationContext(),
-                            R.color.colorLightGreyText),
-                    PorterDuff.Mode.SRC);
-            imageViewButton.setVisibility(GONE);*/
+
+        if(offer.getStatus() == Offer.OfferStatus.REVISION && !offer.hasExpired()){
             accept_button.setVisibility(GONE);
-            bottom_message.setVisibility(View.VISIBLE);
-            bottom_message_text.setText("Lamentablemente esta oferta ha sido cerrada");
+            bottom_message_bar.setVisibility(View.VISIBLE);
+            bottom_message_text.setText("Esta oferta se encuentra en revisión");
+        } else if(offer.getStatus() == Offer.OfferStatus.CANCELED){
+            accept_button.setVisibility(GONE);
+            bottom_message_bar.setVisibility(View.VISIBLE);
+            bottom_message_text.setText("Esta oferta ha sido cancelada");
+            bottom_message_bar_button.setVisibility(GONE);
+        } else if(offer.getStatus() == Offer.OfferStatus.ACCEPTED_APPLICATION && !offer.hasExpired()){
+            accept_button.setVisibility(GONE);
+            bottom_message_bar.setVisibility(View.VISIBLE);
+            bottom_message_text.setText("Esta oferta ha sido adjudicada por otro usuario");
+            bottom_message_bar_button.setVisibility(GONE);
+        } else if(offer.getStatus() == Offer.OfferStatus.FILLED){
+            accept_button.setVisibility(GONE);
+            bottom_message_bar.setVisibility(View.VISIBLE);
+            bottom_message_text.setText("Esta oferta esta sin vacantes");
+            bottom_message_bar_button.setVisibility(GONE);
+        } else if(offer.getStatus() == Offer.OfferStatus.PAUSED){
+            accept_button.setVisibility(GONE);
+            bottom_message_bar.setVisibility(View.VISIBLE);
+            bottom_message_text.setText("Esta oferta ha sido pausada");
+            bottom_message_bar_button.setVisibility(GONE);
+        } else if(offer.getStatus() == Offer.OfferStatus.CLOSED){
+            accept_button.setVisibility(GONE);
+            bottom_message_bar.setVisibility(View.VISIBLE);
+            bottom_message_text.setText("Esta oferta ha sido cerrada");
+            bottom_message_bar_button.setVisibility(GONE);
+        }  else if(offer.getStatus() == Offer.OfferStatus.DEACTIVATED){
+            accept_button.setVisibility(GONE);
+            bottom_message_bar.setVisibility(View.VISIBLE);
+            bottom_message_text.setText("Esta oferta ha sido desactivada");
+            bottom_message_bar_button.setVisibility(GONE);
         }
 
-        if(!offer.isApplied()) {
-            bottom_message.setVisibility(View.GONE);
+        if(offer.hasExpired()){
+            accept_button.setVisibility(GONE);
+            bottom_message_bar.setVisibility(View.VISIBLE);
+            bottom_message_text.setText("Esta oferta está cerrada");
+            bottom_message_bar_button.setVisibility(GONE);
         }
-        if(offer.getPublisherRating() == -1.0f)
+        if(offer.getPublisher().getRating() == -1.0f)
             textViewRating.setText("");
         else
-            textViewRating.setText(String.format(Locale.US, "%.1f", offer.getPublisherRating()));
+            textViewRating.setText(String.format(Locale.US, "%.1f", offer.getPublisher().getRating()));
+
+        DateFormat df3 = new SimpleDateFormat("HH:mm", Locale.US);
+
+        if(offer.getStartTime() != null)
+            textViewStartHour.setText(String.format(Locale.US,"hora de inicio: %s", df3.format(offer.getStartTime())));
+        else
+            textViewStartHour.setVisibility(GONE);
+
+        textViewJobHour.setText(String.format(Locale.US, "duración de la tarea: %d hrs.", offer.getTotalHours()));
+
+        textViewContactTitle.setVisibility(GONE);
+        textViewPhoneLayout.setVisibility(GONE);
+        textViewEmailLayout.setVisibility(GONE);
     }
 
-    DialogInterface currenRatingDialog;
+    DialogInterface currentRatingDialog;
 
     private void setUpForApplication(final Application application){
         if(application.getApplicationStatus() == Application.ApplicationStatus.ACCEPTED){
@@ -299,47 +362,85 @@ public class OfferDetailsActivity extends AppCompatActivity {
             imageViewButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_accepted_offer));
         } else if(application.getApplicationStatus() == Application.ApplicationStatus.REJECTED) {
             accept_button.setVisibility(GONE);
-            bottom_message.setVisibility(View.VISIBLE);
+            bottom_message_bar.setVisibility(View.VISIBLE);
             bottom_message_text.setText("Lamentablemente no has sido seleccionado para esta tarea");
-            action_button.setVisibility(GONE);
-        } else if(application.getApplicationStatus() == Application.ApplicationStatus.REVISION) {
+            bottom_message_bar_button.setVisibility(GONE);
+        } else if(application.getApplicationStatus() == Application.ApplicationStatus.REVISION && !offer.hasExpired()) {
             accept_button.setVisibility(GONE);
-            bottom_message.setVisibility(View.VISIBLE);
+            bottom_message_bar.setVisibility(View.VISIBLE);
             bottom_message_text.setText("Has postulado a esta tarea, te avisaremos cuando sea adjudicada");
-            action_button.setVisibility(View.VISIBLE);
+            bottom_message_bar_button.setVisibility(View.VISIBLE);
         } else if(application.getApplicationStatus() == Application.ApplicationStatus.CANCELED_BY_APPLICANT) {
             accept_button.setVisibility(GONE);
-            bottom_message.setVisibility(View.VISIBLE);
+            bottom_message_bar.setVisibility(View.VISIBLE);
             bottom_message_text.setText("Has cancelado tu postulación");
-            action_button.setVisibility(GONE);
+            bottom_message_bar_button.setVisibility(GONE);
         } else if(application.getApplicationStatus() == Application.ApplicationStatus.CANCELED_BY_PUBLISHER) {
             accept_button.setVisibility(GONE);
-            bottom_message.setVisibility(View.VISIBLE);
+            bottom_message_bar.setVisibility(View.VISIBLE);
             bottom_message_text.setText("La oferta ha sido cancelada");
-            action_button.setVisibility(GONE);
+            bottom_message_bar_button.setVisibility(GONE);
         }
-        if(application.getRating() == -1.0f)
+
+        if(offer.getPublisher().getRating() == -1.0f)
             textViewRating.setText("");
         else
-            textViewRating.setText(String.format(Locale.US, "%.1f", application.getRating()));
+            textViewRating.setText(String.format(Locale.US, "%.1f", offer.getPublisher().getRating()));
 
-        Date currentTime = Calendar.getInstance().getTime();
+        if(offer.getPublisher().getEmail() != null && !offer.getPublisher().getEmail().isEmpty()
+                && offer.getPublisher().getPhone() != null && !offer.getPublisher().getPhone().isEmpty()){
+            textViewPhone.setText(offer.getPublisher().getPhone() );
+            textViewEmail.setText(offer.getPublisher().getEmail() );
+        } else {
+            textViewContactTitle.setVisibility(GONE);
+            textViewPhoneLayout.setVisibility(GONE);
+            textViewEmailLayout.setVisibility(GONE);
+        }
 
-        /*if((offer.getEndDate() == null || currentTime.after(offer.getEndDate())) &&
-                offer.getStatus() != Offer.OfferStatus.CANCELED &&
-                offer.getStatus() != Offer.OfferStatus.DEACTIVATED &&
-                offer.getStatus() != Offer.OfferStatus.PAUSED &&
-                offer.getStatus() != Offer.OfferStatus.CLOSED &&
-                application.getApplicationStatus() == Application.ApplicationStatus.ACCEPTED){
-            checkReviews(offer.getApplication());
+        // closed by no-payment (incomplete)
+        /*if(!offer.isPaid() && offer.hasExpired()){
+            accept_button.setVisibility(GONE);
+            bottom_message_bar.setVisibility(View.VISIBLE);
+            bottom_message_text.setText("Esta oferta está cerrada");
+            bottom_message_bar_button.setVisibility(GONE);
+        // complete
+        } else if(offer.isPaid() && offer.hasExpired()) {
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DAY_OF_MONTH, 7);
+
+            if(application.wasReviewedByApplicantAndPublisher()){
+                accept_button.setVisibility(GONE);
+                bottom_message_bar.setVisibility(View.VISIBLE);
+                bottom_message_text.setText("Esta oferta está cerrada");
+                bottom_message_bar_button.setVisibility(GONE);
+            } else if(application.wasReviewedByApplicant() && offer.getStartDate().after(cal.getTime())){
+                accept_button.setVisibility(GONE);
+                bottom_message_bar.setVisibility(View.VISIBLE);
+                bottom_message_text.setText("Esta oferta está cerrada");
+                bottom_message_bar_button.setVisibility(GONE);
+            } else {
+                complete = true;
+                accept_button.setVisibility(GONE);
+                bottom_message_bar.setVisibility(View.VISIBLE);
+                bottom_message_text.setText("Puedes calificar esta oferta");
+                bottom_message_bar_button.setVisibility(View.VISIBLE);
+                cancel_text.setText("Calificar");
+            }
         }*/
 
-        /*complete = true;
-        accept_button.setVisibility(GONE);
-        bottom_message.setVisibility(View.VISIBLE);
-        bottom_message_text.setText("Puedes calificar esta oferta");
-        action_button.setVisibility(View.VISIBLE);
-        cancel_text.setText("Calificar");*/
+        if(offer.getApplication().isClosed()){
+            accept_button.setVisibility(GONE);
+            bottom_message_bar.setVisibility(View.VISIBLE);
+            bottom_message_text.setText("Esta oferta está cerrada");
+            bottom_message_bar_button.setVisibility(GONE);
+        } else if(offer.getApplication().isQualifiable()){
+            complete = true;
+            accept_button.setVisibility(GONE);
+            bottom_message_bar.setVisibility(View.VISIBLE);
+            bottom_message_text.setText("Puedes calificar esta oferta");
+            bottom_message_bar_button.setVisibility(View.VISIBLE);
+            cancel_text.setText("Calificar");
+        }
     }
 
     @Override
@@ -362,9 +463,12 @@ public class OfferDetailsActivity extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         Log.d("OfferDetailsActivity", "onResponse: " + response.toString());
                         accept_button.setVisibility(GONE);
-                        bottom_message.setVisibility(View.VISIBLE);
+                        bottom_message_bar.setVisibility(View.VISIBLE);
                         bottom_message_text.setText("Has postulado a esta tarea, te avisaremos cuando sea adjudicada");
                         accepted_offer = true;
+
+                        Intent returnIntent = new Intent();
+                        setResult(Activity.RESULT_OK, returnIntent);
                     }
                 })
                 .errorListener(new Response.ErrorListener() {
@@ -393,6 +497,17 @@ public class OfferDetailsActivity extends AppCompatActivity {
                         } else if (volleyError instanceof ParseError) {
                         } else if (volleyError instanceof TimeoutError) {
                         }
+                        AlertDialog.Builder builder = new AlertDialog.Builder(OfferDetailsActivity.this);
+                        builder.setTitle(getString(R.string.application));
+                        builder.setMessage("Ha ocurrido un problema postulando a la oferta");
+                        builder.setNegativeButton("Ok",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        builder.show();
                     }
                 })
                 .build();
@@ -419,28 +534,12 @@ public class OfferDetailsActivity extends AppCompatActivity {
             .POST()
             .tokenized(true)
             .parameters(args)
-            /*.nullableListener(new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(OfferDetailsActivity.this);
-                    builder.setTitle(getString(R.string.application));
-                    builder.setMessage("Hemos calificado exitosamente la oferta");
-                    builder.setNegativeButton("Ok",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                    builder.show();
-                }
-            })*/
             .objectReturnListener(new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(OfferDetailsActivity.this);
                     builder.setTitle(getString(R.string.application));
-                    builder.setMessage("Hemos calificado exitosamente la oferta");
+                    builder.setMessage("Tu calificación ha sido registrada con éxito");
                     builder.setNegativeButton("Ok",
                         new DialogInterface.OnClickListener() {
                             @Override
@@ -450,10 +549,13 @@ public class OfferDetailsActivity extends AppCompatActivity {
                         });
                     builder.show();
 
-                    bottom_message.setVisibility(GONE);
+                    Intent returnIntent = new Intent();
+                    setResult(Activity.RESULT_OK, returnIntent);
+
+                    bottom_message_bar.setVisibility(GONE);
                     accept_button.setVisibility(View.VISIBLE);
                     accept_button.setEnabled(false);
-                    textViewButtonText.setText("Completado");
+                    textViewButtonText.setText("Cerrado");
                 }
             })
             .errorListener(new Response.ErrorListener() {
@@ -482,6 +584,18 @@ public class OfferDetailsActivity extends AppCompatActivity {
                     } else if (volleyError instanceof ParseError) {
                     } else if (volleyError instanceof TimeoutError) {
                     }
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(OfferDetailsActivity.this);
+                    builder.setTitle(getString(R.string.application));
+                    builder.setMessage("Ha ocurrido un problema registrando tu calificación");
+                    builder.setNegativeButton("Ok",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    builder.show();
                 }
             })
             .build();
@@ -511,6 +625,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
                     volleyError.printStackTrace();
                     if (volleyError instanceof NetworkError) {
                     } else if (volleyError instanceof ServerError) {
+                        Log.e("DetailsActivity", "response: " + new String(volleyError.networkResponse.data));
                         try {
                             JSONObject responseObject = new JSONObject(new String(volleyError.networkResponse.data));
                             String genericError = "";
@@ -530,50 +645,22 @@ public class OfferDetailsActivity extends AppCompatActivity {
                     } else if (volleyError instanceof ParseError) {
                     } else if (volleyError instanceof TimeoutError) {
                     }
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(OfferDetailsActivity.this);
+                    builder.setTitle(getString(R.string.application));
+                    builder.setMessage("Ha ocurrido un problema cancelando tu postulación");
+                    builder.setNegativeButton("Ok",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    builder.show();
                 }
             })
             .build();
         sc.execute();
     }
-
-
-    private void checkReviews(Application application){
-        ServerCommunication MyApplicationsWS = new ServerCommunication.ServerCommunicationBuilder(this,
-            String.format(Locale.US,"applications/%d/reviews/", application.getId()))
-            .GET()
-            .tokenized(true)
-            .objectReturnListener(new Response.Listener<JSONObject> () {
-                @Override
-                public void onResponse(JSONObject response) {
-                    if (response != null) {
-                        Log.d("MainActivity", "**** reviews response: " + response.toString());
-                        bottom_message.setVisibility(GONE);
-                        accept_button.setEnabled(false);
-                        textViewButtonText.setText("Completado");
-                    }
-                }
-            })
-            .errorListener(new Response.ErrorListener() {
-               @Override
-               public void onErrorResponse(VolleyError error) {
-                   error.printStackTrace();
-
-                   NetworkResponse networkResponse = error.networkResponse;
-                   if (networkResponse != null) {
-                       Log.e("Status code", String.valueOf(networkResponse.statusCode));
-
-                       complete = true;
-                       accept_button.setVisibility(GONE);
-                       bottom_message.setVisibility(View.VISIBLE);
-                       bottom_message_text.setText("Puedes calificar esta oferta");
-                       action_button.setVisibility(View.VISIBLE);
-                       cancel_text.setText("Calificar");
-                   }
-
-               }
-           }).build();
-        MyApplicationsWS.execute();
-    }
-
 
 }

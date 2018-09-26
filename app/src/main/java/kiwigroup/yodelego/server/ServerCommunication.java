@@ -26,6 +26,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -246,26 +247,59 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
                 mQueue.add(request);
             }
         } else if (multipartListener != null){
-            VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(
-                Request.Method.POST,
-                mContext.getString(R.string.server_base_url) + service,
-                parameters,
-                multipartListener,
-                errorListener) {
+            if(withToken){
+                VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(
+                        method,
+                    mContext.getString(R.string.server_base_url) + service,
+                    parameters,
+                    multipartListener,
+                    errorListener) {
+                        @Override
+                        protected Map<String, DataPart> getByteData() {
+                            Map<String, DataPart> params = new HashMap<>();
+                            if(image != null){
+                                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                                image.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
+                                params.put("profile_picture", new DataPart(
+                                        "profile_picture.png",
+                                        byteArrayOutputStream.toByteArray(),
+                                        "image/jpeg"));
+                            }
+                            return params;
+                        }
+
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                            Map<String, String> headers = new HashMap<>();
+                            headers.put("Authorization", "Token " + TOKEN);
+                            //headers.put("Content-Type", "application/json; charset=utf-8");
+                            return headers;
+                        }
+                    };
+                mQueue.add(multipartRequest);
+            } else {
+                VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(
+                        method,
+                        mContext.getString(R.string.server_base_url) + service,
+                        parameters,
+                        multipartListener,
+                        errorListener) {
                     @Override
                     protected Map<String, DataPart> getByteData() {
-                        Log.d("ServerCommunication", "---++++++*******----> " + (image == null));
-                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                        image.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
                         Map<String, DataPart> params = new HashMap<>();
-                        // file name could found file base or direct access from real path
-                        // for now just get bitmap data from ImageView
-                        params.put("profile_picture", new DataPart("file_avatar.jpg", byteArrayOutputStream.toByteArray(), "image/jpeg"));
+                        if(image != null){
+                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                            image.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
+                            params.put("profile_picture", new DataPart(
+                                    "profile_picture.png",
+                                    byteArrayOutputStream.toByteArray(),
+                                    "image/jpeg"));
+                        }
                         return params;
                     }
-            };
-            mQueue.add(multipartRequest);
-
+                };
+                mQueue.add(multipartRequest);
+            }
         }
         return "";
     }
@@ -377,6 +411,8 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
 
     }
 
+
+
     public class VolleyMultipartRequest extends Request<NetworkResponse> {
         private final String twoHyphens = "--";
         private final String lineEnd = "\r\n";
@@ -429,7 +465,7 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
 
         @Override
         public String getBodyContentType() {
-            return "multipart/form-data;boundary=" + boundary;
+            return "multipart/form-data; charset=utf-8;boundary=" + boundary;
         }
 
         @Override
@@ -443,7 +479,6 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
                 if (params != null && params.size() > 0) {
                     textParse(dos, params, getParamsEncoding());
                 }
-
                 // populate data byte payload
                 Map<String, DataPart> data = getByteData();
                 if (data != null && data.size() > 0) {
@@ -533,7 +568,7 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
         private void buildTextPart(DataOutputStream dataOutputStream, String parameterName, Object parameterValue) throws IOException {
             dataOutputStream.writeBytes(twoHyphens + boundary + lineEnd);
             dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"" + parameterName + "\"" + lineEnd);
-            //dataOutputStream.writeBytes("Content-Type: text/plain; charset=UTF-8" + lineEnd);
+            dataOutputStream.writeBytes("Content-Type: text/plain; charset=utf-8" + lineEnd);
             dataOutputStream.writeBytes(lineEnd);
             dataOutputStream.writeBytes(parameterValue + lineEnd);
         }

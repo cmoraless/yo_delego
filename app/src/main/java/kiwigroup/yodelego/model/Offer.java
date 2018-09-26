@@ -7,11 +7,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -20,28 +20,28 @@ import java.util.Locale;
  * Created by cristian on 1/21/18.
  */
 
-public class Offer implements Serializable, WallItem {
+public class Offer implements Serializable, WallItem{
 
     private long id;
-    private String publisher;
     private Date creationDate;
     private Date startDate;
     private Date endDate;
+    private Date startTime;
     private String publicationResume;
-    private boolean open;
     private String title;
     private int dailyWage;
     private int hourlyWage;
     private int totalWage;
-    private float publisherRating;
-    private String publisherProfilePicture;
+    private int totalHours;
     private String summary;
     private String commune;
-    private String address;
+    private String location;
     private String schedule;
     private OfferStatus status;
-    private boolean applied;
+    private boolean appliedByMe;
     private boolean isPaid;
+
+    private Publisher publisher;
 
     private Application application;
     private List<String> images;
@@ -51,47 +51,45 @@ public class Offer implements Serializable, WallItem {
         Offer offer = new Offer();
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", Locale.US);
         DateFormat df2 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        DateFormat df3 = new SimpleDateFormat("HH:mm:ss", Locale.US);
         try {
 
-            Log.d("Offer", "****** " + object.toString());
+            Log.d("Offer", " OFFER ****** " + object.toString());
 
             offer.setId(object.getLong("id"));
             offer.setTitle(object.getString("title"));
             offer.setSummary(object.getString("description"));
+            if(object.has("location"))
+                offer.setLocation(object.getString("location"));
             offer.setCommune(object.getString("commune"));
-            offer.setPublisher(object.getString("publisher"));
+
+            Publisher publisher = Publisher.parseFromJson(object.getJSONObject("publisher"));
+            offer.setPublisher(publisher);
+
             offer.setCreationDate(df.parse(object.getString("created_at")));
+            offer.setPaid(object.getBoolean("is_paid"));
 
             if(!object.isNull("start_date"))
                 offer.setStartDate(df2.parse(object.getString("start_date")));
+            if(!object.isNull("start_time"))
+                offer.setStartTime(df3.parse(object.getString("start_time")));
             if(!object.isNull("end_date"))
                 offer.setEndDate(df2.parse(object.getString("end_date")));
             if(!object.isNull("daily_wage"))
                 offer.setDailyWage(object.getInt("daily_wage"));
             if(!object.isNull("hourly_wage"))
                 offer.setHourlyWage(object.getInt("hourly_wage"));
+            if(!object.isNull("total_hours\n"))
+                offer.setTotalHours(object.getInt("total_hours"));
+
             if(!object.isNull("total_wage"))
                 offer.setTotalWage(object.getInt("total_wage"));
             if(!object.isNull("images"))
                 offer.setImages(object.getJSONArray("images"));
-            if(!object.isNull("publisher_profile_picture"))
-                offer.setPublisherProfilePicture(object.getString("publisher_profile_picture"));
 
             offer.setStatus(Offer.OfferStatus.fromInteger(object.getInt("status")));
 
-            if(!object.isNull("publisher_rating")){
-                try {
-                    offer.setPublisherRating(BigDecimal.valueOf(object.getDouble("publisher_rating")).floatValue());
-                } catch(Exception ex){
-                    ex.printStackTrace();
-                    offer.setPublisherRating(-1.0f);
-                }
-            } else {
-                offer.setPublisherRating(-1.0f);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
+        } catch (JSONException | ParseException e) {
             e.printStackTrace();
         }
         return offer;
@@ -137,11 +135,11 @@ public class Offer implements Serializable, WallItem {
         this.totalWage = totalWage;
     }
 
-    public String getPublisher() {
+    public Publisher getPublisher() {
         return publisher;
     }
 
-    public void setPublisher(String publisher) {
+    public void setPublisher(Publisher publisher) {
         this.publisher = publisher;
     }
 
@@ -151,14 +149,6 @@ public class Offer implements Serializable, WallItem {
 
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
-    }
-
-    public boolean isOpen() {
-        return open;
-    }
-
-    public void setOpen(boolean open) {
-        this.open = open;
     }
 
     public String getTitle() {
@@ -185,12 +175,12 @@ public class Offer implements Serializable, WallItem {
         this.summary = summary;
     }
 
-    public String getAddress() {
-        return address;
+    public String getLocation() {
+        return location;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getSchedule() {
@@ -201,20 +191,12 @@ public class Offer implements Serializable, WallItem {
         this.schedule = schedule;
     }
 
-    public boolean isApplied() {
-        return applied;
+    public boolean isAppliedByMe() {
+        return appliedByMe;
     }
 
-    public void setApplied(boolean applied) {
-        this.applied = applied;
-    }
-
-    public float getPublisherRating() {
-        return publisherRating;
-    }
-
-    public void setPublisherRating(float publisherRating) {
-        this.publisherRating = publisherRating;
+    public void setAppliedByMe(boolean appliedByMe) {
+        this.appliedByMe = appliedByMe;
     }
 
     public String getCommune() {
@@ -277,13 +259,30 @@ public class Offer implements Serializable, WallItem {
         isPaid = paid;
     }
 
-    public void setPublisherProfilePicture(String publisherProfilePicture) {
-        this.publisherProfilePicture = publisherProfilePicture;
+    public boolean hasExpired() {
+        Date currentTime = Calendar.getInstance().getTime();
+        if(getEndDate() != null && currentTime.after(getEndDate())){
+            return true;
+        }
+        return false;
     }
 
-    public String getPublisherProfilePicture(){
-        return this.publisherProfilePicture;
+    public void setTotalHours(int totalHours) {
+        this.totalHours = totalHours;
     }
+
+    public int getTotalHours() {
+        return totalHours;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
 
     public enum OfferStatus {
         CANCELED,

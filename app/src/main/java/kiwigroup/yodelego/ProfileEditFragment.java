@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -21,12 +22,14 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Response;
 import com.android.volley.ServerError;
@@ -40,6 +43,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -69,6 +73,7 @@ public class ProfileEditFragment extends Fragment {
     private SearchableSpinner universitySpinner;
     private TextInputEditText careerTextView;
     private TextInputEditText yearTextView;
+    private TextInputLayout yearLayout;
     private ArrayAdapter<String> universityAdapter;
 
     private LinearLayout imageLayout;
@@ -90,6 +95,7 @@ public class ProfileEditFragment extends Fragment {
     private Map educationInstitutions;
     private Map careerCategories;
 
+    private Bitmap imageBitmap;
 
     public static ProfileEditFragment newInstance(User user) {
         ProfileEditFragment fragment = new ProfileEditFragment();
@@ -128,6 +134,7 @@ public class ProfileEditFragment extends Fragment {
                 listener.getImageFromGallery("Selecciona tu imagen de perfil", new MainActivity.OnGalleryImageListener() {
                     @Override
                     public void onImageSelected(Bitmap bitmap) {
+                        imageBitmap = bitmap;
                         image.setImageBitmap(bitmap);
                     }
                 });
@@ -150,10 +157,12 @@ public class ProfileEditFragment extends Fragment {
 
         studentFormLayout = view.findViewById(R.id.academic_info);
         studentFormLayout.setVisibility(GONE);
+
         universitySpinner = view.findViewById(R.id.spinner);
         categorySpinner = view.findViewById(R.id.cat_spinner);
         careerTextView = view.findViewById(R.id.career);
         yearTextView = view.findViewById(R.id.enrollment_year);
+        yearLayout = view.findViewById(R.id.year_layout);
 
         bankSpinner = view.findViewById(R.id.bank_spinner);
         accountSpinner = view.findViewById(R.id.account_spinner);
@@ -169,9 +178,41 @@ public class ProfileEditFragment extends Fragment {
 
         if(user.getEducationalInstitution() != null && !user.getEducationalInstitution().isEmpty()) {
             showProgress(true);
-            //studentFormLayout.setVisibility(View.VISIBLE);
+            studentFormLayout.setVisibility(View.VISIBLE);
             careerTextView.setText(user.getCareer());
             yearTextView.setText(String.valueOf(user.getEnrollmentYear()));
+            yearTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final NumberPicker numPicker = new NumberPicker(getActivity());
+                    numPicker.setMaxValue(Calendar.getInstance().get(Calendar.YEAR));
+                    numPicker.setValue(Calendar.getInstance().get(Calendar.YEAR));
+                    numPicker.setMinValue(1920);
+                    numPicker.setWrapSelectorWheel(false);
+
+                    android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
+                    builder.setView(numPicker);
+                    builder.setTitle("Año de ingreso");
+                    builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            yearTextView.setText(String.valueOf(numPicker.getValue()));
+                        }
+                    });
+                    builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            yearTextView.setText(String.valueOf(user.getEnrollmentYear()));
+                        }
+                    });
+                    builder.create();
+                    builder.show();
+                }
+            });
 
             listener.getEducationalInstitutions(new RegisterActivity.OnEducationalInstitutionsListener() {
                 @Override
@@ -288,7 +329,7 @@ public class ProfileEditFragment extends Fragment {
             accountSpinner.setSelection(user.getAccountType());
         }
         account.setEnabled(true);
-        if(user.getAccountNumber() != null && !user.getBank().isEmpty()){
+        if(user.getAccountNumber() != null && !user.getAccountNumber().isEmpty()){
             account.setText(user.getAccountNumber());
         }
     }
@@ -332,9 +373,6 @@ public class ProfileEditFragment extends Fragment {
         name.setError(null);
         lastName.setError(null);
         mail.setError(null);
-        //password.setError(null);
-        //confirmPassword.setError(null);
-        rut.setError(null);
         phone.setError(null);
 
         ((TextView)bankSpinner.getSelectedView()).setError(null);
@@ -350,27 +388,18 @@ public class ProfileEditFragment extends Fragment {
 
         String firstName = name.getText().toString();
         String lastN = lastName.getText().toString();
-        String rutText = rut.getText().toString();
         String phoneText = phone.getText().toString();
-        //String passwordText = password.getText().toString();
-        //String passwordTextConfirm = confirmPassword.getText().toString();
 
         int bank = bankSpinner.getSelectedItemPosition();
         int accountType = accountSpinner.getSelectedItemPosition();
         String acc = account.getText().toString();
 
-        String university = "";
-        int universityId = -1;
-        int category = -1;
-        String career = "";
-        String year = "";
-
-        if(studentFormLayout.getVisibility() == View.VISIBLE){
+        /*if(studentFormLayout.getVisibility() == View.VISIBLE){
             university = universitySpinner.getSelectedItem().toString();
             career = careerTextView.getText().toString();
             year = yearTextView.getText().toString();
             category = categorySpinner.getSelectedItemPosition();
-        }
+        }*/
 
         boolean cancel = false;
         View focusView = null;
@@ -386,35 +415,28 @@ public class ProfileEditFragment extends Fragment {
             focusView = lastName;
             cancel = true;
         }
-        if(TextUtils.isEmpty(rutText)){
-            rut.setError(getString(R.string.error_field_required));
-            focusView = rut;
-            cancel = true;
-        } else if(!isValidRut(rutText)){
-            rut.setError("el Rut no es válido");
-            focusView = rut;
-            cancel = true;
-        }
         if(TextUtils.isEmpty(phoneText)){
             phone.setError(getString(R.string.error_field_required));
             focusView = phone;
             cancel = true;
+        } else if(!isValidPhone(phoneText)){
+            phone.setError(getString(R.string.error_phone_not_valid));
+            focusView = phone;
+            cancel = true;
         }
-        /*if(!passwordText.isEmpty() && !passwordTextConfirm.isEmpty()){
-            if(!TextUtils.isEmpty(passwordText) && !isPasswordValid(passwordText)) {
-                password.setError(getString(R.string.error_invalid_password));
-                focusView = password;
-                cancel = true;
-            } else if(!TextUtils.isEmpty(passwordTextConfirm)) {
-                if(!passwordTextConfirm.equals(passwordText)){
-                    confirmPassword.setError(getString(R.string.error_password_must_be_same));
-                    focusView = confirmPassword;
-                    cancel = true;
-                }
-            }
-        }*/
+
+        String university = "";
+        int universityId = -1;
+        String category = "";
+        int categoryId = -1;
+        String career = "";
+        String year = "";
 
         if(studentFormLayout.getVisibility() == View.VISIBLE){
+            university = universitySpinner.getSelectedItem().toString();
+            category = categorySpinner.getSelectedItem().toString();
+            career = careerTextView.getText().toString();
+            year = yearTextView.getText().toString();
             if(educationInstitutions != null){
                 try{
                     universityId = (Integer) educationInstitutions.get(university);
@@ -424,6 +446,21 @@ public class ProfileEditFragment extends Fragment {
                 }
             } else {
                 universityId = 0;
+            }
+            if(careerCategories != null){
+                try{
+                    categoryId = (Integer) careerCategories.get(category);
+                } catch(Exception ex){
+                    ex.printStackTrace();
+                    categoryId = 0;
+                }
+            } else {
+                categoryId = 0;
+            }
+            if(categoryId < 1){
+                ((TextView)categorySpinner.getSelectedView()).setError(getString(R.string.error_field_required));
+                focusView = categorySpinner.getSelectedView();
+                cancel = true;
             }
             if(universityId < 1){
                 ((TextView)universitySpinner.getSelectedView()).setError(getString(R.string.error_field_required));
@@ -453,15 +490,13 @@ public class ProfileEditFragment extends Fragment {
             updateAccount(
                     firstName,
                     lastN,
-                    rutText,
                     phoneText,
                     universityId,
+                    categoryId,
                     career,
                     year,
                     bank,
-                    category,
                     accountType,
-                    /*passwordText*/"",
                     acc.replaceAll("-", ""));
         }
     }
@@ -469,20 +504,17 @@ public class ProfileEditFragment extends Fragment {
     private void updateAccount(
                               String name,
                               String lastName,
-                              String rut,
                               final String phone,
                               int university,
+                              int career_area,
                               String career,
                               String year,
                               int bank_id,
-                              int career_area,
                               int bank_account_type,
-                              String password,
                               String bank_account_number){
         final HashMap<String, Object> args = new HashMap<>();
         args.put("first_name", name);
         args.put("last_name", lastName);
-        args.put("rut", rut);
         args.put("phone_number", phone);
         if (university >= 0)
             args.put("educational_institution_id", university);
@@ -492,11 +524,11 @@ public class ProfileEditFragment extends Fragment {
             args.put("career", career);
         if (career_area >= 0)
             args.put("career_category_id", career_area);
-        if (!password.isEmpty()) {
-            args.put("password", password);
-        }
 
         if (bank_id >= 1 && bank_account_type >= 1 && bank_account_number != null && !bank_account_number.isEmpty()) {
+            Log.d("EditFragment", "**** bank_id: " + bank_id);
+            Log.d("EditFragment", "**** bank_account_kind: " + bank_account_type);
+            Log.d("EditFragment", "**** bank_account_number: " + bank_account_number);
             args.put("bank_id", bank_id);
             args.put("bank_account_kind", bank_account_type);
             args.put("bank_account_number", bank_account_number);
@@ -523,6 +555,26 @@ public class ProfileEditFragment extends Fragment {
                 .PATCH()
                 .tokenized(true)
                 .parameters(args)
+                /*.multipartListener(new Response.Listener<NetworkResponse>() {
+                    @Override
+                    public void onResponse(NetworkResponse response) {
+                        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
+                        builder.setTitle("Actualización de perfil");
+                        builder.setMessage("Tu perfil se ha actualizado con éxito!");
+                        builder.setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        getActivity().getSupportFragmentManager().popBackStack();
+
+
+                                        listener.updateUser();
+                                    }
+                                });
+                        builder.show();
+                    }
+                }, imageBitmap)*/
                 .objectReturnListener(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -674,9 +726,7 @@ public class ProfileEditFragment extends Fragment {
         return validate;
     }
 
-    private boolean isPasswordValid(String password) {
-        return password.length() > 4;
+    private boolean isValidPhone(String phone){
+        return phone.length() <= 12 && android.util.Patterns.PHONE.matcher(phone).matches();
     }
-
-
 }

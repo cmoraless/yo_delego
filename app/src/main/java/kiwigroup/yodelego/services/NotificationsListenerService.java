@@ -94,6 +94,7 @@ public class NotificationsListenerService extends Service {
                                 int kind = object.getInt("kind");
                                 String offer = object.getString("offer");
 
+
                                 /*OFFER_AVAILABLE = 0
                                 APPLICATION_ACCEPTED = 1
                                 APPLICATION_REJECTED = 2

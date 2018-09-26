@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -117,8 +116,7 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (holder instanceof OfferViewHolder) {
             final OfferViewHolder offerViewHolder = (OfferViewHolder)holder;
             final Offer offer = (Offer) offers.get(position);
-            Log.d("WallAdpater**** " , " ***** offer: " + offer.isApplied());
-            offerViewHolder.resume.setText(Html.fromHtml("<b>" + offer.getPublisher() + "</b>  publicó un nuevo trabajo"));
+            offerViewHolder.resume.setText(Html.fromHtml("<b>" + offer.getPublisher().getName() + "</b>  publicó un nuevo trabajo"));
             offerViewHolder.date.setText(DateUtils.getRelativeTimeSpanString(offer.getCreationDate().getTime(), new Date().getTime(),0L, DateUtils.FORMAT_ABBREV_ALL));
 
             /*offerViewHolder.status.setText(offer.getStatus() == Offer.OfferStatus.ENTERED ? "abierto" : "cerrado");
@@ -139,11 +137,11 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 offerViewHolder.image.setVisibility(View.GONE);
             }
 
-            if(offer.getPublisherProfilePicture() != null && !offer.getPublisherProfilePicture().isEmpty()){
-                Picasso.get().load(offer.getPublisherProfilePicture()).into(offerViewHolder.profileImage);
+            if(offer.getPublisher().getProfilePictureUrl() != null && !offer.getPublisher().getProfilePictureUrl().isEmpty()){
+                Picasso.get().load(offer.getPublisher().getProfilePictureUrl()).into(offerViewHolder.profileImage);
             }
 
-            if(!offer.isApplied()){
+            if(!offer.isAppliedByMe()){
                 if (offer.getStatus() == Offer.OfferStatus.ENTERED ){
                     offerViewHolder.status.setText("abierto");
                     offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
@@ -171,7 +169,32 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
                             R.color.colorRed),
                             PorterDuff.Mode.SRC);
+                } else if(offer.getStatus() == Offer.OfferStatus.CANCELED ){
+                    offerViewHolder.status.setText("cancelada");
+                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                            R.color.colorRed),
+                            PorterDuff.Mode.SRC);
+                } else if (offer.getStatus() == Offer.OfferStatus.PAUSED ){
+                    offerViewHolder.status.setText("pausada");
+                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                            R.color.colorGreyButton),
+                            PorterDuff.Mode.SRC);
+                    offerViewHolder.status.setTextColor(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                            R.color.colorPrimaryDark));
+                } else if(offer.getStatus() == Offer.OfferStatus.DEACTIVATED ){
+                    offerViewHolder.status.setText("desactivado");
+                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                            R.color.colorRed),
+                            PorterDuff.Mode.SRC);
                 }
+
+                if(offer.hasExpired()){
+                    offerViewHolder.status.setText("cerrada");
+                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                            R.color.colorRed),
+                            PorterDuff.Mode.SRC);
+                }
+
             } else {
                 if(offer.getApplication().getApplicationStatus() == REJECTED){
                     offerViewHolder.status.setText("no califica");
@@ -195,6 +218,18 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             PorterDuff.Mode.SRC);
                 } else if (offer.getApplication().getApplicationStatus() == ACCEPTED){
                     offerViewHolder.status.setText("adjudicada");
+                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                            R.color.colorAdjudicated),
+                            PorterDuff.Mode.SRC);
+                }
+
+                if(offer.getApplication().isClosed()){
+                    offerViewHolder.status.setText("cerrada");
+                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                            R.color.colorRed),
+                            PorterDuff.Mode.SRC);
+                } else if(offer.getApplication().isQualifiable()){
+                    offerViewHolder.status.setText("completada");
                     offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
                             R.color.colorAdjudicated),
                             PorterDuff.Mode.SRC);

@@ -2,15 +2,17 @@ package kiwigroup.yodelego.model;
 
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -20,34 +22,37 @@ import java.util.Locale;
 public class Application implements Serializable {
 
     private long id;
-    private String offerTitle;
-    private long offerId;
-    private float rating;
     private ApplicationStatus status;
-    private Date date;
+    private Date creationDate;
+    private boolean isPaid;
+    private boolean isClosed;
+    private boolean isQualifiable;
+    private List<Review> reviews = new ArrayList<>();
 
     public static Application parseFromJson(JSONObject object){
         Application application = new Application();
+
+        Log.d("Offer", " APPLICATION ****** " + object.toString());
+
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", Locale.US);
         try {
             application.setId(object.getLong("id"));
-            application.setOfferTitle(object.getString("offer"));
-            application.setOfferId(object.getLong("offer_id"));
+
             application.setStatus(Application.ApplicationStatus.fromInteger(object.getInt("status")));
-            application.setDate(df.parse(object.getString("created_at")));
-            if(!object.isNull("rating")){
+            application.setCreationDate(df.parse(object.getString("created_at")));
+            application.setPaid(object.getBoolean("is_paid"));
+
+            JSONArray reviews = object.getJSONArray("reviews");
+            for (int i = 0; i < reviews.length(); i++) {
                 try {
-                    application.setRating(BigDecimal.valueOf(object.getDouble("rating")).floatValue());
-                } catch(Exception ex){
-                    ex.printStackTrace();
-                    application.setRating(-1.0f);
+                    Review review = Review.parseFromJson(reviews.getJSONObject(i));
+                    application.reviews.add(review);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } else {
-                application.setRating(-1.0f);
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
+
+        } catch (JSONException | ParseException e) {
             e.printStackTrace();
         }
         return application;
@@ -57,12 +62,49 @@ public class Application implements Serializable {
         this.status = status;
     }
 
-    public float getRating() {
-        return rating;
+    public boolean isPaid() {
+        return isPaid;
     }
 
-    public void setRating(float rating) {
-        this.rating = rating;
+    public void setPaid(boolean paid) {
+        isPaid = paid;
+    }
+
+    public boolean isClosed() {
+        return isClosed;
+    }
+
+    public void setClosed(boolean closed) {
+        isClosed = closed;
+    }
+
+    public boolean wasReviewedByApplicant(){
+        for(int i = 0 ; i < reviews.size(); i++){
+            if(reviews.get(i).getKind() == Review.ReviewKind.APPLICATION){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean wasReviewedByApplicantAndPublisher(){
+        boolean app = false;
+        boolean pub = false;
+        for(int i = 0 ; i < reviews.size(); i++){
+            if(reviews.get(i).getKind() == Review.ReviewKind.APPLICATION)
+                app = true;
+            if(reviews.get(i).getKind() == Review.ReviewKind.APPLICATION)
+                pub = true;
+        }
+        return app && pub;
+    }
+
+    public boolean isQualifiable() {
+        return isQualifiable;
+    }
+
+    public void setQualifiable(boolean qualifiable) {
+        isQualifiable = qualifiable;
     }
 
     public enum ApplicationStatus {
@@ -117,35 +159,12 @@ public class Application implements Serializable {
         this.id = id;
     }
 
-    public String getOfferTitle() {
-        return offerTitle;
+    public Date getCreationDate() {
+        return creationDate;
     }
 
-    public void setOfferTitle(String offerTitle) {
-        this.offerTitle = offerTitle;
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
     }
 
-    public long getOfferId() {
-        return offerId;
-    }
-
-    public void setOfferId(long offerId) {
-        this.offerId = offerId;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    /*public Offer getOffer() {
-        return offer;
-    }
-
-    public void setOffer(Offer offer) {
-        this.offer = offer;
-    }*/
 }

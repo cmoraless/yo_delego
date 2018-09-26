@@ -41,7 +41,7 @@ public class CompleteApplicationsFragment extends Fragment implements OnWallUpda
                 R.color.colorPrimary,
                 R.color.colorPrimaryDark,
                 R.color.colorPrimary);
-        adapter = new ApplicationAdapter(mListener, true);
+        adapter = new ApplicationAdapter(mListener, false, true, false);
         recyclerView.setAdapter(adapter);
         updateData();
         return view;
@@ -79,7 +79,7 @@ public class CompleteApplicationsFragment extends Fragment implements OnWallUpda
 
     @Override
     public void cleanWall() {
-
+        adapter.clear();
     }
 
     @Override

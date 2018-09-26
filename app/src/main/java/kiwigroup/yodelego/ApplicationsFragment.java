@@ -18,7 +18,7 @@ public class ApplicationsFragment extends Fragment {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
-
+    private PagerAdapter adapter;
     private OnUserFragmentsListener mListener;
 
     public static ApplicationsFragment newInstance(User user) {
@@ -48,7 +48,7 @@ public class ApplicationsFragment extends Fragment {
         viewPager = view.findViewById(R.id.pager);
         viewPager.setOffscreenPageLimit(1);
 
-        final PagerAdapter adapter = new PagerAdapter(((MainActivity)getContext()).getSupportFragmentManager(), tabLayout.getTabCount());
+        adapter = new PagerAdapter(((MainActivity)getContext()).getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -124,6 +124,21 @@ public class ApplicationsFragment extends Fragment {
         @Override
         public int getCount() {
             return mNumOfTabs;
+        }
+    }
+
+    public void updateFragmentsData(){
+        if(adapter.mAdjudicatedApplicationsFragment != null){
+            adapter.mAdjudicatedApplicationsFragment.cleanWall();
+            adapter.mAdjudicatedApplicationsFragment.updateData();
+        }
+        if(adapter.mReviewingApplicationsFragment != null){
+            adapter.mReviewingApplicationsFragment.cleanWall();
+            adapter.mReviewingApplicationsFragment.updateData();
+        }
+        if(adapter.mCompleteApplicationsFragment != null){
+            adapter.mCompleteApplicationsFragment.cleanWall();
+            adapter.mCompleteApplicationsFragment.updateData();
         }
     }
 

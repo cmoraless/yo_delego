@@ -36,7 +36,7 @@ public class ReviewingApplicationsFragment extends Fragment implements OnWallUpd
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_application_list, container, false);
         recyclerView = view.findViewById(R.id.list);
-        adapter = new ApplicationAdapter(mListener, Application.ApplicationStatus.REVISION);
+        adapter = new ApplicationAdapter(mListener, false, false, true);
         mSwipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
         mSwipeRefreshLayout.setOnRefreshListener(this);
         mSwipeRefreshLayout.setColorSchemeResources(
@@ -78,7 +78,7 @@ public class ReviewingApplicationsFragment extends Fragment implements OnWallUpd
 
     @Override
     public void cleanWall() {
-
+        adapter.clear();
     }
 
     @Override

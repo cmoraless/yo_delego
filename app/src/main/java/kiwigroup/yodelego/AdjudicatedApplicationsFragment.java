@@ -42,7 +42,7 @@ public class AdjudicatedApplicationsFragment extends Fragment implements OnWallU
                 R.color.colorPrimary,
                 R.color.colorPrimaryDark,
                 R.color.colorPrimary);
-        adapter = new ApplicationAdapter(mListener, Application.ApplicationStatus.ACCEPTED);
+        adapter = new ApplicationAdapter(mListener, true, false, false);
         recyclerView.setAdapter(adapter);
         updateData();
         return view;
@@ -78,7 +78,7 @@ public class AdjudicatedApplicationsFragment extends Fragment implements OnWallU
 
     @Override
     public void cleanWall() {
-
+        adapter.clear();
     }
 
     @Override

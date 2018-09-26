@@ -8,9 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -23,16 +21,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.ImageView;
+import android.view.View;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Response;
 import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,6 +39,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -54,8 +54,8 @@ import kiwigroup.yodelego.model.WallItem;
 import kiwigroup.yodelego.server.ServerCommunication;
 import kiwigroup.yodelego.services.NotificationsListenerService;
 
+import static android.view.View.GONE;
 import static kiwigroup.yodelego.model.Offer.OfferStatus.CANCELED;
-import static kiwigroup.yodelego.model.Offer.OfferStatus.CLOSED;
 import static kiwigroup.yodelego.model.Offer.OfferStatus.DEACTIVATED;
 import static kiwigroup.yodelego.model.Offer.OfferStatus.PAUSED;
 
@@ -67,6 +67,7 @@ public class MainActivity
         NotificationsListenerService.NotificationListener {
 
     public static final int PICK_IMAGE = 888;
+    public static final int APPLICATION_MODIFIED = 432;
 
     private User user;
     private NotificationsListenerService notificationService;
@@ -368,7 +369,7 @@ public class MainActivity
 
     private OnWallUpdateListener listener;
     private List<WallItem> wallOffers;
-    private List<Offer> myApplications;
+    private List<Offer> myOfferApplications;
     private String next;
     private NotificationResume notificationResume;
     private List<kiwigroup.yodelego.model.Notification> notifications;
@@ -386,7 +387,7 @@ public class MainActivity
     public void getMoreWallItems() {
         if(!wallEnded && wallOffers != null){
             listener.onLoadingWallItems();
-            getWallItemsFromServer(listener, myApplications);
+            getWallItemsFromServer(listener, myOfferApplications);
         }
     }
 
@@ -395,9 +396,16 @@ public class MainActivity
         this.listener = listener;
         listener.cleanWall();
         wallOffers = null;
-        myApplications = null;
+        myOfferApplications = null;
         wallEnded = false;
         next = null;
+
+        ApplicationsFragment myFragment = (ApplicationsFragment)
+                getSupportFragmentManager().findFragmentByTag(getString(R.string.id_applications));
+        if (myFragment != null && myFragment.isVisible()) {
+            myFragment.updateFragmentsData();
+        }
+
         getWallItems(listener);
     }
 
@@ -406,11 +414,11 @@ public class MainActivity
             return;
 
         listener.cleanWall();
-        if(myApplications == null){
+        if(myOfferApplications == null){
             getMyApplications(new OnApplicationUpdateListener() {
                 @Override
                 public void onApplicationsResponse(List<Offer> applications) {
-                    myApplications = applications;
+                    myOfferApplications = applications;
                     returnWallItems(applications);
                 }
 
@@ -420,7 +428,7 @@ public class MainActivity
                 }
             }, true);
         } else {
-            returnWallItems(myApplications);
+            returnWallItems(myOfferApplications);
         }
     }
 
@@ -449,7 +457,7 @@ public class MainActivity
                         if(response != null) {
                             Log.d("MainActivity", "**** WALL: " + response.toString());
                             try {
-                                Log.d("MainActivity", "**** myApplications: " + myApplications.size());
+                                Log.d("MainActivity", "**** myOfferApplications: " + myApplications.size());
                                 String url = response.getString("next");
                                 if(response.isNull("next")){
                                     wallEnded = true;
@@ -465,7 +473,7 @@ public class MainActivity
                                     Offer offer = Offer.parseFromJson(object);
                                     for(Offer application : myApplications){
                                         if(application.getId() == offer.getId()){
-                                            offer.setApplied(true);
+                                            offer.setAppliedByMe(true);
                                             offer.setApplication(application.getApplication());
                                         }
                                     }
@@ -500,12 +508,11 @@ public class MainActivity
 
     @Override
     public void getMyApplications(final OnApplicationUpdateListener mOnApplicationUpdateListener,  boolean forceReload) {
-        Log.d("MAINACTIVITY", "*** getMyApplications");
-        if(myApplications == null){
-            myApplications = new ArrayList<>();
+        if(myOfferApplications == null){
+            myOfferApplications = new ArrayList<>();
         }
 
-        if(forceReload || myApplications.size() == 0){
+        if(forceReload || myOfferApplications.size() == 0){
             if(MyApplicationsWS == null){
                 MyApplicationsWS = new ServerCommunication.ServerCommunicationBuilder(MainActivity.this, "applications/")
                     .GET()
@@ -515,18 +522,46 @@ public class MainActivity
                         public void onResponse(JSONArray response) {
                             if (response != null) {
                                 Log.d("MainActivity", "**** applications response: " + response.toString());
-                                myApplications.clear();
+                                myOfferApplications.clear();
                                 if(response.length() > 0){
                                     for (int i = 0; i < response.length(); i++) {
                                         try {
                                             Application application = Application.parseFromJson(response.getJSONObject(i));
-                                            getOfferForApplication(application, mOnApplicationUpdateListener, response.length());
+
+                                            Offer offer = Offer.parseFromJson(response.getJSONObject(i).getJSONObject("offer"));
+                                            offer.setAppliedByMe(true);
+                                            offer.setApplication(application);
+
+                                            //
+                                            // CLOSE AND COMPLETE STATES LOGIC FOR APPLICATIONS
+                                            //
+                                            // closed by no-payment (incomplete)
+                                            if(!offer.isPaid() && offer.hasExpired()){
+                                                application.setClosed(true);
+                                            // complete
+                                            } else if(offer.isPaid() && offer.hasExpired()) {
+                                                Calendar cal = Calendar.getInstance();
+                                                cal.add(Calendar.DAY_OF_MONTH, 7);
+                                                if(application.wasReviewedByApplicantAndPublisher()){
+                                                    application.setClosed(true);
+                                                } else if(application.wasReviewedByApplicant() && offer.getStartDate().after(cal.getTime())){
+                                                    application.setClosed(true);
+                                                } else {
+                                                    application.setQualifiable(true);
+                                                }
+                                            } else {
+                                                application.setQualifiable(false);
+                                                application.setClosed(false);
+                                            }
+
+                                            myOfferApplications.add(offer);
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
                                     }
+                                    mOnApplicationUpdateListener.onApplicationsResponse(myOfferApplications);
                                 } else {
-                                    mOnApplicationUpdateListener.onApplicationsResponse(myApplications);
+                                    mOnApplicationUpdateListener.onApplicationsResponse(myOfferApplications);
                                 }
                             }
                             MyApplicationsWS = null;
@@ -543,38 +578,27 @@ public class MainActivity
                 MyApplicationsWS.execute();
             }
         } else {
-            mOnApplicationUpdateListener.onApplicationsResponse(myApplications);
+            mOnApplicationUpdateListener.onApplicationsResponse(myOfferApplications);
         }
     }
 
     @Override
     public void onWallOfferSelected(Offer offer) {
-        Log.d("MainActivity", "******* onWallOfferSelected. offer.isApplied(): " + offer.isApplied());
         Intent mainIntent = new Intent().setClass(MainActivity.this, OfferDetailsActivity.class);
         mainIntent.putExtra("offer", offer);
-        startActivityForResult(mainIntent, 1);
+        startActivityForResult(mainIntent, APPLICATION_MODIFIED);
     }
 
     @Override
     public void onApplicationSelected(Offer offer) {
-        Log.d("MainActivity", "******* onApplicationSelected. offer.isApplied(): " + offer.isApplied());
         Intent mainIntent = new Intent().setClass(MainActivity.this, OfferDetailsActivity.class);
         mainIntent.putExtra("offer", offer);
-        startActivityForResult(mainIntent, 1);
+        startActivityForResult(mainIntent, APPLICATION_MODIFIED);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1) {
-            if(resultCode == Activity.RESULT_OK){
-                Log.d("MAIN", "****  Activity.RESULT_OK");
-                //displayView(R.id.action_wall);
-                refreshWall(listener);
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                Log.d("MAIN", "****  Activity.RESULT_CANCELED");
-            }
-        }
         if (requestCode == PICK_IMAGE) {
             if(resultCode == Activity.RESULT_OK) {
                 Uri selectedImage = data.getData();
@@ -585,10 +609,15 @@ public class MainActivity
                     e.printStackTrace();
                 }
             }
+        } if (requestCode == APPLICATION_MODIFIED) {
+            if(resultCode == Activity.RESULT_OK) {
+                Log.d("MainActivity", "application modified. Refreshing wall");
+                refreshWall(listener);
+            }
         }
     }
 
-    private void getOfferForApplication(final Application application,
+    /*private void getOfferForApplication(final Application application,
                                         final OnApplicationUpdateListener mOnApplicationUpdateListener,
                                         final int expectedAmount){
         ServerCommunication serverCommunication = new ServerCommunication.ServerCommunicationBuilder(
@@ -602,13 +631,14 @@ public class MainActivity
                     if (response != null) {
 
                         Offer offer = Offer.parseFromJson(response);
-                        offer.setApplied    (true);
+                        offer.setAppliedByMe(true);
                         offer.setApplication(application);
-                        myApplications.add(offer);
 
-                        if (myApplications.size() == expectedAmount)
-                            mOnApplicationUpdateListener.onApplicationsResponse(myApplications);
+                        //checkReviewsForApplication(offer, application, expectedAmount, mOnApplicationUpdateListener);
 
+                        myOfferApplications.add(offer);
+                        if (myOfferApplications.size() == expectedAmount)
+                            mOnApplicationUpdateListener.onApplicationsResponse(myOfferApplications);
                     }
                 }
             })
@@ -621,6 +651,81 @@ public class MainActivity
         serverCommunication.execute();
     }
 
+    private void checkReviewsForApplication(final Offer offer,
+                                            final Application application,
+                                            final int expectedAmount,
+                                            final OnApplicationUpdateListener mOnApplicationUpdateListener){
+        ServerCommunication MyApplicationsWS = new ServerCommunication.ServerCommunicationBuilder(this,
+                String.format(Locale.US,"applications/%d/reviews/", application.getId()))
+                .GET()
+                .tokenized(true)
+                .objectReturnListener(new Response.Listener<JSONObject> () {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        if (response != null) {
+                            Log.e("MainActivity", "**** reviews response: " + response.toString());
+                        }
+                    }
+                })
+                .arrayReturnListener(new Response.Listener<JSONArray> () {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        if (response != null) {
+                            Log.d("MainActivity", "**** applications response: " + response.toString());
+                            myOfferApplications.clear();
+                            if(response.length() > 0){
+                                // si está comentado por publicador y publicante, está cerrada
+                                if(response.length() >= 2){
+                                    application.setClosed(true);
+                                } else {
+                                    boolean possibleClosed = true;
+                                    for (int i = 0; i < response.length(); i++) {
+                                        try {
+                                            int reviewer_id = response.getJSONObject(i).getInt("reviewer_id");
+                                            if(reviewer_id == user.getId()){
+                                                possibleClosed = true;
+                                            }
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                    if(possibleClosed){
+                                        Calendar c = Calendar.getInstance();
+                                        c.add(Calendar.DAY_OF_MONTH, 7);
+                                        Date currentTime = Calendar.getInstance().getTime();
+                                        if(offer.getEndDate() != null && currentTime.after(offer.getEndDate())){
+                                            application.setClosed(true);
+                                        }
+                                    }
+                                }
+                            }
+
+                            myOfferApplications.add(offer);
+                            if (myOfferApplications.size() == expectedAmount)
+                                mOnApplicationUpdateListener.onApplicationsResponse(myOfferApplications);
+                        }
+                    }
+                })
+                .errorListener(new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+
+                        NetworkResponse networkResponse = error.networkResponse;
+                        if (networkResponse != null) {
+                            Log.e("Status code", String.valueOf(networkResponse.statusCode));
+
+                            myOfferApplications.add(offer);
+                            if (myOfferApplications.size() == expectedAmount)
+                                mOnApplicationUpdateListener.onApplicationsResponse(myOfferApplications);
+                        }
+
+                    }
+                }).build();
+        MyApplicationsWS.execute();
+    }*/
+
+
     @Override
     public void updateUser() {
         ServerCommunication userSC = new ServerCommunication.ServerCommunicationBuilder(MainActivity.this, "profile/")
@@ -632,69 +737,8 @@ public class MainActivity
                     if(response != null) {
                         Log.e("LoginActivity", "SCUser response " + response.toString());
                         try {
-                            user = new User();
-                            user.setName(response.getString("first_name"));
-                            user.setLastName(response.getString("last_name"));
-                            user.setEmail(response.getString("email"));
 
-                            if(response.has("rut") && !response.isNull("rut") && !response.getString("rut").isEmpty())
-                                user.setRut(response.getString("rut"));
-
-                            if(response.has("phone_number") && !response.isNull("phone_number") && !response.getString("phone_number").isEmpty())
-                                user.setPhone(response.getString("phone_number"));
-
-                            if(response.has("educational_institution") && !response.isNull("educational_institution") && !response.getString("educational_institution").isEmpty())
-                                user.setEducationalInstitution(response.getString("educational_institution"));
-
-                            if(response.has("career") && !response.isNull("career") && !response.getString("career").isEmpty())
-                                user.setCareer(response.getString("career"));
-
-                            if(response.has("enrollment_year") && !response.isNull("enrollment_year") && !response.getString("enrollment_year").isEmpty())
-                                user.setEnrollmentYear(Integer.parseInt(response.getString("enrollment_year")));
-
-                            if(response.has("bank") && !response.isNull("bank") && !response.getString("bank").isEmpty())
-                                user.setBank(response.getString("bank"));
-
-                            if(response.has("bank_account_kind") && !response.isNull("bank_account_kind"))
-                                user.setAccountType(response.getInt("bank_account_kind"));
-
-                            if(response.has("bank_account_number") && !response.isNull("bank_account_number") && !response.getString("bank_account_number").isEmpty())
-                                user.setAccountNumber(response.getString("bank_account_number"));
-
-                            if(response.has("bank_account_kind") && !response.isNull("bank_account_kind"))
-                                user.setAccountType(response.getInt("bank_account_kind"));
-
-                            if(response.has("publisher_rating") && !response.isNull("publisher_rating") && !response.getString("publisher_rating").isEmpty())
-                                user.setAccountNumber(response.getString("publisher_rating"));
-
-                            if(!response.isNull("publisher_rating")){
-                                try {
-                                    user.setPublisherRating(BigDecimal.valueOf(response.getDouble("publisher_rating")).floatValue());
-                                } catch(Exception ex){
-                                    ex.printStackTrace();
-                                    user.setPublisherRating(-1.0f);
-                                }
-                            }
-
-                            if(!response.isNull("applicant_rating")){
-                                try {
-                                    user.setApplicantRating(BigDecimal.valueOf(response.getDouble("applicant_rating")).floatValue());
-                                } catch(Exception ex){
-                                    ex.printStackTrace();
-                                    user.setApplicantRating(-1.0f);
-                                }
-                            }
-
-                            Log.e("LoginActivity", "SCUser getName " + user.getName());
-                            Log.e("LoginActivity", "SCUser getLastName " + user.getLastName());
-                            Log.e("LoginActivity", "SCUser getSemesters " + user.getSemesters());
-                            Log.e("LoginActivity", "SCUser getCareer " + user.getCareer());
-                            Log.e("LoginActivity", "SCUser getEducationalInstitution " + user.getEducationalInstitution());
-                            Log.e("LoginActivity", "SCUser getEmail " + user.getEmail());
-                            Log.e("LoginActivity", "SCUser getRut " + user.getRut());
-                            Log.e("LoginActivity", "SCUser getEnrollmentYear " + user.getEnrollmentYear());
-                            Log.e("LoginActivity", "SCUser applicant_rating " + user.getApplicantRating());
-                            Log.e("LoginActivity", "SCUser publisher_rating " + user.getPublisherRating());
+                            user = User.parseFromJson(response);
 
                             ProfileFragment mainFragment = (ProfileFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.id_profile));
                             if(mainFragment != null){
@@ -757,12 +801,6 @@ public class MainActivity
     @Override
     public void getImageFromGallery(String message, OnGalleryImageListener listener) {
         this.onGalleryImageListener = listener;
-        /*Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, message), PICK_IMAGE);*/
-
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
@@ -770,23 +808,6 @@ public class MainActivity
     }
 
     private void startPolling(){
-        /*Calendar cal = Calendar.getInstance();
-        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        long interval = 1000 * 5;
-        Intent serviceIntent = new Intent(this, NotificationsListenerService.class);
-        PendingIntent servicePendingIntent =
-            PendingIntent.getService(
-                this,
-                2497, // integer constant used to identify the service
-                serviceIntent,
-                PendingIntent.FLAG_CANCEL_CURRENT);  // FLAG to avoid creating a second service if there's already one running
-        // there are other options like setInexactRepeating, check the docs
-        am.setRepeating(
-            AlarmManager.RTC_WAKEUP,//type of alarm. This one will wake up the device when it goes off, but there are others, check the docs
-            cal.getTimeInMillis(),
-            interval,
-            servicePendingIntent
-        );*/
         Intent serviceIntent = new Intent(this, NotificationsListenerService.class);
         startService(serviceIntent);
         bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
@@ -829,7 +850,7 @@ public class MainActivity
         OFFER_CANCELED = 5*/
 
         for(kiwigroup.yodelego.model.Notification notification : this.notifications){
-            if (notification.getKind() == 0){
+            if (notification.getKind() ==  0){
                 available_offers ++;
             } if (notification.getKind() == 1){
                 accepted_offers ++;
@@ -853,7 +874,7 @@ public class MainActivity
         } else if (rejected_offers > 0) {
             this.notificationResume = new NotificationResume(String.format(Locale.US, "Tienes %d postulaciones rechazadas", rejected_offers));
         } else if (cancelled_by_applicant_offers > 0) {
-            this.notificationResume = new NotificationResume(String.format(Locale.US, "%d postulaciones han sido canceladas por su creador", cancelled_by_applicant_offers));
+            this.notificationResume = new NotificationResume(String.format(Locale.US, "has cancelado tu postulación a una oferta", cancelled_by_applicant_offers));
         } else
             return;
 
@@ -867,7 +888,7 @@ public class MainActivity
         /*getMyApplications(new OnApplicationUpdateListener() {
             @Override
             public void onApplicationsResponse(List<Offer> applications) {
-                myApplications = applications;
+                myOfferApplications = applications;
                 returnWallItems(applications);
             }
 

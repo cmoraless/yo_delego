@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +29,7 @@ public class ProfileFragment extends Fragment {
     private TextView name;
     private TextView rut;
 
-    private TextView assigned_offers;
+    private TextView accepted_offers;
     private TextView complete_offers;
 
     private TextView mail;
@@ -94,7 +95,7 @@ public class ProfileFragment extends Fragment {
         });
         academic_layout = view.findViewById(R.id.academic_info);
 
-        assigned_offers = view.findViewById(R.id.assigned_offers_amounts);
+        accepted_offers = view.findViewById(R.id.assigned_offers_amounts);
         complete_offers = view.findViewById(R.id.complete_offers_amount);
 
         textViewRating = view.findViewById(R.id.publisherRating);
@@ -103,18 +104,25 @@ public class ProfileFragment extends Fragment {
 
         listener.getMyApplications(new OnApplicationUpdateListener() {
             @Override
-            public void onApplicationsResponse(List<Offer> applications) {
+            public void onApplicationsResponse(List<Offer> offers) {
                 int assigned_offers_amount = 0;
                 int complete_offers_amount = 0;
-                for(Offer application : applications){
-                    if(application.getApplication().getApplicationStatus().equals(Application.ApplicationStatus.ACCEPTED)){
+                for(Offer offer : offers){
+
+                    if(offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED
+                            && offer.getApplication().isPaid()
+                            && !offer.hasExpired()) {
                         assigned_offers_amount++;
                     }
-                    /*if(application.getApplicationStatus().equals(Application.ApplicationStatus.)){
-                        complete_offers_amount++;
-                    }*/
+
+                    if(offer.hasExpired() &&
+                            offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED &&
+                            offer.isPaid() ) {
+                        complete_offers_amount ++;
+                    }
                 }
-                assigned_offers.setText(String.valueOf(assigned_offers_amount));
+                accepted_offers.setText(String.valueOf(assigned_offers_amount));
+                complete_offers.setText(String.valueOf(complete_offers_amount));
             }
 
             @Override

@@ -11,6 +11,9 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 import kiwigroup.yodelego.OnUserFragmentsListener;
 import kiwigroup.yodelego.R;
 import kiwigroup.yodelego.model.Application;
@@ -20,12 +23,11 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import static kiwigroup.yodelego.model.Application.ApplicationStatus.ACCEPTED;
-import static kiwigroup.yodelego.model.Application.ApplicationStatus.REVISION;
 
 public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final int VIEW_TYPE_ITEM = 0;
@@ -33,35 +35,53 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private final int VIEW_TYPE_EMPTY = 2;
     private final OnUserFragmentsListener mListener;
     private List<Offer> applications;
-    private Application.ApplicationStatus statusFilter;
+    private boolean adjudicatedFilter;
     private boolean completeFilter;
+    private boolean reviewingFilter;
 
-    public ApplicationAdapter(OnUserFragmentsListener listener, Application.ApplicationStatus filter) {
+    public ApplicationAdapter(OnUserFragmentsListener listener,
+                              boolean adjudicatedFilter,
+                              boolean completeFilter,
+                              boolean reviewingFilter) {
         applications = new ArrayList<>();
         mListener = listener;
-        statusFilter = filter;
-    }
-
-    public ApplicationAdapter(OnUserFragmentsListener listener, boolean completeFilter) {
-        applications = new ArrayList<>();
-        mListener = listener;
+        this.adjudicatedFilter = adjudicatedFilter;
         this.completeFilter = completeFilter;
+        this.reviewingFilter = reviewingFilter;
     }
 
     public void update(List<Offer> applications) {
         this.applications.clear();
+
+        Collections.sort(applications, new Comparator<Offer>() {
+            public int compare(Offer o1, Offer o2) {
+                return o1.getCreationDate().compareTo(o2.getCreationDate());
+            }
+        });
+
         for(Offer offer : applications){
             if(completeFilter){
-                Date currentTime = Calendar.getInstance().getTime();
-                if((offer.getEndDate() == null || currentTime.after(offer.getEndDate())) &&
-                    //offer.getStatus() != Offer.OfferStatus.CANCELED &&
-                    //offer.getStatus() != Offer.OfferStatus.DEACTIVATED &&
-                    //offer.getStatus() != Offer.OfferStatus.PAUSED &&
-                    offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED) {
+                if(offer.hasExpired() &&
+                    offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED &&
+                    offer.isPaid() &&
+                    !offer.getApplication().isClosed()) {
                     this.applications.add(offer);
                 }
-            } else if(offer.getApplication().getApplicationStatus() == statusFilter)
-                this.applications.add(offer);
+            } else if(adjudicatedFilter) {
+                if(offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED
+                        && offer.getApplication().isPaid()
+                        && !offer.hasExpired()
+                        && !offer.getApplication().isClosed()) {
+                    this.applications.add(offer);
+                }
+            } else if(reviewingFilter) {
+                if((offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED
+                        && !offer.getApplication().isPaid())
+                        || offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.REVISION
+                        && !offer.getApplication().isClosed()) {
+                    this.applications.add(offer);
+                }
+            }
         }
         notifyDataSetChanged();
     }
@@ -111,6 +131,10 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             ApplicationViewHolder offerViewHolder = (ApplicationViewHolder) holder;
             final Offer offer = applications.get(position);
 
+            if(offer.getPublisher().getProfilePictureUrl() != null && !offer.getPublisher().getProfilePictureUrl().isEmpty()){
+                Picasso.get().load(offer.getPublisher().getProfilePictureUrl()).into(offerViewHolder.profileImage);
+            }
+
             switch(offer.getApplication().getApplicationStatus()){
                 case CANCELED_BY_APPLICANT:
                     offerViewHolder.status.setText("cerrado");
@@ -134,6 +158,21 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                             PorterDuff.Mode.SRC);
                     break;
             }
+
+            if(offer.getApplication().isClosed()){
+                offerViewHolder.status.setText("cerrada");
+                offerViewHolder.status.getBackground().setColorFilter(
+                        ContextCompat.getColor(offerViewHolder.status.getContext(),
+                        R.color.colorRed),
+                        PorterDuff.Mode.SRC);
+            } else if(offer.getApplication().isQualifiable()){
+                offerViewHolder.status.setText("completada");
+                offerViewHolder.status.getBackground().setColorFilter(
+                        ContextCompat.getColor(offerViewHolder.status.getContext(),
+                        R.color.colorAdjudicated),
+                        PorterDuff.Mode.SRC);
+            }
+
             offerViewHolder.resume.setText(offer.getTitle());
             DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.US);
             otherSymbols.setDecimalSeparator(',');
@@ -153,11 +192,11 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             loadingViewHolder.progressBar.setIndeterminate(true);
         } else if(holder instanceof EmptyViewHolder) {
             EmptyViewHolder emptyViewHolder = (EmptyViewHolder) holder;
-            if(completeFilter)
+                if(completeFilter)
                 emptyViewHolder.resume.setText("no tienes postulaciones completadas");
-            else if(statusFilter == ACCEPTED)
+            else if(adjudicatedFilter)
                 emptyViewHolder.resume.setText("no tienes postulaciones adjudicadas");
-            else if(statusFilter == REVISION)
+            else if(reviewingFilter)
                 emptyViewHolder.resume.setText("no tienes postulaciones en revisión");
         }
     }
@@ -171,11 +210,13 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         TextView resume;
         Button status;
         TextView amount;
+        CircleImageView profileImage;
         public View layout;
 
         ApplicationViewHolder(View view) {
             super(view);
             layout = view;
+            profileImage = view.findViewById(R.id.profile_image);
             resume = view.findViewById(R.id.publication_resume);
             status = view.findViewById(R.id.status_button);
             amount = view.findViewById(R.id.amount);

@@ -3,6 +3,7 @@ package kiwigroup.yodelego;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -77,6 +79,7 @@ public class RegisterMainFragment extends Fragment {
     private String bankError;
     private String accountTypeError;
     private String accountError;
+    private String profileImageError;
 
     private boolean student;
     private boolean noStudent;
@@ -348,7 +351,8 @@ public class RegisterMainFragment extends Fragment {
             String rutError,
             String bankError,
             String accountTypeError,
-            String accountError){
+            String accountError,
+            String profileImageError){
 
         this.firstNameError = firstNameError;
         this.lastNameError = lastNameError;
@@ -358,6 +362,7 @@ public class RegisterMainFragment extends Fragment {
         this.bankError = bankError;
         this.accountTypeError = accountTypeError;
         this.accountError = accountError;
+        this.profileImageError = profileImageError;
 
         signUpButton.setEnabled(true);
         signUpButton.setAlpha(1f);
@@ -382,6 +387,20 @@ public class RegisterMainFragment extends Fragment {
             ((TextView)accountSpinner.getSelectedView()).setError(accountTypeError);
         if(accountError != null)
             TextViewAccount.setError(accountError);
+
+        if(profileImageError != null){
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setTitle("Error en tu imagen");
+            builder.setMessage("Ha ocurrido un error al guardar la imagen de tu perfil, por favor intenta con una nueva");
+            builder.setNegativeButton("Ok",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            builder.show();
+        }
     }
 
     private void showProgress(final boolean show) {
