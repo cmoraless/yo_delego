@@ -8,7 +8,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -36,6 +40,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -471,10 +476,9 @@ public class MainActivity
                                     Log.d("MainActivity", "**** WALL ITEM: " + i);
                                     JSONObject object = array.getJSONObject(i);
                                     Offer offer = Offer.parseFromJson(object);
-                                    for(Offer application : myApplications){
-                                        if(application.getId() == offer.getId()){
-                                            offer.setAppliedByMe(true);
-                                            offer.setApplication(application.getApplication());
+                                    for(Offer savedOffer : myApplications){
+                                        if(savedOffer.getId() == offer.getId()){
+                                            offer = savedOffer;
                                         }
                                     }
                                     // update WallAdapter if this status are supported
@@ -538,16 +542,29 @@ public class MainActivity
                                             // closed by no-payment (incomplete)
                                             if(!offer.isPaid() && offer.hasExpired()){
                                                 application.setClosed(true);
+                                                application.setQualifiable(false);
                                             // complete
                                             } else if(offer.isPaid() && offer.hasExpired()) {
                                                 Calendar cal = Calendar.getInstance();
                                                 cal.add(Calendar.DAY_OF_MONTH, 7);
+
                                                 if(application.wasReviewedByApplicantAndPublisher()){
-                                                    application.setClosed(true);
-                                                } else if(application.wasReviewedByApplicant() && offer.getStartDate().after(cal.getTime())){
+                                                    application.setQualifiable(false);
                                                     application.setClosed(true);
                                                 } else {
-                                                    application.setQualifiable(true);
+                                                    // only
+                                                    if(application.wasReviewedByApplicant()){
+                                                        application.setQualifiable(false);
+                                                        if(offer.getStartDate().after(cal.getTime())){
+                                                            application.setClosed(true);
+                                                        } else {
+                                                            application.setClosed(false);
+                                                        }
+                                                    // neither
+                                                    } else {
+                                                        application.setQualifiable(true);
+                                                        application.setClosed(false);
+                                                    }
                                                 }
                                             } else {
                                                 application.setQualifiable(false);
@@ -586,6 +603,7 @@ public class MainActivity
     public void onWallOfferSelected(Offer offer) {
         Intent mainIntent = new Intent().setClass(MainActivity.this, OfferDetailsActivity.class);
         mainIntent.putExtra("offer", offer);
+        Log.e("Main", " OFFER ****** location: " + offer.getLocation());
         startActivityForResult(mainIntent, APPLICATION_MODIFIED);
     }
 
@@ -593,6 +611,7 @@ public class MainActivity
     public void onApplicationSelected(Offer offer) {
         Intent mainIntent = new Intent().setClass(MainActivity.this, OfferDetailsActivity.class);
         mainIntent.putExtra("offer", offer);
+        Log.e("Main", " OFFER ****** location: " + offer.getLocation());
         startActivityForResult(mainIntent, APPLICATION_MODIFIED);
     }
 
@@ -617,114 +636,17 @@ public class MainActivity
         }
     }
 
-    /*private void getOfferForApplication(final Application application,
-                                        final OnApplicationUpdateListener mOnApplicationUpdateListener,
-                                        final int expectedAmount){
-        ServerCommunication serverCommunication = new ServerCommunication.ServerCommunicationBuilder(
-                MainActivity.this,
-                String.format(Locale.US,"offers/%d/", application.getOfferId()))
-            .GET()
-            .tokenized(true)
-            .objectReturnListener(new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    if (response != null) {
-
-                        Offer offer = Offer.parseFromJson(response);
-                        offer.setAppliedByMe(true);
-                        offer.setApplication(application);
-
-                        //checkReviewsForApplication(offer, application, expectedAmount, mOnApplicationUpdateListener);
-
-                        myOfferApplications.add(offer);
-                        if (myOfferApplications.size() == expectedAmount)
-                            mOnApplicationUpdateListener.onApplicationsResponse(myOfferApplications);
-                    }
-                }
-            })
-            .errorListener(new Response.ErrorListener() {
-               @Override
-               public void onErrorResponse(VolleyError error) {
-                   error.printStackTrace();
-               }
-            }).build();
-        serverCommunication.execute();
+    public static Bitmap rotate(Bitmap bitmap, float degrees) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degrees);
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
-    private void checkReviewsForApplication(final Offer offer,
-                                            final Application application,
-                                            final int expectedAmount,
-                                            final OnApplicationUpdateListener mOnApplicationUpdateListener){
-        ServerCommunication MyApplicationsWS = new ServerCommunication.ServerCommunicationBuilder(this,
-                String.format(Locale.US,"applications/%d/reviews/", application.getId()))
-                .GET()
-                .tokenized(true)
-                .objectReturnListener(new Response.Listener<JSONObject> () {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        if (response != null) {
-                            Log.e("MainActivity", "**** reviews response: " + response.toString());
-                        }
-                    }
-                })
-                .arrayReturnListener(new Response.Listener<JSONArray> () {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        if (response != null) {
-                            Log.d("MainActivity", "**** applications response: " + response.toString());
-                            myOfferApplications.clear();
-                            if(response.length() > 0){
-                                // si está comentado por publicador y publicante, está cerrada
-                                if(response.length() >= 2){
-                                    application.setClosed(true);
-                                } else {
-                                    boolean possibleClosed = true;
-                                    for (int i = 0; i < response.length(); i++) {
-                                        try {
-                                            int reviewer_id = response.getJSONObject(i).getInt("reviewer_id");
-                                            if(reviewer_id == user.getId()){
-                                                possibleClosed = true;
-                                            }
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                    if(possibleClosed){
-                                        Calendar c = Calendar.getInstance();
-                                        c.add(Calendar.DAY_OF_MONTH, 7);
-                                        Date currentTime = Calendar.getInstance().getTime();
-                                        if(offer.getEndDate() != null && currentTime.after(offer.getEndDate())){
-                                            application.setClosed(true);
-                                        }
-                                    }
-                                }
-                            }
-
-                            myOfferApplications.add(offer);
-                            if (myOfferApplications.size() == expectedAmount)
-                                mOnApplicationUpdateListener.onApplicationsResponse(myOfferApplications);
-                        }
-                    }
-                })
-                .errorListener(new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        error.printStackTrace();
-
-                        NetworkResponse networkResponse = error.networkResponse;
-                        if (networkResponse != null) {
-                            Log.e("Status code", String.valueOf(networkResponse.statusCode));
-
-                            myOfferApplications.add(offer);
-                            if (myOfferApplications.size() == expectedAmount)
-                                mOnApplicationUpdateListener.onApplicationsResponse(myOfferApplications);
-                        }
-
-                    }
-                }).build();
-        MyApplicationsWS.execute();
-    }*/
-
+    public static Bitmap flip(Bitmap bitmap, boolean horizontal, boolean vertical) {
+        Matrix matrix = new Matrix();
+        matrix.preScale(horizontal ? -1 : 1, vertical ? -1 : 1);
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+    }
 
     @Override
     public void updateUser() {
@@ -791,9 +713,7 @@ public class MainActivity
 
     @Override
     public void onNotificationSelected() {
-        //displayView(R.id.action_applications);
         bottomNavigationView.setSelectedItemId(R.id.action_applications);
-
     }
 
     private OnGalleryImageListener onGalleryImageListener;
@@ -830,8 +750,9 @@ public class MainActivity
         newNotifications.addAll(notifications);
         this.notifications = newNotifications;
 
+        notificationResume = null;
+
         if(this.notifications.size() == 0){
-            notificationResume = null;
             return;
         }
 
@@ -857,7 +778,7 @@ public class MainActivity
             } else if (notification.getKind() == 2){
                 rejected_offers ++;
             } else if (notification.getKind() == 3){
-                cancelled_by_applicant_offers ++;
+                //cancelled_by_applicant_offers ++;
             } else if (notification.getKind() == 4){
                 paused_offers ++;
             } else if (notification.getKind() == 5){
@@ -866,37 +787,26 @@ public class MainActivity
         }
 
         if( available_offers > 0){
-            this.notificationResume = new NotificationResume(String.format(Locale.US, "Tienes %d oferta nueva", available_offers));
+            this.notificationResume = new NotificationResume(String.format(new Locale("es", "ES"), "Tienes %d oferta nueva", available_offers));
         } else if(accepted_offers > 0 && rejected_offers > 0){
-            this.notificationResume = new NotificationResume(String.format(Locale.US, "Tienes %d postulaciones adjudicadas y %d rechazadas", accepted_offers, rejected_offers));
+            this.notificationResume = new NotificationResume(String.format(new Locale("es", "ES"), "Tienes %d postulaciones adjudicadas y %d rechazadas", accepted_offers, rejected_offers));
         } else if (accepted_offers > 0) {
-            this.notificationResume = new NotificationResume(String.format(Locale.US, "Tienes %d postulaciones adjudicadas", accepted_offers));
+            this.notificationResume = new NotificationResume(String.format(new Locale("es", "ES"), "Tienes %d postulaciones adjudicadas", accepted_offers));
         } else if (rejected_offers > 0) {
-            this.notificationResume = new NotificationResume(String.format(Locale.US, "Tienes %d postulaciones rechazadas", rejected_offers));
+            this.notificationResume = new NotificationResume(String.format(new Locale("es", "ES"), "Tienes %d postulaciones rechazadas", rejected_offers));
         } else if (cancelled_by_applicant_offers > 0) {
-            this.notificationResume = new NotificationResume(String.format(Locale.US, "has cancelado tu postulación a una oferta", cancelled_by_applicant_offers));
-        } else
-            return;
+            //this.notificationResume = new NotificationResume(String.format(new Locale("es", "ES"), "has cancelado tu postulación a una oferta", cancelled_by_applicant_offers));
+        }
 
-        notificationResume.setAcceptedOffers(accepted_offers);
-        notificationResume.setRejectedOffers(rejected_offers);
+        if(notificationResume != null){
+            notificationResume.setAcceptedOffers(accepted_offers);
+            notificationResume.setRejectedOffers(rejected_offers);
 
-        if(listener!= null)
-            listener.onNotificationResponse(notificationResume);
+            if(listener!= null)
+                listener.onNotificationResponse(notificationResume);
 
-        refreshWall(listener);
-        /*getMyApplications(new OnApplicationUpdateListener() {
-            @Override
-            public void onApplicationsResponse(List<Offer> applications) {
-                myOfferApplications = applications;
-                returnWallItems(applications);
-            }
-
-            @Override
-            public void onApplicationError(String error) {
-
-            }
-        }, true);*/
+            refreshWall(listener);
+        }
 
     }
 

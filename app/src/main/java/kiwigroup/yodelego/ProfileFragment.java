@@ -133,7 +133,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void loadData(User user){
-        name.setText(String.format(Locale.US, "%s %s", user.getName(), user.getLastName()));
+        name.setText(String.format(new Locale("es", "ES"), "%s %s", user.getName(), user.getLastName()));
         rut.setText(RUTformat(user.getRut()));
         mail.setText(user.getEmail());
         userType.setText(user.getEducationalInstitution() == null ? "Trabajador" : "Estudiante");
@@ -142,12 +142,12 @@ public class ProfileFragment extends Fragment {
             academic_layout.setVisibility(LinearLayout.GONE);
         } else {
             academic_layout.setVisibility(LinearLayout.VISIBLE);
-            academic_description.setText(Html.fromHtml(String.format(Locale.US, "Estudiante de <b>%s, en la %s, cursa %d semestre</b>", user.getCareer(), user.getEducationalInstitution(), user.getSemesters())));
+            academic_description.setText(Html.fromHtml(String.format(new Locale("es", "ES"), "Estudiante de <b>%s, en la %s, cursa %d semestre</b>", user.getCareer(), user.getEducationalInstitution(), user.getSemesters())));
         }
         if(user.getApplicantRating() == -1.0f)
             textViewRating.setText("");
         else
-            textViewRating.setText(String.format(Locale.US, "%.1f", user.getApplicantRating()));
+            textViewRating.setText(String.format(new Locale("es", "ES"), "%.1f", user.getApplicantRating()));
 
         if(user.getProfileImage() != null && !user.getProfileImage().isEmpty()){
             Picasso.get()

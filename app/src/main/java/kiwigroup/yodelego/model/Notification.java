@@ -89,7 +89,7 @@ public class Notification implements Serializable{
 
     public static Notification parseFromJson(JSONObject object){
         Notification notification = new Notification();
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", Locale.US);
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", new Locale("es", "ES"));
         try {
             Log.d("Offer", "****** " + object.toString());
             notification.setId(object.getLong("id"));

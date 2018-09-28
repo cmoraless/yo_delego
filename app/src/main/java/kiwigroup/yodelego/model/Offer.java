@@ -49,18 +49,19 @@ public class Offer implements Serializable, WallItem{
 
     public static Offer parseFromJson(JSONObject object){
         Offer offer = new Offer();
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", Locale.US);
-        DateFormat df2 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-        DateFormat df3 = new SimpleDateFormat("HH:mm:ss", Locale.US);
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", new Locale("es", "ES"));
+        DateFormat df2 = new SimpleDateFormat("yyyy-MM-dd", new Locale("es", "ES"));
+        DateFormat df3 = new SimpleDateFormat("HH:mm:ss", new Locale("es", "ES"));
         try {
 
-            Log.d("Offer", " OFFER ****** " + object.toString());
+            Log.e("Offer", " OFFER ****** " + object.toString());
 
             offer.setId(object.getLong("id"));
             offer.setTitle(object.getString("title"));
             offer.setSummary(object.getString("description"));
-            if(object.has("location"))
+            if(!object.isNull("location")) {
                 offer.setLocation(object.getString("location"));
+            }
             offer.setCommune(object.getString("commune"));
 
             Publisher publisher = Publisher.parseFromJson(object.getJSONObject("publisher"));
@@ -79,7 +80,7 @@ public class Offer implements Serializable, WallItem{
                 offer.setDailyWage(object.getInt("daily_wage"));
             if(!object.isNull("hourly_wage"))
                 offer.setHourlyWage(object.getInt("hourly_wage"));
-            if(!object.isNull("total_hours\n"))
+            if(!object.isNull("total_hours"))
                 offer.setTotalHours(object.getInt("total_hours"));
 
             if(!object.isNull("total_wage"))

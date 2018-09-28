@@ -163,7 +163,7 @@ public class User implements Serializable {
     }
 
     public static Calendar getCalendar(Date date) {
-        Calendar cal = Calendar.getInstance(Locale.US);
+        Calendar cal = Calendar.getInstance(new Locale("es", "ES"));
         cal.setTime(date);
         return cal;
     }

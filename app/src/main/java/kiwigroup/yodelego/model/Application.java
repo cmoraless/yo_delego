@@ -34,7 +34,7 @@ public class Application implements Serializable {
 
         Log.d("Offer", " APPLICATION ****** " + object.toString());
 
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", Locale.US);
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", new Locale("es", "ES"));
         try {
             application.setId(object.getLong("id"));
 
@@ -80,7 +80,7 @@ public class Application implements Serializable {
 
     public boolean wasReviewedByApplicant(){
         for(int i = 0 ; i < reviews.size(); i++){
-            if(reviews.get(i).getKind() == Review.ReviewKind.APPLICATION){
+            if(reviews.get(i).getKind() == Review.ReviewKind.OFFER){
                 return true;
             }
         }
@@ -91,7 +91,7 @@ public class Application implements Serializable {
         boolean app = false;
         boolean pub = false;
         for(int i = 0 ; i < reviews.size(); i++){
-            if(reviews.get(i).getKind() == Review.ReviewKind.APPLICATION)
+            if(reviews.get(i).getKind() == Review.ReviewKind.OFFER)
                 app = true;
             if(reviews.get(i).getKind() == Review.ReviewKind.APPLICATION)
                 pub = true;

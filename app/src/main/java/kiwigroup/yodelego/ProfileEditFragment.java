@@ -555,7 +555,7 @@ public class ProfileEditFragment extends Fragment {
                 .PATCH()
                 .tokenized(true)
                 .parameters(args)
-                /*.multipartListener(new Response.Listener<NetworkResponse>() {
+                .multipartListener(new Response.Listener<NetworkResponse>() {
                     @Override
                     public void onResponse(NetworkResponse response) {
                         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
@@ -574,8 +574,8 @@ public class ProfileEditFragment extends Fragment {
                                 });
                         builder.show();
                     }
-                }, imageBitmap)*/
-                .objectReturnListener(new Response.Listener<JSONObject>() {
+                }, imageBitmap)
+                /*.objectReturnListener(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
 
@@ -595,7 +595,7 @@ public class ProfileEditFragment extends Fragment {
                                 });
                         builder.show();
                     }
-                })
+                })*/
                 .errorListener(new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
@@ -668,13 +668,14 @@ public class ProfileEditFragment extends Fragment {
                         }
 
                         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
-                        builder.setTitle(getString(R.string.error_creating_account));
+                        builder.setTitle(getString(R.string.error_editing_account));
                         builder.setMessage(message);
                         builder.setPositiveButton("OK",
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         dialog.dismiss();
+                                        listener.updateUser();
                                     }
                                 });
                         builder.show();

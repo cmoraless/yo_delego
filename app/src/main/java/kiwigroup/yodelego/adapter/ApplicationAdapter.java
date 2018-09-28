@@ -29,6 +29,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import static kiwigroup.yodelego.model.Application.ApplicationStatus.ACCEPTED;
+import static kiwigroup.yodelego.model.Application.ApplicationStatus.CANCELED_BY_APPLICANT;
+import static kiwigroup.yodelego.model.Application.ApplicationStatus.REJECTED;
+import static kiwigroup.yodelego.model.Application.ApplicationStatus.REVISION;
+
 public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final int VIEW_TYPE_ITEM = 0;
     private final int VIEW_TYPE_LOADING = 1;
@@ -69,16 +74,15 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 }
             } else if(adjudicatedFilter) {
                 if(offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED
-                        && offer.getApplication().isPaid()
+                        && offer.isPaid()
                         && !offer.hasExpired()
                         && !offer.getApplication().isClosed()) {
                     this.applications.add(offer);
                 }
             } else if(reviewingFilter) {
-                if((offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED
-                        && !offer.getApplication().isPaid())
-                        || offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.REVISION
-                        && !offer.getApplication().isClosed()) {
+                if(!offer.hasExpired()
+                    && !offer.isPaid()
+                    && (offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED || offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.REVISION)) {
                     this.applications.add(offer);
                 }
             }
@@ -135,46 +139,25 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 Picasso.get().load(offer.getPublisher().getProfilePictureUrl()).into(offerViewHolder.profileImage);
             }
 
-            switch(offer.getApplication().getApplicationStatus()){
-                case CANCELED_BY_APPLICANT:
-                    offerViewHolder.status.setText("cerrado");
-                    offerViewHolder.status.getBackground().setColorFilter(
-                            ContextCompat.getColor(offerViewHolder.status.getContext(),
-                            R.color.colorRed),
-                            PorterDuff.Mode.SRC);
-                    break;
-                case REVISION:
-                    offerViewHolder.status.setText("revisión");
-                    offerViewHolder.status.getBackground().setColorFilter(
-                            ContextCompat.getColor(offerViewHolder.status.getContext(),
-                            R.color.colorAcademicShape),
-                            PorterDuff.Mode.SRC);
-                    break;
-                case ACCEPTED:
-                    offerViewHolder.status.setText("adjudicada");
-                    offerViewHolder.status.getBackground().setColorFilter(
-                            ContextCompat.getColor(offerViewHolder.status.getContext(),
-                            R.color.colorAdjudicated),
-                            PorterDuff.Mode.SRC);
-                    break;
-            }
-
-            if(offer.getApplication().isClosed()){
-                offerViewHolder.status.setText("cerrada");
-                offerViewHolder.status.getBackground().setColorFilter(
-                        ContextCompat.getColor(offerViewHolder.status.getContext(),
-                        R.color.colorRed),
-                        PorterDuff.Mode.SRC);
-            } else if(offer.getApplication().isQualifiable()){
-                offerViewHolder.status.setText("completada");
-                offerViewHolder.status.getBackground().setColorFilter(
-                        ContextCompat.getColor(offerViewHolder.status.getContext(),
+            if(adjudicatedFilter){
+                offerViewHolder.status.setText("adjudicado");
+                offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
                         R.color.colorAdjudicated),
+                        PorterDuff.Mode.SRC);
+            } else if(reviewingFilter){
+                offerViewHolder.status.setText("en revisión");
+                offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                        R.color.colorAcademicShape),
+                        PorterDuff.Mode.SRC);
+            } else if(completeFilter){
+                offerViewHolder.status.setText("completado");
+                offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                        R.color.colorPrimaryDark),
                         PorterDuff.Mode.SRC);
             }
 
             offerViewHolder.resume.setText(offer.getTitle());
-            DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.US);
+            DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(new Locale("es", "ES"));
             otherSymbols.setDecimalSeparator(',');
             otherSymbols.setGroupingSeparator('.');
             offerViewHolder.amount.setText(

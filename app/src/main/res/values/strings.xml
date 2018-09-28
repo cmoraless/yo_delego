@@ -39,7 +39,7 @@
 
     <string name="error_login_login">Problema en el servicio de login</string>
     <string name="error_login_commerce">Commerce service problem</string>
-    <string name="error_login_user">User service problem</string>
+    <string name="error_login_user">Error con el inicio de sesión</string>
     <string name="error_login_devices">Devices service problem</string>
     <string name="prompt_email">Correo electrónico</string>
     <string name="prompt_password">Contraseña</string>
@@ -47,7 +47,7 @@
     <string name="action_create_account">Crear cuenta</string>
     <string name="error_invalid_email">El correo es inválido</string>
     <string name="error_invalid_password">La contraseña debe tener al menos 6 caracteres</string>
-    <string name="error_incorrect_password_or_login">Oops, credenciales incorrectas</string>
+    <string name="error_incorrect_password_or_login">No puede iniciar con las credenciales proporcionadas. Si no se ha registrado, vaya a &lt;b>Registrarse aquí&lt;/b></string>
     <string name="error_field_required">Este campo es necesario</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
 
@@ -62,6 +62,7 @@
     <string name="error_json_exception">Json exception</string>
 
     <string name="error_creating_account">Problema al crear la cuenta</string>
+    <string name="error_editing_account">Problema al editar la cuenta</string>
 
     <string name="error_network_title">Problema de conexión</string>
     <string name="error_network_details">Necesitas Internet para completar esta acción</string>

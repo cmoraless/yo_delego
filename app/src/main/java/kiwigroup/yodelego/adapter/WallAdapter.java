@@ -25,6 +25,7 @@ import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import kiwigroup.yodelego.R;
+import kiwigroup.yodelego.model.Application;
 import kiwigroup.yodelego.model.NotificationResume;
 import kiwigroup.yodelego.model.Offer;
 import kiwigroup.yodelego.model.WallItem;
@@ -148,15 +149,22 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             R.color.colorGreenText),
                             PorterDuff.Mode.SRC);
                 } else if (offer.getStatus() == Offer.OfferStatus.REVISION ){
-                    offerViewHolder.status.setText("en revisión");
+                    offerViewHolder.status.setText("abierto");
                     offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
-                            R.color.colorAcademicShape),
+                            R.color.colorGreenText),
                             PorterDuff.Mode.SRC);
                 } else if (offer.getStatus() == Offer.OfferStatus.ACCEPTED_APPLICATION ){
-                    offerViewHolder.status.setText("adjudicada");
-                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
-                            R.color.colorAdjudicated),
-                            PorterDuff.Mode.SRC);
+                    if(offer.isPaid()){
+                        offerViewHolder.status.setText("adjudicado");
+                        offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                                R.color.colorAdjudicated),
+                                PorterDuff.Mode.SRC);
+                    } else {
+                        offerViewHolder.status.setText("abierto");
+                        offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                                R.color.colorGreenText),
+                                PorterDuff.Mode.SRC);
+                    }
                 } else if (offer.getStatus() == Offer.OfferStatus.FILLED ){
                     offerViewHolder.status.setText("sin vacantes");
                     offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
@@ -165,17 +173,17 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     offerViewHolder.status.setTextColor(ContextCompat.getColor(offerViewHolder.status.getContext(),
                             R.color.colorPrimaryDark));
                 } else if(offer.getStatus() == Offer.OfferStatus.CLOSED ){
-                    offerViewHolder.status.setText("cerrada");
+                    offerViewHolder.status.setText("cerrado");
                     offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
                             R.color.colorRed),
                             PorterDuff.Mode.SRC);
                 } else if(offer.getStatus() == Offer.OfferStatus.CANCELED ){
-                    offerViewHolder.status.setText("cancelada");
+                    offerViewHolder.status.setText("cancelado");
                     offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
                             R.color.colorRed),
                             PorterDuff.Mode.SRC);
                 } else if (offer.getStatus() == Offer.OfferStatus.PAUSED ){
-                    offerViewHolder.status.setText("pausada");
+                    offerViewHolder.status.setText("pausado");
                     offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
                             R.color.colorGreyButton),
                             PorterDuff.Mode.SRC);
@@ -189,7 +197,7 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 }
 
                 if(offer.hasExpired()){
-                    offerViewHolder.status.setText("cerrada");
+                    offerViewHolder.status.setText("cerrado");
                     offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
                             R.color.colorRed),
                             PorterDuff.Mode.SRC);
@@ -202,41 +210,76 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             R.color.colorRed),
                             PorterDuff.Mode.SRC);
                 } else if (offer.getApplication().getApplicationStatus() == CANCELED_BY_APPLICANT){
-                    offerViewHolder.status.setText("cancelada");
+                    offerViewHolder.status.setText("cancelado");
                     offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
                             R.color.colorRed),
                             PorterDuff.Mode.SRC);
                 } else if (offer.getApplication().getApplicationStatus() == CANCELED_BY_APPLICANT){
-                    offerViewHolder.status.setText("cancelada");
+                    offerViewHolder.status.setText("cancelado");
                     offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
                             R.color.colorRed),
                             PorterDuff.Mode.SRC);
                 } else if (offer.getApplication().getApplicationStatus() == REVISION){
-                    offerViewHolder.status.setText("en revisión");
-                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
-                            R.color.colorAcademicShape),
-                            PorterDuff.Mode.SRC);
+                    if(offer.hasExpired()){
+                        offerViewHolder.status.setText("cerrado");
+                        offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                                R.color.colorRed),
+                                PorterDuff.Mode.SRC);
+                    } else {
+                        offerViewHolder.status.setText("en revisión");
+                        offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                                R.color.colorAcademicShape),
+                                PorterDuff.Mode.SRC);
+                    }
                 } else if (offer.getApplication().getApplicationStatus() == ACCEPTED){
-                    offerViewHolder.status.setText("adjudicada");
-                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
-                            R.color.colorAdjudicated),
-                            PorterDuff.Mode.SRC);
+                    if(offer.isPaid()) {
+                        if(offer.hasExpired()){
+                            if(!offer.getApplication().isClosed()) {
+                                offerViewHolder.status.setText("completado");
+                                offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                                        R.color.colorPrimaryDark),
+                                        PorterDuff.Mode.SRC);
+                            } else {
+                                offerViewHolder.status.setText("cerrado");
+                                offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                                        R.color.colorRed),
+                                        PorterDuff.Mode.SRC);
+                            }
+                        } else {
+                            offerViewHolder.status.setText("adjudicado");
+                            offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                                    R.color.colorAdjudicated),
+                                    PorterDuff.Mode.SRC);
+                        }
+                    } else {
+                        if(offer.getApplication().isClosed()) {
+                            offerViewHolder.status.setText("cerrado");
+                            offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                                    R.color.colorRed),
+                                    PorterDuff.Mode.SRC);
+                        } else {
+                            offerViewHolder.status.setText("en revisión");
+                            offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                                    R.color.colorAcademicShape),
+                                    PorterDuff.Mode.SRC);
+                        }
+                    }
                 }
 
-                if(offer.getApplication().isClosed()){
-                    offerViewHolder.status.setText("cerrada");
+                /*if(offer.getApplication().isClosed()){
+                    offerViewHolder.status.setText("cerrado");
                     offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
                             R.color.colorRed),
                             PorterDuff.Mode.SRC);
                 } else if(offer.getApplication().isQualifiable()){
-                    offerViewHolder.status.setText("completada");
+                    offerViewHolder.status.setText("completado");
                     offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
-                            R.color.colorAdjudicated),
+                            R.color.colorPrimaryDark),
                             PorterDuff.Mode.SRC);
-                }
+                }*/
             }
             offerViewHolder.title.setText(offer.getTitle());
-            DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.US);
+            DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(new Locale("es", "ES"));
             otherSymbols.setDecimalSeparator(',');
             otherSymbols.setGroupingSeparator('.');
             offerViewHolder.amount.setText(String.format("$%s", new DecimalFormat("#,###", otherSymbols).format(offer.getTotalWage())));

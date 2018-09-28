@@ -64,7 +64,9 @@ public class OfferDetailsActivity extends AppCompatActivity {
     private Offer offer;
     private TextView textViewTitle;
     private TextView textViewCreationDate;
-    private TextView textViewJobDates;
+    private TextView textViewInitDate;
+    private TextView textViewEndDate;
+
     private TextView textViewResume;
     private TextView textViewAmount;
     private TextView textViewRating;
@@ -98,7 +100,9 @@ public class OfferDetailsActivity extends AppCompatActivity {
         publicationOwner = findViewById(R.id.publication_owner);
         textViewTitle = findViewById(R.id.title);
         textViewCreationDate = findViewById(R.id.creationDate);
-        textViewJobDates = findViewById(R.id.jobDate);
+        textViewInitDate = findViewById(R.id.init_date);
+        textViewEndDate = findViewById(R.id.end_date);
+
         textViewResume = findViewById(R.id.publication_resume);
         textViewAmount = findViewById(R.id.dailyWage);
         accept_button = findViewById(R.id.accept_button);
@@ -243,6 +247,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         if(getIntent().hasExtra("offer")){
             offer = (Offer) bundle.getSerializable("offer");
+            Log.e("Offer", " OFFER ****** location: " + offer.getLocation());
             if(offer != null) {
                 setUpForOffer(offer);
                 if (offer.isAppliedByMe()) {
@@ -253,7 +258,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
     }
 
     private void setUpForOffer(final Offer offer){
-        DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.US);
+        DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(new Locale("es", "ES"));
         otherSymbols.setDecimalSeparator(',');
         otherSymbols.setGroupingSeparator('.');
         publicationOwner.setText(Html.fromHtml(String.format("publicado por <b>%s</b>", offer.getPublisher().getName())));
@@ -267,81 +272,90 @@ public class OfferDetailsActivity extends AppCompatActivity {
         textViewCreationDate.setText(DateUtils.getRelativeTimeSpanString(offer.getCreationDate().getTime(), new Date().getTime(),0L, DateUtils.FORMAT_ABBREV_ALL));
         textViewResume.setText(offer.getSummary());
         if(offer.getLocation() != null && !offer.getLocation().isEmpty()){
-            textViewAddress.setText(String.format(Locale.US, "%s, %s", offer.getLocation(), offer.getCommune()));
+            textViewAddress.setText(String.format(new Locale("es", "ES"), "%s, %s", offer.getLocation(), offer.getCommune()));
         } else {
             textViewAddress.setText(offer.getCommune());
         }
 
-        if(offer.getStartDate() != null && offer.getEndDate() != null && !offer.getStartDate().equals(offer.getEndDate())){
-            textViewJobDates.setText(
-                    String.format(Locale.US, "%s a %s",
-                            DateUtils.getRelativeTimeSpanString(offer.getStartDate().getTime(), new Date().getTime(), 0L, DateUtils.FORMAT_ABBREV_ALL),
-                            DateUtils.getRelativeTimeSpanString(offer.getEndDate().getTime(), new Date().getTime(), 0L, DateUtils.FORMAT_ABBREV_ALL)));
-        } else if((offer.getStartDate() != null)){
-            textViewJobDates.setText(
-                    String.format(Locale.US, "%s",
-                            DateUtils.getRelativeTimeSpanString(offer.getStartDate().getTime(), new Date().getTime(), 0L, DateUtils.FORMAT_ABBREV_ALL)));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("d 'de' MMMM 'de' yyyy", new Locale("es", "ES"));
+
+        if(offer.getStartDate() != null){
+            textViewInitDate.setText(String.format("inicio: %s", dateFormat.format(offer.getStartDate().getTime())));
         }
+        if(offer.getEndDate() != null){
+            textViewEndDate.setText(String.format("término: %s", dateFormat.format(offer.getEndDate().getTime())));
+
+        }
+
         bottom_message_bar.setVisibility(View.GONE);
         accept_button.setVisibility(View.VISIBLE);
 
         textViewAmount.setText(String.format("$%s", new DecimalFormat("#,###", otherSymbols).format(offer.getTotalWage())));
 
-        if(offer.getStatus() == Offer.OfferStatus.REVISION && !offer.hasExpired()){
-            accept_button.setVisibility(GONE);
+        if(!offer.isAppliedByMe()){
+            if(offer.getStatus() == Offer.OfferStatus.REVISION && !offer.hasExpired()){
+            /*accept_button.setVisibility(GONE);
             bottom_message_bar.setVisibility(View.VISIBLE);
-            bottom_message_text.setText("Esta oferta se encuentra en revisión");
-        } else if(offer.getStatus() == Offer.OfferStatus.CANCELED){
-            accept_button.setVisibility(GONE);
-            bottom_message_bar.setVisibility(View.VISIBLE);
-            bottom_message_text.setText("Esta oferta ha sido cancelada");
-            bottom_message_bar_button.setVisibility(GONE);
-        } else if(offer.getStatus() == Offer.OfferStatus.ACCEPTED_APPLICATION && !offer.hasExpired()){
-            accept_button.setVisibility(GONE);
-            bottom_message_bar.setVisibility(View.VISIBLE);
-            bottom_message_text.setText("Esta oferta ha sido adjudicada por otro usuario");
-            bottom_message_bar_button.setVisibility(GONE);
-        } else if(offer.getStatus() == Offer.OfferStatus.FILLED){
-            accept_button.setVisibility(GONE);
-            bottom_message_bar.setVisibility(View.VISIBLE);
-            bottom_message_text.setText("Esta oferta esta sin vacantes");
-            bottom_message_bar_button.setVisibility(GONE);
-        } else if(offer.getStatus() == Offer.OfferStatus.PAUSED){
-            accept_button.setVisibility(GONE);
-            bottom_message_bar.setVisibility(View.VISIBLE);
-            bottom_message_text.setText("Esta oferta ha sido pausada");
-            bottom_message_bar_button.setVisibility(GONE);
-        } else if(offer.getStatus() == Offer.OfferStatus.CLOSED){
-            accept_button.setVisibility(GONE);
-            bottom_message_bar.setVisibility(View.VISIBLE);
-            bottom_message_text.setText("Esta oferta ha sido cerrada");
-            bottom_message_bar_button.setVisibility(GONE);
-        }  else if(offer.getStatus() == Offer.OfferStatus.DEACTIVATED){
-            accept_button.setVisibility(GONE);
-            bottom_message_bar.setVisibility(View.VISIBLE);
-            bottom_message_text.setText("Esta oferta ha sido desactivada");
-            bottom_message_bar_button.setVisibility(GONE);
+            bottom_message_text.setText("Esta oferta se encuentra en revisión");*/
+            } else if(offer.getStatus() == Offer.OfferStatus.CANCELED){
+                accept_button.setVisibility(GONE);
+                bottom_message_bar.setVisibility(View.VISIBLE);
+                bottom_message_text.setText("Esta oferta ha sido cancelada");
+                bottom_message_bar_button.setVisibility(GONE);
+            } else if(offer.getStatus() == Offer.OfferStatus.ACCEPTED_APPLICATION){
+                if(offer.isPaid()){
+                    accept_button.setVisibility(GONE);
+                    bottom_message_bar.setVisibility(View.VISIBLE);
+                    bottom_message_text.setText("Esta oferta ha sido adjudicada por otro usuario");
+                    bottom_message_bar_button.setVisibility(GONE);
+                } else {
+                /*accept_button.setVisibility(GONE);
+                bottom_message_bar.setVisibility(View.VISIBLE);
+                bottom_message_text.setText("Esta oferta se encuentra en revisión");*/
+                }
+            } else if(offer.getStatus() == Offer.OfferStatus.FILLED){
+                accept_button.setVisibility(GONE);
+                bottom_message_bar.setVisibility(View.VISIBLE);
+                bottom_message_text.setText("Esta oferta esta sin vacantes");
+                bottom_message_bar_button.setVisibility(GONE);
+            } else if(offer.getStatus() == Offer.OfferStatus.PAUSED){
+                accept_button.setVisibility(GONE);
+                bottom_message_bar.setVisibility(View.VISIBLE);
+                bottom_message_text.setText("Esta oferta ha sido pausada");
+                bottom_message_bar_button.setVisibility(GONE);
+            } else if(offer.getStatus() == Offer.OfferStatus.CLOSED){
+                accept_button.setVisibility(GONE);
+                bottom_message_bar.setVisibility(View.VISIBLE);
+                bottom_message_text.setText("Esta oferta ha sido cerrada");
+                bottom_message_bar_button.setVisibility(GONE);
+            }  else if(offer.getStatus() == Offer.OfferStatus.DEACTIVATED){
+                accept_button.setVisibility(GONE);
+                bottom_message_bar.setVisibility(View.VISIBLE);
+                bottom_message_text.setText("Esta oferta ha sido desactivada");
+                bottom_message_bar_button.setVisibility(GONE);
+            }
+
+            if(offer.hasExpired()){
+                accept_button.setVisibility(GONE);
+                bottom_message_bar.setVisibility(View.VISIBLE);
+                bottom_message_text.setText("Esta oferta está cerrada");
+                bottom_message_bar_button.setVisibility(GONE);
+            }
         }
 
-        if(offer.hasExpired()){
-            accept_button.setVisibility(GONE);
-            bottom_message_bar.setVisibility(View.VISIBLE);
-            bottom_message_text.setText("Esta oferta está cerrada");
-            bottom_message_bar_button.setVisibility(GONE);
-        }
         if(offer.getPublisher().getRating() == -1.0f)
             textViewRating.setText("");
         else
-            textViewRating.setText(String.format(Locale.US, "%.1f", offer.getPublisher().getRating()));
+            textViewRating.setText(String.format(new Locale("es", "ES"), "%.1f", offer.getPublisher().getRating()));
 
-        DateFormat df3 = new SimpleDateFormat("HH:mm", Locale.US);
+        DateFormat df3 = new SimpleDateFormat("HH:mm", new Locale("es", "ES"));
 
         if(offer.getStartTime() != null)
-            textViewStartHour.setText(String.format(Locale.US,"hora de inicio: %s", df3.format(offer.getStartTime())));
+            textViewStartHour.setText(String.format(new Locale("es", "ES"),"inicio: %s hrs.", df3.format(offer.getStartTime())));
         else
             textViewStartHour.setVisibility(GONE);
 
-        textViewJobHour.setText(String.format(Locale.US, "duración de la tarea: %d hrs.", offer.getTotalHours()));
+        textViewJobHour.setText(String.format(new Locale("es", "ES"), "duración de la tarea: %d hrs.", offer.getTotalHours()));
 
         textViewContactTitle.setVisibility(GONE);
         textViewPhoneLayout.setVisibility(GONE);
@@ -352,20 +366,72 @@ public class OfferDetailsActivity extends AppCompatActivity {
 
     private void setUpForApplication(final Application application){
         if(application.getApplicationStatus() == Application.ApplicationStatus.ACCEPTED){
-            accept_button.setEnabled(false);
-            textViewButtonText.setText("adjudicada");
-            accept_button.getBackground().setColorFilter(
-                    ContextCompat.getColor(getApplicationContext(),
-                            R.color.colorAdjudicated),
-                    PorterDuff.Mode.SRC);
-            imageViewButton.setVisibility(View.VISIBLE);
-            imageViewButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_accepted_offer));
+            if(offer.isPaid()){
+                if(offer.hasExpired()){
+                    if(!offer.getApplication().isClosed()){
+                        if(offer.getApplication().isQualifiable()) {
+                            complete = true;
+                            accept_button.setVisibility(GONE);
+                            bottom_message_bar.setVisibility(View.VISIBLE);
+                            bottom_message_text.setText("Puedes calificar esta oferta");
+                            bottom_message_bar_button.setVisibility(View.VISIBLE);
+                            cancel_text.setText("Calificar");
+                        } else {
+                            accept_button.setVisibility(GONE);
+                            bottom_message_bar.setVisibility(View.VISIBLE);
+                            bottom_message_text.setText("Esta oferta está cerrada");
+                            bottom_message_bar_button.setVisibility(GONE);
+                        }
+                    } else {
+                        accept_button.setVisibility(GONE);
+                        bottom_message_bar.setVisibility(View.VISIBLE);
+                        bottom_message_text.setText("Esta oferta está cerrada");
+                        bottom_message_bar_button.setVisibility(GONE);
+                    }
+                } else {
+                    accept_button.setEnabled(false);
+                    textViewButtonText.setText("adjudicada");
+                    accept_button.getBackground().setColorFilter(
+                            ContextCompat.getColor(getApplicationContext(),
+                                    R.color.colorAdjudicated),
+                            PorterDuff.Mode.SRC);
+                    imageViewButton.setVisibility(View.VISIBLE);
+                    imageViewButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_accepted_offer));
+                }
+            } else {
+                if(offer.getApplication().isClosed()) {
+                    accept_button.setVisibility(GONE);
+                    bottom_message_bar.setVisibility(View.VISIBLE);
+                    bottom_message_text.setText("Esta oferta está cerrada");
+                    bottom_message_bar_button.setVisibility(GONE);
+                } else {
+                    accept_button.setVisibility(GONE);
+                    bottom_message_bar.setVisibility(View.VISIBLE);
+                    bottom_message_text.setText("Has postulado a esta tarea, te avisaremos cuando sea adjudicada");
+                    bottom_message_bar_button.setVisibility(View.VISIBLE);
+                }
+
+            }
+            /*if(offer.isPaid()){
+                accept_button.setEnabled(false);
+                textViewButtonText.setText("adjudicada");
+                accept_button.getBackground().setColorFilter(
+                        ContextCompat.getColor(getApplicationContext(),
+                                R.color.colorAdjudicated),
+                        PorterDuff.Mode.SRC);
+                imageViewButton.setVisibility(View.VISIBLE);
+                imageViewButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_accepted_offer));
+            } else {
+                accept_button.setVisibility(GONE);
+                bottom_message_bar.setVisibility(View.VISIBLE);
+                bottom_message_text.setText("Has postulado a esta tarea, te avisaremos cuando sea adjudicada");
+            }*/
         } else if(application.getApplicationStatus() == Application.ApplicationStatus.REJECTED) {
             accept_button.setVisibility(GONE);
             bottom_message_bar.setVisibility(View.VISIBLE);
             bottom_message_text.setText("Lamentablemente no has sido seleccionado para esta tarea");
             bottom_message_bar_button.setVisibility(GONE);
-        } else if(application.getApplicationStatus() == Application.ApplicationStatus.REVISION && !offer.hasExpired()) {
+        } else if(application.getApplicationStatus() == Application.ApplicationStatus.REVISION) {
             accept_button.setVisibility(GONE);
             bottom_message_bar.setVisibility(View.VISIBLE);
             bottom_message_text.setText("Has postulado a esta tarea, te avisaremos cuando sea adjudicada");
@@ -382,53 +448,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
             bottom_message_bar_button.setVisibility(GONE);
         }
 
-        if(offer.getPublisher().getRating() == -1.0f)
-            textViewRating.setText("");
-        else
-            textViewRating.setText(String.format(Locale.US, "%.1f", offer.getPublisher().getRating()));
-
-        if(offer.getPublisher().getEmail() != null && !offer.getPublisher().getEmail().isEmpty()
-                && offer.getPublisher().getPhone() != null && !offer.getPublisher().getPhone().isEmpty()){
-            textViewPhone.setText(offer.getPublisher().getPhone() );
-            textViewEmail.setText(offer.getPublisher().getEmail() );
-        } else {
-            textViewContactTitle.setVisibility(GONE);
-            textViewPhoneLayout.setVisibility(GONE);
-            textViewEmailLayout.setVisibility(GONE);
-        }
-
-        // closed by no-payment (incomplete)
-        /*if(!offer.isPaid() && offer.hasExpired()){
-            accept_button.setVisibility(GONE);
-            bottom_message_bar.setVisibility(View.VISIBLE);
-            bottom_message_text.setText("Esta oferta está cerrada");
-            bottom_message_bar_button.setVisibility(GONE);
-        // complete
-        } else if(offer.isPaid() && offer.hasExpired()) {
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DAY_OF_MONTH, 7);
-
-            if(application.wasReviewedByApplicantAndPublisher()){
-                accept_button.setVisibility(GONE);
-                bottom_message_bar.setVisibility(View.VISIBLE);
-                bottom_message_text.setText("Esta oferta está cerrada");
-                bottom_message_bar_button.setVisibility(GONE);
-            } else if(application.wasReviewedByApplicant() && offer.getStartDate().after(cal.getTime())){
-                accept_button.setVisibility(GONE);
-                bottom_message_bar.setVisibility(View.VISIBLE);
-                bottom_message_text.setText("Esta oferta está cerrada");
-                bottom_message_bar_button.setVisibility(GONE);
-            } else {
-                complete = true;
-                accept_button.setVisibility(GONE);
-                bottom_message_bar.setVisibility(View.VISIBLE);
-                bottom_message_text.setText("Puedes calificar esta oferta");
-                bottom_message_bar_button.setVisibility(View.VISIBLE);
-                cancel_text.setText("Calificar");
-            }
-        }*/
-
-        if(offer.getApplication().isClosed()){
+        /*if(offer.getApplication().isClosed()){
             accept_button.setVisibility(GONE);
             bottom_message_bar.setVisibility(View.VISIBLE);
             bottom_message_text.setText("Esta oferta está cerrada");
@@ -440,6 +460,24 @@ public class OfferDetailsActivity extends AppCompatActivity {
             bottom_message_text.setText("Puedes calificar esta oferta");
             bottom_message_bar_button.setVisibility(View.VISIBLE);
             cancel_text.setText("Calificar");
+        }*/
+
+        if(offer.getPublisher().getRating() == -1.0f)
+            textViewRating.setText("");
+        else
+            textViewRating.setText(String.format(new Locale("es", "ES"), "%.1f", offer.getPublisher().getRating()));
+
+        if(offer.getPublisher().getEmail() != null && !offer.getPublisher().getEmail().isEmpty()
+                && offer.getPublisher().getPhone() != null && !offer.getPublisher().getPhone().isEmpty()){
+            textViewContactTitle.setVisibility(View.VISIBLE);
+            textViewPhoneLayout.setVisibility(View.VISIBLE);
+            textViewEmailLayout.setVisibility(View.VISIBLE);
+            textViewPhone.setText(offer.getPublisher().getPhone() );
+            textViewEmail.setText(offer.getPublisher().getEmail() );
+        } else {
+            textViewContactTitle.setVisibility(GONE);
+            textViewPhoneLayout.setVisibility(GONE);
+            textViewEmailLayout.setVisibility(GONE);
         }
     }
 
@@ -455,7 +493,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
     protected void acceptOffer(){
         Log.d("OfferDetailsActivity", "--- accept offers process ---");
         ServerCommunication serverCommunication = new ServerCommunication.ServerCommunicationBuilder(
-                this, String.format(Locale.US,"offers/%d/", offer.getId()))
+                this, String.format(new Locale("es", "ES"),"offers/%d/", offer.getId()))
                 .POST()
                 .tokenized(true)
                 .objectReturnListener(new Response.Listener<JSONObject>() {
@@ -530,7 +568,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
         args.put("text", text);
 
         ServerCommunication sc = new ServerCommunication.ServerCommunicationBuilder(this,
-            String.format(Locale.US,"applications/%d/reviews/", application_id))
+            String.format(new Locale("es", "ES"),"applications/%d/reviews/", application_id))
             .POST()
             .tokenized(true)
             .parameters(args)
@@ -607,7 +645,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
         args.put("status", Application.ApplicationStatus.toInt(Application.ApplicationStatus.CANCELED_BY_APPLICANT));
         Log.d("****cancelApplication", " -----> application new status: " + Application.ApplicationStatus.toInt(Application.ApplicationStatus.CANCELED_BY_APPLICANT));
         ServerCommunication sc = new ServerCommunication.ServerCommunicationBuilder(this,
-            String.format(Locale.US,"applications/%d/", application.getId()))
+            String.format(new Locale("es", "ES"),"applications/%d/", application.getId()))
             .PATCH()
             .tokenized(true)
             .parameters(args)
@@ -625,7 +663,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
                     volleyError.printStackTrace();
                     if (volleyError instanceof NetworkError) {
                     } else if (volleyError instanceof ServerError) {
-                        Log.e("DetailsActivity", "response: " + new String(volleyError.networkResponse.data));
+                        Log.e("DetailsActivity", "response" + new String(volleyError.networkResponse.data));
                         try {
                             JSONObject responseObject = new JSONObject(new String(volleyError.networkResponse.data));
                             String genericError = "";
@@ -662,5 +700,4 @@ public class OfferDetailsActivity extends AppCompatActivity {
             .build();
         sc.execute();
     }
-
 }

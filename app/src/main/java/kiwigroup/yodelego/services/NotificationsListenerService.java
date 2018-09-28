@@ -177,7 +177,7 @@ public class NotificationsListenerService extends Service {
         HashMap<String, Object> args = new HashMap<>();
         args.put("status", 1);
         ServerCommunication sc = new ServerCommunication.ServerCommunicationBuilder(
-                this, String.format(Locale.US,"notifications/%d/", id))
+                this, String.format(new Locale("es", "ES"),"notifications/%d/", id))
             .PATCH()
             .tokenized(true)
             .parameters(args)
