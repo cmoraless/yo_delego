@@ -40,8 +40,8 @@ public class ApplicationsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         TabLayout tabLayout = view.findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.adjudicated_applications_title)));
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.reviewing_applications_title)));
+        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.adjudicated_applications_title)));
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.complete_applications_title)));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
@@ -67,7 +67,6 @@ public class ApplicationsFragment extends Fragment {
                 viewPager.setCurrentItem(tab.getPosition());
             }
         });
-
     }
 
     @Override
@@ -102,15 +101,15 @@ public class ApplicationsFragment extends Fragment {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    if(mAdjudicatedApplicationsFragment == null)
-                        mAdjudicatedApplicationsFragment = new AdjudicatedApplicationsFragment();
-                    mAdjudicatedApplicationsFragment.updateData();
-                    return mAdjudicatedApplicationsFragment;
-                case 1:
                     if(mReviewingApplicationsFragment == null)
                         mReviewingApplicationsFragment = new ReviewingApplicationsFragment();
                     mReviewingApplicationsFragment.updateData();
                     return mReviewingApplicationsFragment;
+                case 1:
+                    if(mAdjudicatedApplicationsFragment == null)
+                        mAdjudicatedApplicationsFragment = new AdjudicatedApplicationsFragment();
+                    mAdjudicatedApplicationsFragment.updateData();
+                    return mAdjudicatedApplicationsFragment;
                 case 2:
                     if(mCompleteApplicationsFragment == null)
                         mCompleteApplicationsFragment = new CompleteApplicationsFragment();

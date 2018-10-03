@@ -28,6 +28,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.squareup.picasso.Picasso;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -243,6 +245,11 @@ public class RegisterMainFragment extends Fragment {
                         image.setImageBitmap(bitmap);
                         profileBitmap = bitmap;
                     }
+
+                    /*@Override
+                    public void onImageSelected(Uri selectedImage) {
+                        Picasso.get().load(selectedImage).placeholder(R.drawable.ic_profile).into(image);
+                    }*/
                 });
             }
         });

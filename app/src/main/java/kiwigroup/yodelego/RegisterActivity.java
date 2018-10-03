@@ -6,7 +6,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -31,6 +33,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -266,8 +269,17 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
             if(resultCode == Activity.RESULT_OK) {
                 Uri selectedImage = data.getData();
                 try {
-                    image = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
-                    onGalleryImageListener.onImageSelected(image);
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
+                    bitmap = rotate(bitmap, getCameraPhotoOrientation(selectedImage));
+                    if(bitmap.getWidth() * bitmap.getHeight() > 2048){
+                        int width = 1048;
+                        int heightofBitMap = bitmap.getHeight();
+                        int widthofBitMap = bitmap.getWidth();
+                        heightofBitMap = width * heightofBitMap / widthofBitMap;
+                        widthofBitMap = width;
+                        bitmap = Bitmap.createScaledBitmap(bitmap, widthofBitMap, heightofBitMap, true);
+                    }
+                    onGalleryImageListener.onImageSelected(bitmap);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -275,6 +287,47 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
         }
     }
 
+    public int getCameraPhotoOrientation(Uri imageUri) {
+        int rotate = 0;
+        try {
+
+            android.support.media.ExifInterface exif;
+
+            InputStream input = getContentResolver().openInputStream(imageUri);
+            if (Build.VERSION.SDK_INT > 23)
+                exif = new android.support.media.ExifInterface(input);
+            else
+                exif = new android.support.media.ExifInterface(imageUri.getPath());
+
+            String exifOrientation = exif
+                    .getAttribute(android.support.media.ExifInterface.TAG_ORIENTATION);
+            Log.d("exifOrientation", exifOrientation);
+            int orientation = exif.getAttributeInt(
+                    android.support.media.ExifInterface.TAG_ORIENTATION,
+                    android.support.media.ExifInterface.ORIENTATION_NORMAL);
+            switch (orientation) {
+                case android.support.media.ExifInterface.ORIENTATION_ROTATE_270:
+                    rotate = 270;
+                    break;
+                case android.support.media.ExifInterface.ORIENTATION_ROTATE_180:
+                    rotate = 180;
+                    break;
+                case android.support.media.ExifInterface.ORIENTATION_ROTATE_90:
+                    rotate = 90;
+                    break;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return rotate;
+    }
+
+    public static Bitmap rotate(Bitmap bitmap, float degrees) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degrees);
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+    }
 
     private MainActivity.OnGalleryImageListener onGalleryImageListener;
 

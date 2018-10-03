@@ -9,10 +9,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.media.ExifInterface;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -36,12 +40,15 @@ import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -137,6 +144,16 @@ public class ProfileEditFragment extends Fragment {
                         imageBitmap = bitmap;
                         image.setImageBitmap(bitmap);
                     }
+
+                    /*@Override
+                    public void onImageSelected(Uri selectedImage) {
+                        Log.d("EditFragment", "****** onImageSelected ***** ");
+                        Picasso.get()
+                                .load(selectedImage)
+                                .rotate(getCameraPhotoOrientation(selectedImage))
+                                .placeholder(R.drawable.ic_profile)
+                                .into(image);
+                    }*/
                 });
             }
         });
@@ -599,11 +616,9 @@ public class ProfileEditFragment extends Fragment {
                 .errorListener(new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-                    /*signUpButton.setEnabled(true);
-                    signUpButton.setAlpha(1f);
-                    cancelButton.setEnabled(true);
-                    cancelButton.setAlpha(1f);
-                    showProgress(false);*/
+                        editButton.setEnabled(true);
+                        editButton.setAlpha(1f);
+                        showProgress(false);
                         Log.d("createAccount", "volleyError: " + volleyError.toString());
 
                         String message = "";
@@ -656,6 +671,18 @@ public class ProfileEditFragment extends Fragment {
 
                                 } catch (JSONException e) {
                                     e.printStackTrace();
+                                    android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
+                                    builder.setTitle(getString(R.string.error_editing_account));
+                                    builder.setMessage(message);
+                                    builder.setPositiveButton("OK",
+                                            new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss();
+                                                    listener.updateUser();
+                                                }
+                                            });
+                                    builder.show();
                                 }
                             }
                             return;
@@ -729,5 +756,41 @@ public class ProfileEditFragment extends Fragment {
 
     private boolean isValidPhone(String phone){
         return phone.length() <= 12 && android.util.Patterns.PHONE.matcher(phone).matches();
+    }
+
+    public int getCameraPhotoOrientation(Uri imageUri) {
+        int rotate = 0;
+        try {
+
+            ExifInterface exif;
+
+            InputStream input = getContext().getContentResolver().openInputStream(imageUri);
+            if (Build.VERSION.SDK_INT > 23)
+                exif = new ExifInterface(input);
+            else
+                exif = new ExifInterface(imageUri.getPath());
+
+            String exifOrientation = exif
+                    .getAttribute(ExifInterface.TAG_ORIENTATION);
+            Log.d("exifOrientation", exifOrientation);
+            int orientation = exif.getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL);
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotate = 270;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotate = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotate = 90;
+                    break;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return rotate;
     }
 }

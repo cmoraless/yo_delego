@@ -262,10 +262,30 @@ public class Offer implements Serializable, WallItem{
 
     public boolean hasExpired() {
         Date currentTime = Calendar.getInstance().getTime();
-        if(getEndDate() != null && currentTime.after(getEndDate())){
-            return true;
+        if(getEndDate() == null)
+            return false;
+        else{
+            if(getStartTime() == null){
+                return currentTime.after(getEndDate());
+            } else {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(getEndDate());
+                cal.add(Calendar.HOUR_OF_DAY, 1);
+                cal.getTime();
+                return currentTime.after(combine(getEndDate(), getStartTime()));
+            }
         }
-        return false;
+    }
+
+    private static Date combine(Date date, Date time) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(time);
+        int hour = cal.get(Calendar.HOUR_OF_DAY);
+        int min = cal.get(Calendar.MINUTE);
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, hour);
+        cal.set(Calendar.MINUTE, min);
+        return cal.getTime();
     }
 
     public void setTotalHours(int totalHours) {

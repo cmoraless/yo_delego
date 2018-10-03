@@ -144,9 +144,17 @@ public class LoginActivity extends BaseLoginActivity {
         new Handler().post(new Runnable() {
             @Override
             public void run() {
+
+                final String realMessage;
+                if(errorMessage.contains("No puede iniciar sesión con las credenciales proporcionadas")){
+                    realMessage = "No puede iniciar sesión con las credenciales proporcionadas. Si no se ha registrado, vaya a \"Registrarse aquí\".";
+                } else {
+                    realMessage = errorMessage;
+                }
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                 builder.setTitle(getString(R.string.error_login));
-                builder.setMessage(getString(R.string.error_login_login) + ". " + errorMessage);
+                builder.setMessage(getString(R.string.error_login_user)  + ". " + realMessage);
                 builder.setPositiveButton(getString(R.string.message_ok),
                         new DialogInterface.OnClickListener() {
                             @Override

@@ -258,6 +258,11 @@ public class OfferDetailsActivity extends AppCompatActivity {
     }
 
     private void setUpForOffer(final Offer offer){
+        DateFormat df31 = new SimpleDateFormat("HH:mm", new Locale("es", "ES"));
+
+        Date currentTime = Calendar.getInstance().getTime();
+        Log.d("OfferDetailsActivity", "*** setUpForApplication getEndDate: " + df31.format(offer.getEndDate()));
+
         DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(new Locale("es", "ES"));
         otherSymbols.setDecimalSeparator(',');
         otherSymbols.setGroupingSeparator('.');
@@ -472,8 +477,8 @@ public class OfferDetailsActivity extends AppCompatActivity {
             textViewContactTitle.setVisibility(View.VISIBLE);
             textViewPhoneLayout.setVisibility(View.VISIBLE);
             textViewEmailLayout.setVisibility(View.VISIBLE);
-            textViewPhone.setText(offer.getPublisher().getPhone() );
-            textViewEmail.setText(offer.getPublisher().getEmail() );
+            textViewPhone.setText(offer.getPublisher().getPhone());
+            textViewEmail.setText(offer.getPublisher().getEmail());
         } else {
             textViewContactTitle.setVisibility(GONE);
             textViewPhoneLayout.setVisibility(GONE);

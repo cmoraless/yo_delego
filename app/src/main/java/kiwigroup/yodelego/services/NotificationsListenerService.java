@@ -77,7 +77,6 @@ public class NotificationsListenerService extends Service {
     }
 
     private void syncData(){
-        Log.d("NotificationsService", "*** syncData()" );
         ServerCommunication userSC = new ServerCommunication.ServerCommunicationBuilder(getApplication(), "notifications/")
             .GET()
             .tokenized(true)
@@ -85,6 +84,8 @@ public class NotificationsListenerService extends Service {
                 @Override
                 public void onResponse(JSONArray response) {
                     if(response != null) {
+
+                        Log.d("NotificationsService", "*** response: " + response.toString() );
                         int available_offers = 0;
                         List<kiwigroup.yodelego.model.Notification> notifications = new ArrayList<>();
                         for (int i = 0; i < response.length(); i++) {
@@ -119,7 +120,7 @@ public class NotificationsListenerService extends Service {
                                 kiwigroup.yodelego.model.Notification notification = kiwigroup.yodelego.model.Notification.parseFromJson(object);
                                 notifications.add(notification);
 
-                                checkNotification(id);
+                                //checkNotification(id);
 
                             } catch (JSONException e) {
                                 e.printStackTrace();

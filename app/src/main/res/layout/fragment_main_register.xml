@@ -59,11 +59,9 @@
                     android:layout_gravity="right"
                     android:maxLines="1"
                     android:layout_weight="1"
-                    android:text="Imagen de perfil"
+                    android:text="Carga tu imagen de perfil"
                     android:textSize="12sp"
-                    android:textAllCaps="true"
-                    android:textColor="@color/colorBlackText"
-                    android:textStyle="bold" />
+                    android:textColor="@color/colorBlackText" />
 
             </LinearLayout>
 
