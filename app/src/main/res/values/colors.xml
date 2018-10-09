@@ -3,7 +3,7 @@
 
     <color name="colorRed">#FF0000</color>
     <color name="colorRedNotification">#f83c48</color>
-    <color name="colorPrimary">#FC5457</color>
+    <color name="colorPrimary">#ff5252</color>
     <color name="colorPrimaryDark">#646464</color>
     <color name="colorAccent">#e0e0e0</color>
     <color name="colorBackground">#3964A2</color>
@@ -30,7 +30,7 @@
     <color name="colorPrimaryText">#842c2c</color>
     <color name="colorSecondaryText">#6f6f6f</color>
     <color name="colorGreenText">#14C767</color>
-    <color name="colorSplashBackground">#FC5457</color>
+    <color name="colorSplashBackground">#ff5252</color>
     <color name="colorRedButton">#FFE6E6</color>
     <color name="colorGreyButton">#F0F1F4</color>
     <color name="colorToolBarBackground">#FBFCFC</color>

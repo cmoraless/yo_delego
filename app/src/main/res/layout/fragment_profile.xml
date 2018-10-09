@@ -52,7 +52,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:maxLines="1"
-                        android:text="Estudiante"
+                        android:text=""
                         android:textColor="@color/colorPrimaryDark"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -106,7 +106,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
-                    android:text="Lily Anguita"
+                    android:text=""
                     android:includeFontPadding="false"
                     android:textColor="@color/colorPrimaryDark"
                     android:textSize="26sp"
@@ -118,7 +118,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:maxLines="1"
-                    android:text="15.687.098-5"
+                    android:text=""
                     android:textColor="@color/colorPrimaryDark"
                     android:textSize="14sp" />
 
@@ -128,7 +128,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:maxLines="1"
-                    android:text="lili.anguita@yodelego.com"
+                    android:text=""
                     android:textColor="@color/colorPrimaryDark"
                     android:textSize="14sp" />
 
@@ -163,7 +163,7 @@
                 android:layout_marginRight="20dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="15dp"
-                android:text="Estudiante de derecho, en la Universidad Católica de Valparaíso, cursa 5to semestre"
+                android:text=""
                 android:textColor="@color/colorAcademicInfoText"
                 android:textSize="14sp" />
 

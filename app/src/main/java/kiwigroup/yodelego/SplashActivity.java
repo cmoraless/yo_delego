@@ -16,7 +16,7 @@ import kiwigroup.yodelego.model.User;
 
 public class SplashActivity extends BaseLoginActivity {
 
-    private static final long SPLASH_SCREEN_DELAY = 2500;
+    private static final long SPLASH_SCREEN_DELAY = 3500;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,9 +28,16 @@ public class SplashActivity extends BaseLoginActivity {
 
         SharedPreferences sharedPref = getSharedPreferences("login", Context.MODE_PRIVATE);
         if (sharedPref.contains("username") && sharedPref.contains("password")){
-            String username = sharedPref.getString("username", "");
-            String password = sharedPref.getString("password", "");
-            startLoginProcess(username, password);
+            final String username = sharedPref.getString("username", "");
+            final String password = sharedPref.getString("password", "");
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    startLoginProcess(username, password);
+                }
+            }, SPLASH_SCREEN_DELAY);
+
         } else {
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {

@@ -351,16 +351,29 @@ public class OfferDetailsActivity extends AppCompatActivity {
         if(offer.getPublisher().getRating() == -1.0f)
             textViewRating.setText("");
         else
-            textViewRating.setText(String.format(new Locale("es", "ES"), "%.1f", offer.getPublisher().getRating()));
+            textViewRating.setText(
+                    String.format(
+                            new Locale("es", "ES"),
+                            "%.1f",
+                            offer.getPublisher().getRating()));
 
-        DateFormat df3 = new SimpleDateFormat("HH:mm", new Locale("es", "ES"));
+        DateFormat df3 = new SimpleDateFormat(
+                "HH:mm",
+                new Locale("es", "ES"));
 
         if(offer.getStartTime() != null)
-            textViewStartHour.setText(String.format(new Locale("es", "ES"),"inicio: %s hrs.", df3.format(offer.getStartTime())));
+            textViewStartHour.setText(
+                    String.format(
+                            new Locale("es", "ES"),
+                            "inicio: %s hrs.",
+                            df3.format(offer.getStartTime())));
         else
             textViewStartHour.setVisibility(GONE);
 
-        textViewJobHour.setText(String.format(new Locale("es", "ES"), "duración de la tarea: %d hrs.", offer.getTotalHours()));
+        textViewJobHour.setText(
+                String.format(new Locale("es", "ES"),
+                        "duración de la tarea: %d hrs.",
+                        offer.getTotalHours()));
 
         textViewContactTitle.setVisibility(GONE);
         textViewPhoneLayout.setVisibility(GONE);
@@ -401,7 +414,8 @@ public class OfferDetailsActivity extends AppCompatActivity {
                                     R.color.colorAdjudicated),
                             PorterDuff.Mode.SRC);
                     imageViewButton.setVisibility(View.VISIBLE);
-                    imageViewButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_accepted_offer));
+                    imageViewButton.setImageDrawable(
+                            ContextCompat.getDrawable(this, R.drawable.ic_accepted_offer));
                 }
             } else {
                 if(offer.getApplication().isClosed()) {

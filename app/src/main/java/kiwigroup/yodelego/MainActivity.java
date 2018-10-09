@@ -626,13 +626,15 @@ public class MainActivity
                 try {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
                     bitmap = rotate(bitmap, getCameraPhotoOrientation(selectedImage));
-                    if(bitmap.getWidth() * bitmap.getHeight() > 2048){
-                        int width = 1024;
+                    if(bitmap.getWidth() > 256){
+                        int width = 256;
                         int heightofBitMap = bitmap.getHeight();
                         int widthofBitMap = bitmap.getWidth();
                         heightofBitMap = width * heightofBitMap / widthofBitMap;
                         widthofBitMap = width;
                         bitmap = Bitmap.createScaledBitmap(bitmap, widthofBitMap, heightofBitMap, true);
+
+                        Log.d("Size*****", "** size: " + bitmap.getHeight()*bitmap.getWidth());
                     }
                     onGalleryImageListener.onImageSelected(bitmap);
                 } catch (IOException e) {
