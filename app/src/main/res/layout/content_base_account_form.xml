@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/type"
         android:textColorHint="@color/colorBlackText"
+        android:importantForAutofill="noExcludeDescendants"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
         android:layout_marginTop="20dp">
@@ -40,6 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/first_name_layout"
         android:textColorHint="@color/colorBlackText"
+        android:importantForAutofill="noExcludeDescendants"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
         android:layout_marginTop="15dp">
@@ -67,6 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/last_name_layout"
         android:textColorHint="@color/colorBlackText"
+        android:importantForAutofill="noExcludeDescendants"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
         android:layout_marginTop="15dp">
@@ -94,6 +97,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/id_layout"
         android:textColorHint="@color/colorBlackText"
+        android:importantForAutofill="noExcludeDescendants"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
         android:layout_marginTop="15dp">
@@ -121,6 +125,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/mail_layout"
         android:textColorHint="@color/colorBlackText"
+        android:importantForAutofill="noExcludeDescendants"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
         android:layout_marginTop="15dp">
@@ -148,6 +153,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/phone_layout"
         android:textColorHint="@color/colorBlackText"
+        android:importantForAutofill="noExcludeDescendants"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
         android:layout_marginTop="16dp">
@@ -178,6 +184,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/password_layout"
         android:textColorHint="@color/colorBlackText"
+        android:importantForAutofill="noExcludeDescendants"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
         android:layout_marginTop="15dp">

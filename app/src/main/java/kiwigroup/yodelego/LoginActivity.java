@@ -9,18 +9,19 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.TextInputEditText;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import kiwigroup.yodelego.model.User;
 
 public class LoginActivity extends BaseLoginActivity {
 
-    private AutoCompleteTextView mEmailView;
+    private EditText mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private RelativeLayout mLoginFormView;
@@ -34,6 +35,9 @@ public class LoginActivity extends BaseLoginActivity {
         mPasswordView = findViewById(R.id.pin);
         mLoginFormView = findViewById(R.id.email_login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        TextView version_text = findViewById(R.id.version_text);
+        version_text.setText(String.format("version %s", BuildConfig.VERSION_NAME));
     }
 
     public void loginClicked(View view){

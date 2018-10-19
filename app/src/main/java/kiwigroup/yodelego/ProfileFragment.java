@@ -1,6 +1,8 @@
 package kiwigroup.yodelego;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -38,6 +40,8 @@ public class ProfileFragment extends Fragment {
     private TextView edit;
     private LinearLayout academic_layout;
     private TextView textViewRating;
+
+    private TextView version_text;
 
     private User user;
     private OnUserFragmentsListener listener;
@@ -101,6 +105,9 @@ public class ProfileFragment extends Fragment {
         textViewRating = view.findViewById(R.id.publisherRating);
 
         loadData(user);
+
+        version_text = view.findViewById(R.id.version_text);
+        version_text.setText(String.format("version %s", BuildConfig.VERSION_NAME));
 
         listener.getMyApplications(new OnApplicationUpdateListener() {
             @Override

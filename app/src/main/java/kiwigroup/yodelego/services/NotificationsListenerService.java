@@ -114,13 +114,13 @@ public class NotificationsListenerService extends Service {
                                 } else if (kind == 2){
                                     sendNotification(String.format("Tu postulación a %s ha sido rechazada", offer));
                                 } else if (kind == 3){
-                                    sendNotification(String.format("Tu postulación a %s ha sido cancelada por su creador", offer));
+                                    sendNotification(String.format("Tu postulación a %s ha sido cancelada con éxito", offer));
                                 }
 
                                 kiwigroup.yodelego.model.Notification notification = kiwigroup.yodelego.model.Notification.parseFromJson(object);
                                 notifications.add(notification);
 
-                                //checkNotification(id);
+                                checkNotification(id);
 
                             } catch (JSONException e) {
                                 e.printStackTrace();

@@ -24,6 +24,8 @@
     <color name="colorButtons">#FC5457</color>
     <color name="colorWelcomeText">#7E292A</color>
 
+    <color name="colorDarkRed">#c6263e</color>
+
     <color name="colorAcademicInfoText">#7e5410</color>
     <color name="colorTextSecondaryButton">#6b6b6b</color>
     <color name="colorBlackText">#383838</color>

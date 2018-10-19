@@ -162,7 +162,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             otherSymbols.setGroupingSeparator('.');
             offerViewHolder.amount.setText(
                     String.format("$%s", new DecimalFormat("#,###", otherSymbols).format(
-                            offer.getTotalWage())));
+                            offer.getWage())));
 
             ((ApplicationViewHolder) holder).layout.setOnClickListener(new View.OnClickListener() {
                 @Override

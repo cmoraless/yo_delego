@@ -82,6 +82,7 @@ public class RegisterMainFragment extends Fragment {
     private String accountTypeError;
     private String accountError;
     private String profileImageError;
+    private String phoneError;
 
     private boolean student;
     private boolean noStudent;
@@ -336,6 +337,8 @@ public class RegisterMainFragment extends Fragment {
                 textViewLastName.setError(lastNameError);
             if(mailError != null)
                 textViewMail.setError(mailError);
+            if(phoneError != null)
+                textViewPhone.setError(phoneError);
             if(passwordError != null)
                 textViewPassword.setError(passwordError);
             if(rutError != null)
@@ -354,6 +357,7 @@ public class RegisterMainFragment extends Fragment {
             String firstNameError,
             String lastNameError,
             String mailError,
+            String phoneError,
             String passwordError,
             String rutError,
             String bankError,
@@ -364,6 +368,7 @@ public class RegisterMainFragment extends Fragment {
         this.firstNameError = firstNameError;
         this.lastNameError = lastNameError;
         this.mailError = mailError;
+        this.phoneError = phoneError;
         this.passwordError = passwordError;
         this.rutError = rutError;
         this.bankError = bankError;
@@ -383,6 +388,8 @@ public class RegisterMainFragment extends Fragment {
             textViewLastName.setError(lastNameError);
         if(mailError != null)
             textViewMail.setError(mailError);
+        if(phoneError != null)
+            textViewPhone.setError(phoneError);
         if(passwordError != null)
             textViewPassword.setError(passwordError);
         if(rutError != null)
@@ -437,6 +444,7 @@ public class RegisterMainFragment extends Fragment {
         textViewFirstName.setError(null);
         textViewLastName.setError(null);
         textViewMail.setError(null);
+        textViewPhone.setError(null);
         textViewPassword.setError(null);
         textViewConfirmPassword.setError(null);
         textViewRut.setError(null);

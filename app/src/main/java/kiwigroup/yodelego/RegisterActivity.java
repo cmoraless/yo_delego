@@ -269,17 +269,17 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
             if(resultCode == Activity.RESULT_OK) {
                 Uri selectedImage = data.getData();
                 try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
-                    bitmap = rotate(bitmap, getCameraPhotoOrientation(selectedImage));
-                    if(bitmap.getWidth() > 256){
+                    image = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
+                    image = rotate(image, getCameraPhotoOrientation(selectedImage));
+                    if(image.getWidth() > 256){
                         int width = 256;
-                        int heightofBitMap = bitmap.getHeight();
-                        int widthofBitMap = bitmap.getWidth();
+                        int heightofBitMap = image.getHeight();
+                        int widthofBitMap = image.getWidth();
                         heightofBitMap = width * heightofBitMap / widthofBitMap;
                         widthofBitMap = width;
-                        bitmap = Bitmap.createScaledBitmap(bitmap, widthofBitMap, heightofBitMap, true);
+                        image = Bitmap.createScaledBitmap(image, widthofBitMap, heightofBitMap, true);
                     }
-                        onGalleryImageListener.onImageSelected(bitmap);
+                    onGalleryImageListener.onImageSelected(image);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -378,6 +378,7 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
                             String lastNameError = checkForError(responseObject, "last_name");
                             String rutError = checkForError(responseObject, "rut");
                             String emailError = checkForError(responseObject, "email");
+                            String phoneError = checkForError(responseObject, "phone_number");
                             String passwordError = checkForError(responseObject, "password");
                             String bankNameError = checkForError(responseObject, "bank_id");
                             String bankAccountNumberError = checkForError(responseObject, "bank_account_number");
@@ -391,6 +392,7 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
                                     lastNameError != null ||
                                     rutError != null ||
                                     emailError != null ||
+                                    phoneError != null ||
                                     passwordError != null ||
                                     bankNameError != null ||
                                     bankAccountNumberError != null ||
@@ -408,6 +410,7 @@ public class RegisterActivity extends AppCompatActivity implements OnRegisterFra
                                         firstNameError,
                                         lastNameError,
                                         emailError,
+                                        phoneError,
                                         passwordError,
                                         rutError,
                                         bankNameError,

@@ -4,14 +4,18 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.Html;
+import android.text.TextWatcher;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -81,6 +85,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
     private TextView textViewStartHour;
     private TextView textViewJobHour;
 
+    private RelativeLayout attachLayout;
     private boolean complete;
 
     @Override
@@ -120,6 +125,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
         textViewEmailLayout = findViewById(R.id.email_layout);
         textViewPhone = findViewById(R.id.phone);
         textViewEmail = findViewById(R.id.email);
+        attachLayout = findViewById(R.id.attach);
 
         textViewStartHour = findViewById(R.id.start_hour);
         textViewJobHour = findViewById(R.id.job_hours);
@@ -180,6 +186,27 @@ public class OfferDetailsActivity extends AppCompatActivity {
                             final View view = inflater.inflate(R.layout.dialog_rank2, null);
                             final RatingBar ratingBar = view.findViewById(R.id.dialog_ratingbar);
                             final TextView text = view.findViewById(R.id.text);
+                            text.addTextChangedListener(new TextWatcher() {
+                                @Override
+                                public void afterTextChanged(Editable s) {}
+                                @Override
+                                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                                @Override
+                                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                                    ((AlertDialog) currentRatingDialog).
+                                            getButton(AlertDialog.BUTTON_POSITIVE).
+                                            setEnabled(!text.getText().toString().isEmpty() &&
+                                                    ratingBar.getRating() > 0);
+                                }
+                            });
+
+                            text.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                                @Override
+                                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                                    text.setError(null);
+                                    return false;
+                                }
+                            });
                             text.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                                 @Override
                                 public void onFocusChange(View v, boolean hasFocus) {
@@ -193,7 +220,10 @@ public class OfferDetailsActivity extends AppCompatActivity {
                             ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
                                 @Override
                                 public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                                    ((AlertDialog) currentRatingDialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(rating > 0);
+                                    ((AlertDialog) currentRatingDialog).
+                                            getButton(AlertDialog.BUTTON_POSITIVE).
+                                            setEnabled(!text.getText().toString().isEmpty() &&
+                                                    ratingBar.getRating() > 0);
                                     InputMethodManager inputMethodManager =
                                             (InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
                                     inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
@@ -223,11 +253,11 @@ public class OfferDetailsActivity extends AppCompatActivity {
                             builder.setCancelable(true);
                             builder.setPositiveButton("Calificar", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                    if(ratingBar.getRating() > 0){
+                                    if(ratingBar.getRating() > 0 && !text.getText().toString().isEmpty()){
                                         rateApplication(
-                                                offer.getApplication().getId(),
-                                                ratingBar.getRating(),
-                                                text.getText().toString());
+                                            offer.getApplication().getId(),
+                                            ratingBar.getRating(),
+                                            text.getText().toString());
                                         dialog.dismiss();
                                     }
                                 }
@@ -258,11 +288,6 @@ public class OfferDetailsActivity extends AppCompatActivity {
     }
 
     private void setUpForOffer(final Offer offer){
-        DateFormat df31 = new SimpleDateFormat("HH:mm", new Locale("es", "ES"));
-
-        Date currentTime = Calendar.getInstance().getTime();
-        Log.d("OfferDetailsActivity", "*** setUpForApplication getEndDate: " + df31.format(offer.getEndDate()));
-
         DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(new Locale("es", "ES"));
         otherSymbols.setDecimalSeparator(',');
         otherSymbols.setGroupingSeparator('.');
@@ -295,7 +320,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
         bottom_message_bar.setVisibility(View.GONE);
         accept_button.setVisibility(View.VISIBLE);
 
-        textViewAmount.setText(String.format("$%s", new DecimalFormat("#,###", otherSymbols).format(offer.getTotalWage())));
+        textViewAmount.setText(String.format("$%s", new DecimalFormat("#,###", otherSymbols).format(offer.getWage())));
 
         if(!offer.isAppliedByMe()){
             if(offer.getStatus() == Offer.OfferStatus.REVISION && !offer.hasExpired()){
@@ -378,6 +403,18 @@ public class OfferDetailsActivity extends AppCompatActivity {
         textViewContactTitle.setVisibility(GONE);
         textViewPhoneLayout.setVisibility(GONE);
         textViewEmailLayout.setVisibility(GONE);
+
+        if(offer.getAttaches() != null && !offer.getAttaches().isEmpty()){
+            attachLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(offer.getAttaches().get(0)));
+                    startActivity(browserIntent);
+                }
+            });
+        } else {
+            attachLayout.setVisibility(GONE);
+        }
     }
 
     DialogInterface currentRatingDialog;
@@ -395,16 +432,30 @@ public class OfferDetailsActivity extends AppCompatActivity {
                             bottom_message_bar_button.setVisibility(View.VISIBLE);
                             cancel_text.setText("Calificar");
                         } else {
+                            if(application.wasReviewedByApplicant()){
+                                accept_button.setVisibility(GONE);
+                                bottom_message_bar.setVisibility(View.VISIBLE);
+                                bottom_message_text.setText("Esta tarea ya ha sido calificada");
+                                bottom_message_bar_button.setVisibility(GONE);
+                            } else {
+                                accept_button.setVisibility(GONE);
+                                bottom_message_bar.setVisibility(View.VISIBLE);
+                                bottom_message_text.setText("Esta oferta está cerrada");
+                                bottom_message_bar_button.setVisibility(GONE);
+                            }
+                        }
+                    } else {
+                        if(application.wasReviewedByApplicant()){
+                            accept_button.setVisibility(GONE);
+                            bottom_message_bar.setVisibility(View.VISIBLE);
+                            bottom_message_text.setText("Esta tarea ya ha sido calificada");
+                            bottom_message_bar_button.setVisibility(GONE);
+                        } else {
                             accept_button.setVisibility(GONE);
                             bottom_message_bar.setVisibility(View.VISIBLE);
                             bottom_message_text.setText("Esta oferta está cerrada");
                             bottom_message_bar_button.setVisibility(GONE);
                         }
-                    } else {
-                        accept_button.setVisibility(GONE);
-                        bottom_message_bar.setVisibility(View.VISIBLE);
-                        bottom_message_text.setText("Esta oferta está cerrada");
-                        bottom_message_bar_button.setVisibility(GONE);
                     }
                 } else {
                     accept_button.setEnabled(false);

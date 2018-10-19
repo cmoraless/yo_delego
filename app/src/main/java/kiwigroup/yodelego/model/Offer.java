@@ -32,6 +32,7 @@ public class Offer implements Serializable, WallItem{
     private int dailyWage;
     private int hourlyWage;
     private int totalWage;
+    private int wage;
     private int totalHours;
     private String summary;
     private String commune;
@@ -45,6 +46,7 @@ public class Offer implements Serializable, WallItem{
 
     private Application application;
     private List<String> images;
+    private List<String> attaches;
     public Offer(){}
 
     public static Offer parseFromJson(JSONObject object){
@@ -83,10 +85,14 @@ public class Offer implements Serializable, WallItem{
             if(!object.isNull("total_hours"))
                 offer.setTotalHours(object.getInt("total_hours"));
 
-            if(!object.isNull("total_wage"))
-                offer.setTotalWage(object.getInt("total_wage"));
+            if(!object.isNull("wage"))
+                offer.setWage(object.getInt("wage"));
+            if(!object.isNull("hourly_wage"))
+                offer.setHourlyWage(object.getInt("hourly_wage"));
             if(!object.isNull("images"))
                 offer.setImages(object.getJSONArray("images"));
+            if(!object.isNull("attachments"))
+                offer.setAttaches(object.getJSONArray("attachments"));
 
             offer.setStatus(Offer.OfferStatus.fromInteger(object.getInt("status")));
 
@@ -302,6 +308,33 @@ public class Offer implements Serializable, WallItem{
 
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
+    }
+
+    public int getWage() {
+        return wage;
+    }
+
+    public void setWage(int wage) {
+        this.wage = wage;
+    }
+
+    public List<String> getAttaches() {
+        return attaches;
+    }
+
+    public void setAttaches(JSONArray JSONArrayAttaches) {
+        this.attaches = new ArrayList<>();
+        for(int i = 0; i < JSONArrayAttaches.length(); i++){
+            try {
+                String path = JSONArrayAttaches.getString(i);
+                if(!path.contains("/web.yodelego.com")){
+                    path = "http://web.yodelego.com/" + path;
+                }
+                this.attaches.add(path);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 

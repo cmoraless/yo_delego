@@ -282,7 +282,7 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(new Locale("es", "ES"));
             otherSymbols.setDecimalSeparator(',');
             otherSymbols.setGroupingSeparator('.');
-            offerViewHolder.amount.setText(String.format("$%s", new DecimalFormat("#,###", otherSymbols).format(offer.getTotalWage())));
+            offerViewHolder.amount.setText(String.format("$%s", new DecimalFormat("#,###", otherSymbols).format(offer.getWage())));
             offerViewHolder.description.setText(offer.getSummary());
             offerViewHolder.details.setOnClickListener(new View.OnClickListener() {
                 @Override
