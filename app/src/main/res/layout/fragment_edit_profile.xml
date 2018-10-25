@@ -9,153 +9,180 @@
     android:background="@color/colorPrimary"
     tools:context=".ProfileEditFragment">
 
-    <RelativeLayout
-        android:id="@+id/email_login_form"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp">
+        android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/imageLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:orientation="vertical"
-            android:paddingStart="5dp">
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/profile_image"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@drawable/ic_profile"
-                app:civ_border_width="0dp"
-                android:layout_gravity="center_horizontal"/>
-
-            <TextView
-                android:id="@+id/edit"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="right"
-                android:maxLines="1"
-                android:layout_weight="1"
-                android:text="@string/edit_photo"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                android:textAllCaps="true"
-                android:textStyle="bold" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/summary_info"
+            android:id="@+id/progress_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:orientation="vertical"
-            android:layout_marginTop="20dp"
-            android:paddingEnd="20dp"
-            android:paddingStart="20dp"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp"
-            android:layout_below="@id/imageLayout"
-            android:elevation="5dp"
-            android:background="@drawable/profile_summary_info_shape">
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
-            <include
-                android:id="@+id/form"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                layout="@layout/content_base_account_form"/>
+            <ProgressBar
+                android:id="@+id/login_progress"
+                style="?android:attr/progressBarStyleLarge"
+                android:indeterminateTint="@color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/academic_info"
+        <RelativeLayout
+            android:id="@+id/email_login_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:paddingEnd="20dp"
-            android:paddingStart="20dp"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp"
-            android:gravity="center|top"
-            android:layout_below="@id/summary_info"
-            android:elevation="5dp"
             android:orientation="vertical"
-            android:background="@drawable/profile_academic_info_shape">
-
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginTop="8dp"
-                app:srcCompat="@drawable/ic_academic"/>
-
-            <include
-                android:id="@+id/form"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                layout="@layout/content_student_account_form"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/bank_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="15dp"
             android:layout_marginBottom="20dp"
-            android:paddingEnd="20dp"
-            android:paddingStart="20dp"
-            android:paddingBottom="30dp"
-            android:paddingTop="10dp"
-            android:gravity="center|top"
-            android:layout_below="@id/academic_info"
-            android:elevation="5dp"
-            android:orientation="vertical"
-            android:background="@drawable/profile_bank_info_shape">
+            android:layout_marginLeft="20dp"
+            android:visibility="gone"
+            android:layout_marginRight="20dp">
 
-            <ImageView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_marginTop="8dp"
-                app:srcCompat="@drawable/ic_bank"/>
+            <LinearLayout
+                android:id="@+id/imageLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:orientation="vertical"
+                android:paddingStart="5dp">
 
-            <include
-                android:id="@+id/form"
+                <de.hdodenhof.circleimageview.CircleImageView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/profile_image"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/ic_profile"
+                    app:civ_border_width="0dp"
+                    android:layout_gravity="center_horizontal"/>
+
+                <TextView
+                    android:id="@+id/edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="right"
+                    android:maxLines="1"
+                    android:layout_weight="1"
+                    android:text="@string/edit_photo"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textAllCaps="true"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/summary_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                layout="@layout/content_bank_form"/>
+                android:layout_gravity="center_horizontal"
+                android:orientation="vertical"
+                android:layout_marginTop="20dp"
+                android:paddingEnd="20dp"
+                android:paddingStart="20dp"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:layout_below="@id/imageLayout"
+                android:elevation="5dp"
+                android:background="@drawable/profile_summary_info_shape">
 
-        </LinearLayout>
+                <include
+                    android:id="@+id/form"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    layout="@layout/content_base_account_form"/>
 
-        <Button
-            android:id="@+id/edit_btn"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="30dp"
-            android:layout_below="@id/bank_info"
-            android:text="guardar"
-            android:background="@drawable/button_secondary_background"
-            android:textColor="@color/colorPrimary"
-            android:textAllCaps="true"
-            android:textSize="18sp"/>
+            </LinearLayout>
 
-        <ProgressBar
-            android:id="@+id/login_progress"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:theme="@style/AppTheme.WhiteAccent"
-            android:visibility="gone" />
+            <LinearLayout
+                android:id="@+id/academic_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:paddingEnd="20dp"
+                android:paddingStart="20dp"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:gravity="center|top"
+                android:layout_below="@id/summary_info"
+                android:elevation="5dp"
+                android:orientation="vertical"
+                android:background="@drawable/profile_academic_info_shape">
 
-    </RelativeLayout>
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="8dp"
+                    app:srcCompat="@drawable/ic_academic"/>
 
+                <include
+                    android:id="@+id/form"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    layout="@layout/content_student_account_form"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/bank_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:paddingEnd="20dp"
+                android:paddingStart="20dp"
+                android:paddingBottom="30dp"
+                android:paddingTop="10dp"
+                android:gravity="center|top"
+                android:layout_below="@id/academic_info"
+                android:elevation="5dp"
+                android:orientation="vertical"
+                android:background="@drawable/profile_bank_info_shape">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_marginTop="8dp"
+                    app:srcCompat="@drawable/ic_bank"/>
+
+                <include
+                    android:id="@+id/form"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    layout="@layout/content_bank_form"/>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/edit_btn"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="30dp"
+                android:layout_below="@id/bank_info"
+                android:text="guardar"
+                android:background="@drawable/button_secondary_background"
+                android:textColor="@color/colorPrimary"
+                android:textAllCaps="true"
+                android:textSize="18sp"/>
+
+            <!--<ProgressBar
+                android:id="@+id/login_progress"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:theme="@style/AppTheme.WhiteAccent"
+                android:visibility="gone" />-->
+
+        </RelativeLayout>
+
+    </LinearLayout>
 </ScrollView>
 

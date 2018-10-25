@@ -63,9 +63,9 @@ import kiwigroup.yodelego.server.ServerCommunication;
 import static android.view.View.GONE;
 
 public class ProfileEditFragment extends Fragment {
-    private View mProgressView;
+    private LinearLayout progressLayout;
+    private RelativeLayout formLayout;
 
-    private LinearLayout baseFormLayout;
     private TextInputEditText name;
     private TextInputEditText lastName;
     private TextInputEditText rut;
@@ -74,7 +74,6 @@ public class ProfileEditFragment extends Fragment {
     private TextInputEditText password;
     private TextInputEditText confirmPassword;
     private Button editButton;
-    private RelativeLayout formLayout;
 
     private LinearLayout studentFormLayout;
     private SearchableSpinner universitySpinner;
@@ -129,9 +128,7 @@ public class ProfileEditFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        baseFormLayout = view.findViewById(R.id.summary_info);
-
-        mProgressView = view.findViewById(R.id.login_progress);
+        progressLayout = view.findViewById(R.id.progress_layout);
         formLayout = view.findViewById(R.id.email_login_form);
 
         imageLayout = view.findViewById(R.id.imageLayout);
@@ -194,7 +191,6 @@ public class ProfileEditFragment extends Fragment {
         categorySpinner.setPositiveButton("OK");
 
         if(user.getEducationalInstitution() != null && !user.getEducationalInstitution().isEmpty()) {
-            showProgress(true);
             studentFormLayout.setVisibility(View.VISIBLE);
             careerTextView.setText(user.getCareer());
             yearTextView.setText(String.valueOf(user.getEnrollmentYear()));
@@ -352,22 +348,8 @@ public class ProfileEditFragment extends Fragment {
     }
 
     private void showProgress(final boolean show) {
-        for (int i = 0; i < formLayout.getChildCount(); i++) {
-            View child = formLayout.getChildAt(i);
-            child.setVisibility(show ? GONE : View.VISIBLE);
-            child.setEnabled(!show);
-        }
-
-        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-        mProgressView.setVisibility(show ? View.VISIBLE : GONE);
-        mProgressView.animate().setDuration(shortAnimTime).alpha(
-                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mProgressView.setVisibility(show ? View.VISIBLE : GONE);
-            }
-        });
+        formLayout.setVisibility(show ? View.GONE : View.VISIBLE);
+        progressLayout.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -729,68 +711,7 @@ public class ProfileEditFragment extends Fragment {
         return null;
     }
 
-    private static boolean isValidRut(String rut) {
-
-        boolean validate = false;
-        try {
-            rut =  rut.toUpperCase();
-            rut = rut.replace(".", "");
-            rut = rut.replace("-", "");
-            int rutAux = Integer.parseInt(rut.substring(0, rut.length() - 1));
-
-            char dv = rut.charAt(rut.length() - 1);
-
-            int m = 0, s = 1;
-            for (; rutAux != 0; rutAux /= 10) {
-                s = (s + rutAux % 10 * (9 - m++ % 6)) % 11;
-            }
-            if (dv == (char) (s != 0 ? s + 47 : 75)) {
-                validate = true;
-            }
-
-        } catch (Exception e) {
-            return false;
-        }
-        return validate;
-    }
-
     private boolean isValidPhone(String phone){
         return phone.length() <= 12 && android.util.Patterns.PHONE.matcher(phone).matches();
-    }
-
-    public int getCameraPhotoOrientation(Uri imageUri) {
-        int rotate = 0;
-        try {
-
-            ExifInterface exif;
-
-            InputStream input = getContext().getContentResolver().openInputStream(imageUri);
-            if (Build.VERSION.SDK_INT > 23)
-                exif = new ExifInterface(input);
-            else
-                exif = new ExifInterface(imageUri.getPath());
-
-            String exifOrientation = exif
-                    .getAttribute(ExifInterface.TAG_ORIENTATION);
-            Log.d("exifOrientation", exifOrientation);
-            int orientation = exif.getAttributeInt(
-                    ExifInterface.TAG_ORIENTATION,
-                    ExifInterface.ORIENTATION_NORMAL);
-            switch (orientation) {
-                case ExifInterface.ORIENTATION_ROTATE_270:
-                    rotate = 270;
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_180:
-                    rotate = 180;
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_90:
-                    rotate = 90;
-                    break;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return rotate;
     }
 }

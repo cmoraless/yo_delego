@@ -3,7 +3,6 @@ package kiwigroup.yodelego.adapter;
 import android.graphics.PorterDuff;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,17 +21,10 @@ import kiwigroup.yodelego.model.Offer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import static kiwigroup.yodelego.model.Application.ApplicationStatus.ACCEPTED;
-import static kiwigroup.yodelego.model.Application.ApplicationStatus.CANCELED_BY_APPLICANT;
-import static kiwigroup.yodelego.model.Application.ApplicationStatus.REJECTED;
-import static kiwigroup.yodelego.model.Application.ApplicationStatus.REVISION;
 
 public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final int VIEW_TYPE_ITEM = 0;
@@ -66,7 +58,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         for(Offer offer : applications){
             if(completeFilter){
-                if(offer.hasExpired() &&
+                if(offer.hasFinished() &&
                     offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED &&
                     offer.isPaid() &&
                     !offer.getApplication().isClosed()) {
@@ -75,12 +67,12 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             } else if(adjudicatedFilter) {
                 if(offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED
                         && offer.isPaid()
-                        && !offer.hasExpired()
+                        && !offer.hasFinished()
                         && !offer.getApplication().isClosed()) {
                     this.applications.add(offer);
                 }
             } else if(reviewingFilter) {
-                if(!offer.hasExpired()
+                if(!offer.hasStarted()
                     && !offer.isPaid()
                     && (offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED || offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.REVISION)) {
                     this.applications.add(offer);

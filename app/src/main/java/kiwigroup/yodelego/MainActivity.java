@@ -8,11 +8,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,11 +23,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
-import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Response;
 import com.android.volley.ServerError;
@@ -41,13 +36,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -61,7 +53,6 @@ import kiwigroup.yodelego.model.WallItem;
 import kiwigroup.yodelego.server.ServerCommunication;
 import kiwigroup.yodelego.services.NotificationsListenerService;
 
-import static android.view.View.GONE;
 import static kiwigroup.yodelego.model.Offer.OfferStatus.CANCELED;
 import static kiwigroup.yodelego.model.Offer.OfferStatus.DEACTIVATED;
 import static kiwigroup.yodelego.model.Offer.OfferStatus.PAUSED;
@@ -541,12 +532,53 @@ public class MainActivity
                                             //
                                             // CLOSE AND COMPLETE STATES LOGIC FOR APPLICATIONS
                                             //
-                                            // closed by no-payment (incomplete)
-                                            if(!offer.isPaid() && offer.hasExpired()){
+                                            if(offer.isPaid()){
+                                                if(offer.hasFinished()) {
+                                                    Calendar cal = Calendar.getInstance();
+                                                    cal.add(Calendar.DAY_OF_MONTH, 7);
+
+                                                    if (application.wasReviewedByApplicantAndPublisher()) {
+                                                        application.setQualifiable(false); // cerrado
+                                                        application.setClosed(true);
+                                                    } else {
+                                                        // only
+                                                        if (application.wasReviewedByApplicant()) {
+                                                            application.setQualifiable(false);
+                                                            if (offer.getEndDate().after(cal.getTime())) {
+                                                                // complete
+                                                                application.setClosed(true);
+                                                            } else {
+                                                                application.setClosed(false);
+                                                            }
+                                                            // neither
+                                                        } else {
+                                                            // adjudicada
+                                                            application.setQualifiable(true);
+                                                            application.setClosed(false);
+                                                        }
+                                                    }
+                                                } else {
+                                                    // adjudicada
+                                                    application.setQualifiable(false);
+                                                    application.setClosed(false);
+                                                }
+                                            } else {
+                                                // closed by no-payment (incomplete)
+                                                if(offer.hasStarted()){
+                                                    application.setClosed(true);
+                                                    application.setQualifiable(false);
+                                                } else {
+                                                    application.setQualifiable(false);
+                                                    application.setClosed(false);
+                                                }
+                                            }
+
+                                            /*// closed by no-payment (incomplete)
+                                            if(!offer.isPaid() && offer.hasStarted()){
                                                 application.setClosed(true);
                                                 application.setQualifiable(false);
                                             // complete
-                                            } else if(offer.isPaid() && offer.hasExpired()) {
+                                            } else if(offer.isPaid() && offer.hasStarted()) {
                                                 Calendar cal = Calendar.getInstance();
                                                 cal.add(Calendar.DAY_OF_MONTH, 7);
 
@@ -571,7 +603,7 @@ public class MainActivity
                                             } else {
                                                 application.setQualifiable(false);
                                                 application.setClosed(false);
-                                            }
+                                            }*/
 
                                             myOfferApplications.add(offer);
                                         } catch (Exception e) {

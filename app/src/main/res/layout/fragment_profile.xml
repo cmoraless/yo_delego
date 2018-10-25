@@ -12,279 +12,311 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp">
+        android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/progress_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:paddingStart="5dp">
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/profile_image"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@drawable/ic_profile"
-                app:civ_border_width="0dp"
-                android:layout_gravity="center_vertical"/>
+            <ProgressBar
+                android:id="@+id/login_progress"
+                style="?android:attr/progressBarStyleLarge"
+                android:indeterminateTint="@color/colorPrimary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/form_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="4dp"
+            android:layout_marginTop="11dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp">
 
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:orientation="vertical"
-                android:paddingLeft="10dp">
+                android:orientation="horizontal"
+                android:paddingStart="5dp">
 
-                <RelativeLayout
+                <de.hdodenhof.circleimageview.CircleImageView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/profile_image"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/ic_profile"
+                    app:civ_border_width="0dp"
+                    android:layout_gravity="center_vertical"/>
+
+                <LinearLayout
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    android:paddingLeft="10dp">
+
+                    <RelativeLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:orientation="horizontal">
+
+                        <kiwigroup.yodelego.customui.DynamicTextView
+                            android:id="@+id/user_type"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxLines="1"
+                            android:layout_centerVertical="true"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:id="@+id/rating_layout"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:layout_toRightOf="@id/user_type"
+                            android:layout_centerVertical="true"
+                            android:background="@drawable/button_rating_background"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginTop="1dp"
+                                android:src="@drawable/ic_star"/>
+
+                            <TextView
+                                android:id="@+id/publisherRating"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginEnd="7dp"
+                                android:textColor="@color/white"
+                                android:textStyle="bold"
+                                android:textSize="12sp"/>
+
+                        </LinearLayout>
+
+                        <kiwigroup.yodelego.customui.DynamicTextView
+                            android:id="@+id/edit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxLines="1"
+                            android:text="@string/edit"
+                            android:layout_alignParentRight="true"
+                            android:padding="6dp"
+                            android:textAllCaps="true"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                    </RelativeLayout>
 
                     <kiwigroup.yodelego.customui.DynamicTextView
-                        android:id="@+id/user_type"
+                        android:id="@+id/name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:maxLines="1"
                         android:text=""
+                        android:includeFontPadding="false"
                         android:textColor="@color/colorPrimaryDark"
-                        android:textSize="16sp"
+                        android:textSize="26sp"
                         android:textStyle="bold" />
-
-                    <LinearLayout
-                        android:id="@+id/rating_layout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:layout_toRightOf="@id/user_type"
-                        android:layout_centerVertical="true"
-                        android:background="@drawable/button_rating_background"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="15dp"
-                            android:layout_height="15dp"
-                            android:layout_marginStart="5dp"
-                            android:layout_marginTop="1dp"
-                            android:src="@drawable/ic_star"/>
-
-                        <TextView
-                            android:id="@+id/publisherRating"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginEnd="7dp"
-                            android:text="5.0"
-                            android:textColor="@color/white"
-                            android:textStyle="bold"
-                            android:textSize="12sp"/>
-
-                    </LinearLayout>
 
                     <kiwigroup.yodelego.customui.DynamicTextView
-                        android:id="@+id/edit"
+                        android:id="@+id/rut"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
                         android:maxLines="1"
-                        android:text="@string/edit"
-                        android:layout_alignParentRight="true"
-                        android:textAllCaps="true"
+                        android:text=""
                         android:textColor="@color/colorPrimaryDark"
-                        android:textSize="15sp"
+                        android:textSize="14sp" />
+
+                    <kiwigroup.yodelego.customui.DynamicTextView
+                        android:id="@+id/mail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:maxLines="1"
+                        android:text=""
+                        android:textColor="@color/colorPrimaryDark"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/academic_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center|top"
+                android:padding="4dp"
+                android:elevation="4dp"
+                android:orientation="vertical"
+                android:background="@drawable/profile_academic_info_shape">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="8dp"
+                    app:srcCompat="@drawable/ic_academic"/>
+
+                <TextView
+                    android:id="@+id/academic_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="5"
+                    android:gravity="center"
+                    android:lineSpacingMultiplier="1.2"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="15dp"
+                    android:text=""
+                    android:textColor="@color/colorAcademicInfoText"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/summary_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="vertical"
+                android:layout_marginTop="20dp"
+                android:padding="4dp"
+                android:elevation="4dp"
+                android:background="@drawable/profile_summary_info_shape">
+
+                <LinearLayout
+                    android:id="@+id/awarded_works_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginTop="15dp"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_marginTop="2dp"
+                        app:srcCompat="@drawable/ic_awarded_works"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="0dp"
+                        android:maxLines="2"
+                        android:text="Tareas adjudicadas"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
-                </RelativeLayout>
+                    <TextView
+                        android:id="@+id/assigned_offers_amounts"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="0dp"
+                        android:gravity="end"
+                        android:maxLines="1"
+                        android:text="0"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
 
-                <kiwigroup.yodelego.customui.DynamicTextView
-                    android:id="@+id/name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:text=""
-                    android:includeFontPadding="false"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textSize="26sp"
-                    android:textStyle="bold" />
+                </LinearLayout>
 
-                <kiwigroup.yodelego.customui.DynamicTextView
-                    android:id="@+id/rut"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/canceled_works_layout"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:maxLines="1"
-                    android:text=""
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textSize="14sp" />
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginRight="20dp"
+                    android:orientation="horizontal">
 
-                <kiwigroup.yodelego.customui.DynamicTextView
-                    android:id="@+id/mail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:maxLines="1"
-                    android:text=""
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textSize="14sp" />
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_marginTop="2dp"
+                        app:srcCompat="@drawable/ic_awarded_works"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLines="2"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="0dp"
+                        android:text="Tareas completadas"
+                        android:textColor="@color/colorPrimary"
+                        android:textStyle="bold"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/complete_offers_amount"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="0dp"
+                        android:gravity="end"
+                        android:maxLines="1"
+                        android:text="0"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/academic_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:gravity="center|top"
-            android:elevation="4dp"
-            android:orientation="vertical"
-            android:background="@drawable/profile_academic_info_shape">
-
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginTop="8dp"
-                app:srcCompat="@drawable/ic_academic"/>
-
-            <TextView
-                android:id="@+id/academic_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxLines="5"
-                android:gravity="center"
-                android:lineSpacingMultiplier="1.2"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="15dp"
-                android:text=""
-                android:textColor="@color/colorAcademicInfoText"
+            <Button
+                android:id="@+id/cancel_button"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/button_third_background"
+                android:elevation="0dp"
+                android:text="CERRAR SESIÓN"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:textColor="@color/white"
                 android:textSize="14sp" />
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/summary_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:orientation="vertical"
-            android:layout_marginTop="20dp"
-            android:elevation="4dp"
-            android:background="@drawable/profile_summary_info_shape">
-
-            <LinearLayout
-                android:id="@+id/awarded_works_layout"
+            <TextView
+                android:id="@+id/version_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginBottom="40dp"
                 android:layout_marginTop="15dp"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:layout_marginTop="2dp"
-                    app:srcCompat="@drawable/ic_awarded_works"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="0dp"
-                    android:maxLines="2"
-                    android:text="Tareas adjudicadas"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/assigned_offers_amounts"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="0dp"
-                    android:gravity="end"
-                    android:maxLines="1"
-                    android:text="0"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/canceled_works_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
-                android:layout_marginRight="20dp"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:layout_marginTop="2dp"
-                    app:srcCompat="@drawable/ic_awarded_works"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:maxLines="2"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="0dp"
-                    android:text="Tareas completadas"
-                    android:textColor="@color/colorPrimary"
-                    android:textStyle="bold"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/complete_offers_amount"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="0dp"
-                    android:gravity="end"
-                    android:maxLines="1"
-                    android:text="0"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
+                android:gravity="right"
+                android:text="22323"
+                android:textColor="@color/colorBlackText"
+                android:textSize="10sp" />
 
         </LinearLayout>
-
-        <Button
-            android:id="@+id/cancel_button"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="15dp"
-            android:background="@drawable/button_third_background"
-            android:elevation="0dp"
-            android:text="CERRAR SESIÓN"
-            android:textAllCaps="false"
-            android:textStyle="bold"
-            android:textColor="@color/white"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/version_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
-            android:layout_marginTop="15dp"
-            android:gravity="right"
-            android:text="22323"
-            android:textColor="@color/colorBlackText"
-            android:textSize="10sp" />
 
     </LinearLayout>
 

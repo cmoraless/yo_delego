@@ -1,8 +1,5 @@
 package kiwigroup.yodelego;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
@@ -34,8 +31,9 @@ public class RegisterStudentFragment extends Fragment {
 
     private OnRegisterFragmentListener mListener;
 
-    private View mProgressView;
+    private LinearLayout progressLayout;
     private LinearLayout formLayout;
+
     private SearchableSpinner universitySpinner;
     private SearchableSpinner categoriesSpinner;
     private TextInputEditText careerTextView;
@@ -114,8 +112,8 @@ public class RegisterStudentFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        progressLayout = view.findViewById(R.id.progress_layout);
         formLayout = view.findViewById(R.id.email_login_form);
-        mProgressView = view.findViewById(R.id.login_progress);
 
         universitySpinner = view.findViewById(R.id.spinner);
         categoriesSpinner = view.findViewById(R.id.cat_spinner);
@@ -314,21 +312,8 @@ public class RegisterStudentFragment extends Fragment {
     }
 
     private void showProgress(final boolean show) {
-        for (int i = 0; i < formLayout.getChildCount(); i++) {
-            View child = formLayout.getChildAt(i);
-            child.setEnabled(!show);
-        }
-
-        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-        mProgressView.animate().setDuration(shortAnimTime).alpha(
-                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            }
-        });
+        formLayout.setVisibility(show ? View.GONE : View.VISIBLE);
+        progressLayout.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @Override

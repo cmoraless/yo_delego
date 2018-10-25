@@ -84,7 +84,6 @@ public class NotificationsListenerService extends Service {
                 @Override
                 public void onResponse(JSONArray response) {
                     if(response != null) {
-
                         Log.d("NotificationsService", "*** response: " + response.toString() );
                         int available_offers = 0;
                         List<kiwigroup.yodelego.model.Notification> notifications = new ArrayList<>();

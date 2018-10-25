@@ -43,7 +43,6 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -160,7 +159,8 @@ public class OfferDetailsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(offer != null)
                     if(offer.isAppliedByMe()) {
-                        if(offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.REVISION && !complete){
+                        if((offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.REVISION ||
+                                offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED ) && !complete){
                             AlertDialog.Builder builder = new AlertDialog.Builder(OfferDetailsActivity.this);
                             builder.setTitle(getString(R.string.application));
                             builder.setMessage(Html.fromHtml(String.format(getString(R.string.cancel_application), offer.getTitle())));
@@ -323,26 +323,22 @@ public class OfferDetailsActivity extends AppCompatActivity {
         textViewAmount.setText(String.format("$%s", new DecimalFormat("#,###", otherSymbols).format(offer.getWage())));
 
         if(!offer.isAppliedByMe()){
-            if(offer.getStatus() == Offer.OfferStatus.REVISION && !offer.hasExpired()){
-            /*accept_button.setVisibility(GONE);
-            bottom_message_bar.setVisibility(View.VISIBLE);
-            bottom_message_text.setText("Esta oferta se encuentra en revisión");*/
+            if(offer.getStatus() == Offer.OfferStatus.REVISION && !offer.hasStarted()){
+                /*accept_button.setVisibility(GONE);
+                bottom_message_bar.setVisibility(View.VISIBLE);
+                bottom_message_text.setText("Esta oferta se encuentra en revisión");*/
             } else if(offer.getStatus() == Offer.OfferStatus.CANCELED){
                 accept_button.setVisibility(GONE);
                 bottom_message_bar.setVisibility(View.VISIBLE);
                 bottom_message_text.setText("Esta oferta ha sido cancelada");
                 bottom_message_bar_button.setVisibility(GONE);
             } else if(offer.getStatus() == Offer.OfferStatus.ACCEPTED_APPLICATION){
-                if(offer.isPaid()){
+                /*if(offer.isPaid()){
                     accept_button.setVisibility(GONE);
                     bottom_message_bar.setVisibility(View.VISIBLE);
                     bottom_message_text.setText("Esta oferta ha sido adjudicada por otro usuario");
                     bottom_message_bar_button.setVisibility(GONE);
-                } else {
-                /*accept_button.setVisibility(GONE);
-                bottom_message_bar.setVisibility(View.VISIBLE);
-                bottom_message_text.setText("Esta oferta se encuentra en revisión");*/
-                }
+                }*/
             } else if(offer.getStatus() == Offer.OfferStatus.FILLED){
                 accept_button.setVisibility(GONE);
                 bottom_message_bar.setVisibility(View.VISIBLE);
@@ -365,7 +361,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
                 bottom_message_bar_button.setVisibility(GONE);
             }
 
-            if(offer.hasExpired()){
+            if(offer.hasStarted()){
                 accept_button.setVisibility(GONE);
                 bottom_message_bar.setVisibility(View.VISIBLE);
                 bottom_message_text.setText("Esta oferta está cerrada");
@@ -422,7 +418,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
     private void setUpForApplication(final Application application){
         if(application.getApplicationStatus() == Application.ApplicationStatus.ACCEPTED){
             if(offer.isPaid()){
-                if(offer.hasExpired()){
+                if(offer.hasFinished()){
                     if(!offer.getApplication().isClosed()){
                         if(offer.getApplication().isQualifiable()) {
                             complete = true;

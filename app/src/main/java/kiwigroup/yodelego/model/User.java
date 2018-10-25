@@ -85,6 +85,9 @@ public class User implements Serializable {
             if(response.has("publisher_rating") && !response.isNull("publisher_rating") && !response.getString("publisher_rating").isEmpty())
                 user.setPublisherRating(Float.parseFloat(response.getString("publisher_rating")));
 
+            if(response.has("applicant_rating") && !response.isNull("applicant_rating") && !response.getString("applicant_rating").isEmpty())
+                user.setApplicantRating(Float.parseFloat(response.getString("applicant_rating")));
+
             Log.e("LoginActivity", "SCUser getName " + user.getName());
             Log.e("LoginActivity", "SCUser getLastName " + user.getLastName());
             Log.e("LoginActivity", "SCUser getSemesters " + user.getSemesters());

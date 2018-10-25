@@ -266,20 +266,25 @@ public class Offer implements Serializable, WallItem{
         isPaid = paid;
     }
 
-    public boolean hasExpired() {
+    public boolean hasStarted() {
         Date currentTime = Calendar.getInstance().getTime();
-        if(getEndDate() == null)
+        if(getStartDate() == null)
             return false;
         else{
             if(getStartTime() == null){
-                return currentTime.after(getEndDate());
+                return currentTime.after(getStartDate());
             } else {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(getEndDate());
-                cal.add(Calendar.HOUR_OF_DAY, 1);
-                cal.getTime();
-                return currentTime.after(combine(getEndDate(), getStartTime()));
+                return currentTime.after(combine(getStartDate(), getStartTime()));
             }
+        }
+    }
+
+    public boolean hasFinished() {
+        Date currentTime = Calendar.getInstance().getTime();
+        if (getEndDate() == null)
+            return false;
+        else {
+            return currentTime.after(combine(getEndDate(), getTotalHours()));
         }
     }
 
@@ -291,6 +296,14 @@ public class Offer implements Serializable, WallItem{
         cal.setTime(date);
         cal.set(Calendar.HOUR_OF_DAY, hour);
         cal.set(Calendar.MINUTE, min);
+        return cal.getTime();
+    }
+
+    private static Date combine(Date date, int hour) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, hour);
+        cal.set(Calendar.MINUTE, hour);
         return cal.getTime();
     }
 

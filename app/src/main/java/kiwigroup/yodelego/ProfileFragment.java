@@ -1,13 +1,10 @@
 package kiwigroup.yodelego;
 
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +22,9 @@ import kiwigroup.yodelego.model.Offer;
 import kiwigroup.yodelego.model.User;
 
 public class ProfileFragment extends Fragment {
+    private LinearLayout progressLayout;
+    private LinearLayout formLayout;
+
     private CircleImageView image;
 
     private TextView userType;
@@ -53,6 +53,8 @@ public class ProfileFragment extends Fragment {
         bundle.putSerializable("user", user);
         fragment.setArguments(bundle);
 
+
+
         return fragment;
     }
 
@@ -77,6 +79,12 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        progressLayout = view.findViewById(R.id.progress_layout);
+        formLayout = view.findViewById(R.id.form_layout);
+
+        listener.updateUser();
+
         image = view.findViewById(R.id.profile_image);
         userType = view.findViewById(R.id.user_type);
         edit = view.findViewById(R.id.edit);
@@ -104,7 +112,7 @@ public class ProfileFragment extends Fragment {
 
         textViewRating = view.findViewById(R.id.publisherRating);
 
-        loadData(user);
+        //loadData(user);
 
         version_text = view.findViewById(R.id.version_text);
         version_text.setText(String.format("version %s", BuildConfig.VERSION_NAME));
@@ -118,11 +126,11 @@ public class ProfileFragment extends Fragment {
 
                     if(offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED
                             && offer.getApplication().isPaid()
-                            && !offer.hasExpired()) {
+                            && !offer.hasStarted()) {
                         assigned_offers_amount++;
                     }
 
-                    if(offer.hasExpired() &&
+                    if(offer.hasStarted() &&
                             offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED &&
                             offer.isPaid() ) {
                         complete_offers_amount ++;
@@ -139,7 +147,14 @@ public class ProfileFragment extends Fragment {
         }, false);
     }
 
+    private void showProgress(final boolean show) {
+        formLayout.setVisibility(show ? View.GONE : View.VISIBLE);
+        progressLayout.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
     private void loadData(User user){
+        showProgress(false);
+
         name.setText(String.format(new Locale("es", "ES"), "%s %s", user.getName(), user.getLastName()));
         rut.setText(RUTformat(user.getRut()));
         mail.setText(user.getEmail());
