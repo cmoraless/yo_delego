@@ -284,7 +284,11 @@ public class Offer implements Serializable, WallItem{
         if (getEndDate() == null)
             return false;
         else {
-            return currentTime.after(combine(getEndDate(), getTotalHours()));
+            Date date1 = combine(getEndDate(), getStartTime());
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date1);
+            Date date2 = combine(date1, getTotalHours());
+            return currentTime.after(date2);
         }
     }
 
@@ -302,8 +306,7 @@ public class Offer implements Serializable, WallItem{
     private static Date combine(Date date, int hour) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        cal.set(Calendar.HOUR_OF_DAY, hour);
-        cal.set(Calendar.MINUTE, hour);
+        cal.add(Calendar.HOUR_OF_DAY, hour);
         return cal.getTime();
     }
 

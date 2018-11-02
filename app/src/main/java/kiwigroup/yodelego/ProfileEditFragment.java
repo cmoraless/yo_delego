@@ -712,6 +712,8 @@ public class ProfileEditFragment extends Fragment {
     }
 
     private boolean isValidPhone(String phone){
-        return phone.length() <= 12 && android.util.Patterns.PHONE.matcher(phone).matches();
+        return phone.length() <= 12
+                && android.util.Patterns.PHONE.matcher(phone).matches()
+                && phone.startsWith("+");
     }
 }

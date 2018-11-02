@@ -106,14 +106,9 @@ public class ProfileFragment extends Fragment {
             }
         });
         academic_layout = view.findViewById(R.id.academic_info);
-
         accepted_offers = view.findViewById(R.id.assigned_offers_amounts);
         complete_offers = view.findViewById(R.id.complete_offers_amount);
-
         textViewRating = view.findViewById(R.id.publisherRating);
-
-        //loadData(user);
-
         version_text = view.findViewById(R.id.version_text);
         version_text.setText(String.format("version %s", BuildConfig.VERSION_NAME));
 
@@ -130,7 +125,7 @@ public class ProfileFragment extends Fragment {
                         assigned_offers_amount++;
                     }
 
-                    if(offer.hasStarted() &&
+                    if(offer.hasFinished() &&
                             offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED &&
                             offer.isPaid() ) {
                         complete_offers_amount ++;

@@ -128,8 +128,8 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
                                 editor.putString("password", password);
                                 editor.apply();
 
+                                user.setToken(ServerCommunication.TOKEN);
                                 onLoginSuccess(user);
-
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 onUserInfoError(getString(R.string.error_json_exception));

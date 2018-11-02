@@ -12,12 +12,13 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import kiwigroup.yodelego.adapter.ApplicationAdapter;
-import kiwigroup.yodelego.model.Application;
-import kiwigroup.yodelego.model.NotificationResume;
 import kiwigroup.yodelego.model.Offer;
+import kiwigroup.yodelego.model.StatusNotification;
 import kiwigroup.yodelego.model.WallItem;
 
-public class CompleteApplicationsFragment extends Fragment implements OnWallUpdateListener, SwipeRefreshLayout.OnRefreshListener {
+public class CompleteApplicationsFragment
+        extends Fragment
+        implements OnWallUpdateListener, SwipeRefreshLayout.OnRefreshListener {
     private OnUserFragmentsListener mListener;
     private RecyclerView recyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -111,7 +112,7 @@ public class CompleteApplicationsFragment extends Fragment implements OnWallUpda
     }
 
     @Override
-    public void onNotificationResponse(NotificationResume notificationResume) {
+    public void onNotificationResponse(List<StatusNotification> notificationResume) {
 
     }
 

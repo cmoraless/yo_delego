@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 
 import kiwigroup.yodelego.model.Application;
 import kiwigroup.yodelego.model.Offer;
+import kiwigroup.yodelego.model.StatusNotification;
 
 public interface OnUserFragmentsListener {
     void closeSession();
@@ -17,7 +18,7 @@ public interface OnUserFragmentsListener {
     void onWallOfferSelected(Offer offer);
     void onApplicationSelected(Offer application);
     void updateUser();
-    void closeNotifications();
+    void closeNotification(StatusNotification notification);
     void onNotificationSelected();
     void getImageFromGallery(String message, MainActivity.OnGalleryImageListener listener);
 }

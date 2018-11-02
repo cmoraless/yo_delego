@@ -2,8 +2,8 @@ package kiwigroup.yodelego;
 
 import java.util.List;
 
-import kiwigroup.yodelego.model.NotificationResume;
 import kiwigroup.yodelego.model.Offer;
+import kiwigroup.yodelego.model.StatusNotification;
 import kiwigroup.yodelego.model.WallItem;
 
 public interface OnWallUpdateListener {
@@ -13,6 +13,5 @@ public interface OnWallUpdateListener {
     void onWallItemsError(String error);
     void onApplicationsResponse(List<Offer> applications);
     void onApplicationError(String error);
-    void onNotificationResponse(NotificationResume notificationResume);
-
+    void onNotificationResponse(List<StatusNotification> notificationResume);
 }

@@ -57,6 +57,10 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         });
 
         for(Offer offer : applications){
+
+            if(offer.getStatus() == Offer.OfferStatus.CANCELED)
+                continue;
+
             if(completeFilter){
                 if(offer.hasFinished() &&
                     offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED &&

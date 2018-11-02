@@ -323,48 +323,62 @@ public class OfferDetailsActivity extends AppCompatActivity {
         textViewAmount.setText(String.format("$%s", new DecimalFormat("#,###", otherSymbols).format(offer.getWage())));
 
         if(!offer.isAppliedByMe()){
-            if(offer.getStatus() == Offer.OfferStatus.REVISION && !offer.hasStarted()){
-                /*accept_button.setVisibility(GONE);
+            if (offer.getStatus() == Offer.OfferStatus.ENTERED ||
+                    offer.getStatus() == Offer.OfferStatus.REVISION ||
+                    offer.getStatus() == Offer.OfferStatus.ACCEPTED_APPLICATION){
+                if(offer.hasStarted()){
+                    accept_button.setVisibility(GONE);
+                    bottom_message_bar.setVisibility(View.VISIBLE);
+                    bottom_message_text.setText("Esta oferta está cerrada");
+                    bottom_message_bar_button.setVisibility(GONE);
+                } else {
+                    // ABIERTO
+                }
+            } else if (offer.getStatus() == Offer.OfferStatus.FILLED ){
+                if(offer.hasStarted()){
+                    accept_button.setVisibility(GONE);
+                    bottom_message_bar.setVisibility(View.VISIBLE);
+                    bottom_message_text.setText("Esta oferta está cerrada");
+                    bottom_message_bar_button.setVisibility(GONE);
+                } else {
+                    if(offer.isPaid()){
+                        accept_button.setVisibility(GONE);
+                        bottom_message_bar.setVisibility(View.VISIBLE);
+                        bottom_message_text.setText("Esta oferta ha sido adjudicada por otro usuario");
+                        bottom_message_bar_button.setVisibility(GONE);
+                    } else {
+                        accept_button.setVisibility(GONE);
+                        bottom_message_bar.setVisibility(View.VISIBLE);
+                        bottom_message_text.setText("Esta oferta esta sin vacantes");
+                        bottom_message_bar_button.setVisibility(GONE);
+                    }
+                }
+            } else if(offer.getStatus() == Offer.OfferStatus.CLOSED ){
+                accept_button.setVisibility(GONE);
                 bottom_message_bar.setVisibility(View.VISIBLE);
-                bottom_message_text.setText("Esta oferta se encuentra en revisión");*/
-            } else if(offer.getStatus() == Offer.OfferStatus.CANCELED){
+                bottom_message_text.setText("Esta oferta está cerrada");
+                bottom_message_bar_button.setVisibility(GONE);
+            } else if(offer.getStatus() == Offer.OfferStatus.CANCELED ){
                 accept_button.setVisibility(GONE);
                 bottom_message_bar.setVisibility(View.VISIBLE);
                 bottom_message_text.setText("Esta oferta ha sido cancelada");
                 bottom_message_bar_button.setVisibility(GONE);
-            } else if(offer.getStatus() == Offer.OfferStatus.ACCEPTED_APPLICATION){
-                /*if(offer.isPaid()){
+            } else if (offer.getStatus() == Offer.OfferStatus.PAUSED ){
+                if(offer.hasStarted()){
                     accept_button.setVisibility(GONE);
                     bottom_message_bar.setVisibility(View.VISIBLE);
-                    bottom_message_text.setText("Esta oferta ha sido adjudicada por otro usuario");
+                    bottom_message_text.setText("Esta oferta está cerrada");
                     bottom_message_bar_button.setVisibility(GONE);
-                }*/
-            } else if(offer.getStatus() == Offer.OfferStatus.FILLED){
-                accept_button.setVisibility(GONE);
-                bottom_message_bar.setVisibility(View.VISIBLE);
-                bottom_message_text.setText("Esta oferta esta sin vacantes");
-                bottom_message_bar_button.setVisibility(GONE);
-            } else if(offer.getStatus() == Offer.OfferStatus.PAUSED){
-                accept_button.setVisibility(GONE);
-                bottom_message_bar.setVisibility(View.VISIBLE);
-                bottom_message_text.setText("Esta oferta ha sido pausada");
-                bottom_message_bar_button.setVisibility(GONE);
-            } else if(offer.getStatus() == Offer.OfferStatus.CLOSED){
-                accept_button.setVisibility(GONE);
-                bottom_message_bar.setVisibility(View.VISIBLE);
-                bottom_message_text.setText("Esta oferta ha sido cerrada");
-                bottom_message_bar_button.setVisibility(GONE);
-            }  else if(offer.getStatus() == Offer.OfferStatus.DEACTIVATED){
+                } else {
+                    accept_button.setVisibility(GONE);
+                    bottom_message_bar.setVisibility(View.VISIBLE);
+                    bottom_message_text.setText("Esta oferta ha sido pausada");
+                    bottom_message_bar_button.setVisibility(GONE);
+                }
+            } else if(offer.getStatus() == Offer.OfferStatus.DEACTIVATED ){
                 accept_button.setVisibility(GONE);
                 bottom_message_bar.setVisibility(View.VISIBLE);
                 bottom_message_text.setText("Esta oferta ha sido desactivada");
-                bottom_message_bar_button.setVisibility(GONE);
-            }
-
-            if(offer.hasStarted()){
-                accept_button.setVisibility(GONE);
-                bottom_message_bar.setVisibility(View.VISIBLE);
-                bottom_message_text.setText("Esta oferta está cerrada");
                 bottom_message_bar_button.setVisibility(GONE);
             }
         }
@@ -431,7 +445,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
                             if(application.wasReviewedByApplicant()){
                                 accept_button.setVisibility(GONE);
                                 bottom_message_bar.setVisibility(View.VISIBLE);
-                                bottom_message_text.setText("Esta tarea ya ha sido calificada");
+                                bottom_message_text.setText("Ya calificaste esta oferta");
                                 bottom_message_bar_button.setVisibility(GONE);
                             } else {
                                 accept_button.setVisibility(GONE);
@@ -550,11 +564,12 @@ public class OfferDetailsActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         Intent returnIntent = new Intent();
-        setResult(accepted_offer ? Activity.RESULT_OK : Activity.RESULT_CANCELED, returnIntent);
+        setResult(accepted_offer || rated_application ? Activity.RESULT_OK : Activity.RESULT_CANCELED, returnIntent);
         super.onBackPressed();
     }
 
     boolean accepted_offer;
+    boolean rated_application;
 
     protected void acceptOffer(){
         Log.d("OfferDetailsActivity", "--- accept offers process ---");
@@ -570,9 +585,6 @@ public class OfferDetailsActivity extends AppCompatActivity {
                         bottom_message_bar.setVisibility(View.VISIBLE);
                         bottom_message_text.setText("Has postulado a esta tarea, te avisaremos cuando sea adjudicada");
                         accepted_offer = true;
-
-                        Intent returnIntent = new Intent();
-                        setResult(Activity.RESULT_OK, returnIntent);
                     }
                 })
                 .errorListener(new Response.ErrorListener() {
@@ -581,22 +593,17 @@ public class OfferDetailsActivity extends AppCompatActivity {
                         volleyError.printStackTrace();
                         if (volleyError instanceof NetworkError) {
                         } else if (volleyError instanceof ServerError) {
-                            try {
-                                JSONObject responseObject = new JSONObject(new String(volleyError.networkResponse.data));
-                                Log.d("acceptOffer", "---> onErrorResponse " + responseObject.toString());
-                                String genericError = "";
-                                Iterator<String> iter = responseObject.keys();
-                                while (iter.hasNext()) {
-                                    String key = iter.next();
-                                    String errors = "";
-                                    JSONArray errorsArray = responseObject.getJSONArray(key);
-                                    for(int i = 0; i < errorsArray.length(); i++){
-                                        errors += " " + errorsArray.getString(i);
-                                    }
+                            Log.d("acceptOffer", "---> onErrorResponse " + new String(volleyError.networkResponse.data));
+                            /*String genericError = "";
+                            Iterator<String> iter = responseObject.keys();
+                            while (iter.hasNext()) {
+                                String key = iter.next();
+                                String errors = "";
+                                JSONArray errorsArray = responseObject.getJSONArray(key);
+                                for(int i = 0; i < errorsArray.length(); i++){
+                                    errors += " " + errorsArray.getString(i);
                                 }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                            }*/
                         } else if (volleyError instanceof AuthFailureError) {
                         } else if (volleyError instanceof ParseError) {
                         } else if (volleyError instanceof TimeoutError) {
@@ -622,7 +629,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             Intent returnIntent = new Intent();
-            setResult(accepted_offer ? Activity.RESULT_OK : Activity.RESULT_CANCELED, returnIntent);
+            setResult(accepted_offer | rated_application ? Activity.RESULT_OK : Activity.RESULT_CANCELED, returnIntent);
             finish();
         }
         return super.onOptionsItemSelected(item);
@@ -652,10 +659,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
                             }
                         });
                     builder.show();
-
-                    Intent returnIntent = new Intent();
-                    setResult(Activity.RESULT_OK, returnIntent);
-
+                    rated_application = true;
                     bottom_message_bar.setVisibility(GONE);
                     accept_button.setVisibility(View.VISIBLE);
                     accept_button.setEnabled(false);

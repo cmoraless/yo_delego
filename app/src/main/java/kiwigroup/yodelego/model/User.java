@@ -41,6 +41,7 @@ public class User implements Serializable {
     private float applicantRating;
     private float publisherRating;
     private String profileImage;
+    private String token;
 
     public static User parseFromJson(JSONObject response){
         User user = new User();
@@ -268,5 +269,13 @@ public class User implements Serializable {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

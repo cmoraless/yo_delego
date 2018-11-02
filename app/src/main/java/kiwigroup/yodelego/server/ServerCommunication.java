@@ -37,7 +37,7 @@ import kiwigroup.yodelego.R;
 
 public class ServerCommunication extends AsyncTask<String, String, String> {
 
-    private static String TOKEN;
+    public static String TOKEN;
 
     private String service;
     private Context mContext;

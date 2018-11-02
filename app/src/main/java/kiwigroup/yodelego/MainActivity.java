@@ -43,11 +43,10 @@ import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 
 import kiwigroup.yodelego.model.Application;
-import kiwigroup.yodelego.model.NotificationResume;
 import kiwigroup.yodelego.model.Offer;
+import kiwigroup.yodelego.model.StatusNotification;
 import kiwigroup.yodelego.model.User;
 import kiwigroup.yodelego.model.WallItem;
 import kiwigroup.yodelego.server.ServerCommunication;
@@ -56,6 +55,7 @@ import kiwigroup.yodelego.services.NotificationsListenerService;
 import static kiwigroup.yodelego.model.Offer.OfferStatus.CANCELED;
 import static kiwigroup.yodelego.model.Offer.OfferStatus.DEACTIVATED;
 import static kiwigroup.yodelego.model.Offer.OfferStatus.PAUSED;
+import static kiwigroup.yodelego.services.NotificationsListenerService.ACTION_START_SERVICE;
 
 public class MainActivity
     extends
@@ -70,6 +70,8 @@ public class MainActivity
     private User user;
     private NotificationsListenerService notificationService;
     private BottomNavigationView bottomNavigationView;
+
+    private boolean mShouldUnbind;
     private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
@@ -88,6 +90,7 @@ public class MainActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -98,12 +101,13 @@ public class MainActivity
         Bundle bundle = getIntent().getExtras();
         user = (User) bundle.getSerializable("user");
 
+        ServerCommunication.setTOKEN(user.getToken());
+
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
                     Fragment editProfileFragment = getSupportFragmentManager().findFragmentByTag(getString(R.string.id_profile_edit));
                     if (editProfileFragment != null && editProfileFragment.isVisible() && !alreadyAsked) {
                         handleProfileEditionBack(item.getItemId());
@@ -116,7 +120,13 @@ public class MainActivity
                 }
             });
         displayView(R.id.action_wall);
-        startPolling();
+        bindPollingService();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        doUnbindService();
     }
 
     boolean alreadyAsked = false;
@@ -369,16 +379,15 @@ public class MainActivity
     private List<WallItem> wallOffers;
     private List<Offer> myOfferApplications;
     private String next;
-    private NotificationResume notificationResume;
-    private List<kiwigroup.yodelego.model.Notification> notifications;
+    private List<StatusNotification> statusNotifications;
     private boolean wallEnded;
 
     @Override
     public void getWallItems(final OnWallUpdateListener listener) {
         this.listener = listener;
         getWallItemsForListener();
-        if(notificationResume != null)
-            listener.onNotificationResponse(notificationResume);
+        if(statusNotifications != null && statusNotifications.size() > 0)
+            listener.onNotificationResponse(statusNotifications);
     }
 
     @Override
@@ -782,8 +791,9 @@ public class MainActivity
     }
 
     @Override
-    public void closeNotifications() {
-        notificationResume = null;
+    public void closeNotification(StatusNotification notification) {
+        //statusNotifications.remove(notification);
+        notificationService.removeNotification(notification);
     }
 
     @Override
@@ -802,37 +812,50 @@ public class MainActivity
         startActivityForResult(Intent.createChooser(intent, message), PICK_IMAGE);
     }
 
-    private void startPolling(){
+    private void bindPollingService(){
         Intent serviceIntent = new Intent(this, NotificationsListenerService.class);
+        serviceIntent.setAction(ACTION_START_SERVICE);
+        serviceIntent.putExtra("user", user);
         startService(serviceIntent);
-        bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
+        if (bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE)){
+            mShouldUnbind = true;
+        }
+    }
+
+    private void doUnbindService() {
+        if (mShouldUnbind) {
+            unbindService(mConnection);
+            mShouldUnbind = false;
+        }
     }
 
     @Override
-    public void notification(List<kiwigroup.yodelego.model.Notification> notifications) {
-        List<kiwigroup.yodelego.model.Notification> newNotifications = new ArrayList<>();
-        if(this.notifications != null){
-            for(kiwigroup.yodelego.model.Notification savedNotification : this.notifications){
+    public void notification(List<StatusNotification> statusNotifications) {
+        /*List<StatusNotification> newStatusNotifications = new ArrayList<>();
+        if(this.statusNotifications != null){
+            for(StatusNotification savedStatusNotification : this.statusNotifications){
                 boolean delete = false;
-                for(kiwigroup.yodelego.model.Notification notification : notifications){
-                    if(notification.getId() == savedNotification.getId())
+                for(StatusNotification statusNotification : statusNotifications){
+                    if(statusNotification.getId() == savedStatusNotification.getId())
                         delete = true;
                 }
                 if(!delete)
-                    newNotifications.add(savedNotification);
+                    newStatusNotifications.add(savedStatusNotification);
             }
         }
-        newNotifications.addAll(notifications);
-        this.notifications = newNotifications;
+        newStatusNotifications.addAll(0, statusNotifications);
+        this.statusNotifications = newStatusNotifications;*/
 
-        notificationResume = null;
-
-        if(this.notifications.size() == 0){
-            return;
+        this.statusNotifications = statusNotifications;
+        if(this.statusNotifications.size() > 0 && listener!= null){
+            listener.onNotificationResponse(this.statusNotifications);
+            refreshWall(listener);
         }
 
-        for(kiwigroup.yodelego.model.Notification notification : notifications){
+        /*notificationResume = null;
 
+        if(this.statusNotifications.size() == 0){
+            return;
         }
 
         int available_offers = 0;
@@ -842,25 +865,18 @@ public class MainActivity
         int paused_offers = 0;
         int cancelled_offers = 0;
 
-        /*OFFER_AVAILABLE = 0
-        APPLICATION_ACCEPTED = 1
-        APPLICATION_REJECTED = 2
-        APPLICATION_CANCELED_BY_APPLICANT = 3
-        OFFER_PAUSED = 4
-        OFFER_CANCELED = 5*/
-
-        for(kiwigroup.yodelego.model.Notification notification : this.notifications){
-            if (notification.getKind() ==  0){
+        for(StatusNotification statusNotification : this.statusNotifications){
+            if (statusNotification.getKind() ==  0){
                 available_offers ++;
-            } if (notification.getKind() == 1){
+            } if (statusNotification.getKind() == 1){
                 accepted_offers ++;
-            } else if (notification.getKind() == 2){
+            } else if (statusNotification.getKind() == 2){
                 rejected_offers ++;
-            } else if (notification.getKind() == 3){
+            } else if (statusNotification.getKind() == 3){
                 //cancelled_by_applicant_offers ++;
-            } else if (notification.getKind() == 4){
+            } else if (statusNotification.getKind() == 4){
                 paused_offers ++;
-            } else if (notification.getKind() == 5){
+            } else if (statusNotification.getKind() == 5){
                 cancelled_offers ++;
             }
         }
@@ -875,6 +891,8 @@ public class MainActivity
             this.notificationResume = new NotificationResume(String.format(new Locale("es", "ES"), "Tienes %d postulaciones rechazadas", rejected_offers));
         } else if (cancelled_by_applicant_offers > 0) {
             //this.notificationResume = new NotificationResume(String.format(new Locale("es", "ES"), "has cancelado tu postulación a una oferta", cancelled_by_applicant_offers));
+        } else if (cancelled_offers > 0) {
+            this.notificationResume = new NotificationResume(String.format(new Locale("es", "ES"), "La oferta %s ha sido cancelada", rejected_offers));
         }
 
         if(notificationResume != null){
@@ -885,8 +903,14 @@ public class MainActivity
                 listener.onNotificationResponse(notificationResume);
 
             refreshWall(listener);
-        }
+        }*/
 
+        /*OFFER_AVAILABLE = 0
+        APPLICATION_ACCEPTED = 1
+        APPLICATION_REJECTED = 2
+        APPLICATION_CANCELED_BY_APPLICANT = 3
+        OFFER_PAUSED = 4
+        OFFER_CANCELED = 5*/
     }
 
     public interface OnGalleryImageListener {

@@ -43,6 +43,8 @@
     <color name="colorToggleSelected">#9E9FAA</color>
     <color name="colorToggleUnselected">#FAFAFA</color>
 
+    <color name="colorNotificationBackground">#f83c48</color>
+
     <color name="white">#ffffff</color>
     <color name="green">#47bf28</color>
     <color name="colorListHeaderBackground">#F0F1F4</color>

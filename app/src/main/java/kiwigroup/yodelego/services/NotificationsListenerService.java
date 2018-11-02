@@ -8,9 +8,9 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -30,6 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -37,6 +38,8 @@ import java.util.Locale;
 
 import kiwigroup.yodelego.MainActivity;
 import kiwigroup.yodelego.R;
+import kiwigroup.yodelego.model.StatusNotification;
+import kiwigroup.yodelego.model.User;
 import kiwigroup.yodelego.server.ServerCommunication;
 
 /**
@@ -44,12 +47,17 @@ import kiwigroup.yodelego.server.ServerCommunication;
  */
 
 public class NotificationsListenerService extends Service {
-
-    public static final String NOTIFICATION_CHANNEL_ID = "my_channel_id_01";
-    private static final long DEFAULT_SYNC_INTERVAL = 30 * 1000;
+    private int ID = 0;
+    public static boolean isServiceRunning = false;
+    public static final String NOTIFICATION_CHANNEL_ID = "yodelego_channel";
+    public static final String SERVICE_NOTIFICATION_CHANNEL_ID = "yodelego_service";
+    public static final String ACTION_START_SERVICE = "ACTION_START_SERVICE";
+    private static final long DEFAULT_SYNC_INTERVAL = 5 * 1000;
     private Handler mHandler;
     private NotificationListener listener;
     private final IBinder mBinder = new LocalBinder();
+    private User user;
+    private List<StatusNotification> statusNotifications;
 
     private Runnable runnableService = new Runnable() {
         @Override
@@ -66,14 +74,43 @@ public class NotificationsListenerService extends Service {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        isServiceRunning = false;
+        mHandler.removeCallbacksAndMessages(null);
+        mHandler.removeMessages(0);
+        stopForeground(true);
+        stopSelf();
+    }
+
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        mHandler = new Handler();
-        mHandler.post(runnableService);
+        if(intent != null){
+            Bundle bundle = intent.getExtras();
+            user = (User) bundle.getSerializable("user");
+            if (intent.getAction().equals(ACTION_START_SERVICE)) {
+                startServiceWithNotification();
+            }
+        }
         return START_STICKY;
+    }
+
+    public void removeNotification(StatusNotification notification) {
+        statusNotifications.remove(notification);
+        updateNotifications();
     }
 
     public void addListener(NotificationListener listener){
         this.listener = listener;
+        updateNotifications();
+    }
+
+    private void updateNotifications(){
+        if(listener != null && statusNotifications != null && statusNotifications.size() > 0){
+            listener.notification(statusNotifications);
+        }
     }
 
     private void syncData(){
@@ -84,60 +121,45 @@ public class NotificationsListenerService extends Service {
                 @Override
                 public void onResponse(JSONArray response) {
                     if(response != null) {
-                        Log.d("NotificationsService", "*** response: " + response.toString() );
-                        int available_offers = 0;
-                        List<kiwigroup.yodelego.model.Notification> notifications = new ArrayList<>();
+                        Log.d("NotificationsService", "*** notifications response: " + response.toString() );
+                        List<StatusNotification> newStatusNotifications = new ArrayList<>();
                         for (int i = 0; i < response.length(); i++) {
                             try {
                                 JSONObject object = response.getJSONObject(i);
-                                int id = object.getInt("id");
-                                int kind = object.getInt("kind");
-                                String offer = object.getString("offer");
-
-
-                                /*OFFER_AVAILABLE = 0
-                                APPLICATION_ACCEPTED = 1
-                                APPLICATION_REJECTED = 2
-                                APPLICATION_CANCELED_BY_APPLICANT = 3
-                                OFFER_PAUSED = 4
-                                OFFER_CANCELED = 5*/
-
-                                // Offer available
-                                if(kind == 0){
-                                    available_offers ++;
-                                    sendNotification(String.format("Existe una nueva oferta disponible", offer));
-                                // Application accepted
-                                } else if (kind == 1){
-                                    sendNotification(String.format("Tu postulación a %s ha sido aceptada", offer));
-                                // Application rejected
-                                } else if (kind == 2){
-                                    sendNotification(String.format("Tu postulación a %s ha sido rechazada", offer));
-                                } else if (kind == 3){
-                                    sendNotification(String.format("Tu postulación a %s ha sido cancelada con éxito", offer));
+                                StatusNotification statusNotification = StatusNotification.parseFromJson(object);
+                                newStatusNotifications.add(statusNotification);
+                                if(statusNotification.getKind() == StatusNotification.NotificationKinds.OFFER_AVAILABLE){
+                                    sendNotification("Existe una nueva oferta disponible");
+                                } else if (statusNotification.getKind() == StatusNotification.NotificationKinds.APPLICATION_ACCEPTED){
+                                    sendNotification(String.format("Tu postulación a %s ha sido aceptada", statusNotification.getOffer()));
+                                } else if (statusNotification.getKind() == StatusNotification.NotificationKinds.APPLICATION_REJECTED){
+                                    sendNotification(String.format("Tu postulación a %s ha sido rechazada", statusNotification.getOffer()));
+                                } else if (statusNotification.getKind() == StatusNotification.NotificationKinds.APPLICATION_CANCELED_BY_APPLICANT){
+                                    sendNotification(String.format("Tu postulación a %s ha sido cancelada con éxito", statusNotification.getOffer()));
+                                } else if (statusNotification.getKind() == StatusNotification.NotificationKinds.OFFER_CANCELED){
+                                    sendNotification(String.format("La oferta %s ha sido cancelada", statusNotification.getOffer()));
                                 }
-
-                                kiwigroup.yodelego.model.Notification notification = kiwigroup.yodelego.model.Notification.parseFromJson(object);
-                                notifications.add(notification);
-
-                                checkNotification(id);
-
+                                checkNotification(statusNotification.getId());
                             } catch (JSONException e) {
                                 e.printStackTrace();
                                 return;
                             }
                         }
-                        if(notifications.size() <= 0)
-                            return;
 
-                        if(listener != null){
-                            listener.notification(notifications);
+                        if(statusNotifications != null){
+                            for(StatusNotification savedStatusNotification : statusNotifications){
+                                boolean delete = false;
+                                for(StatusNotification statusNotification : newStatusNotifications){
+                                    if(statusNotification.getId() == savedStatusNotification.getId())
+                                        delete = true;
+                                }
+                                if(!delete)
+                                    newStatusNotifications.add(savedStatusNotification);
+                            }
                         }
-                        if(available_offers > 0){
-                            if(available_offers == 1)
-                                sendNotification("Existe una oferta nueva!");
-                            else
-                                sendNotification("Existen " + available_offers + " ofertas nuevas!");
-                        }
+                        statusNotifications = newStatusNotifications;
+
+                        updateNotifications();
                     }
                 }
             })
@@ -171,9 +193,58 @@ public class NotificationsListenerService extends Service {
             })
             .build();
         userSC.execute();
+
+        /*if(ID < 3){
+            String str = "[{\"id\":" + ID +",\"offer_id\":48,\"offer\":\"tarea con notificación 4\",\"receiver\":\"Cristian Morales\",\"application\":\"tarea con notificación 4 [Aceptada]\",\"status\":0,\"kind\":5,\"created_at\":\"2018-11-02T17:28:10.228138-03:00\"}]";
+            JSONArray response = null;
+            try {
+                response = new JSONArray(str);
+                List<StatusNotification> newStatusNotifications = new ArrayList<>();
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject object = response.getJSONObject(i);
+                        StatusNotification statusNotification = StatusNotification.parseFromJson(object);
+                        newStatusNotifications.add(statusNotification);
+                        if(statusNotification.getKind() == StatusNotification.NotificationKinds.OFFER_AVAILABLE){
+                            sendNotification("Existe una nueva oferta disponible");
+                        } else if (statusNotification.getKind() == StatusNotification.NotificationKinds.APPLICATION_ACCEPTED){
+                            sendNotification(String.format("Tu postulación a %s ha sido aceptada", statusNotification.getOffer()));
+                        } else if (statusNotification.getKind() == StatusNotification.NotificationKinds.APPLICATION_REJECTED){
+                            sendNotification(String.format("Tu postulación a %s ha sido rechazada", statusNotification.getOffer()));
+                        } else if (statusNotification.getKind() == StatusNotification.NotificationKinds.APPLICATION_CANCELED_BY_APPLICANT){
+                            sendNotification(String.format("Tu postulación a %s ha sido cancelada con éxito", statusNotification.getOffer()));
+                        } else if (statusNotification.getKind() == StatusNotification.NotificationKinds.OFFER_CANCELED){
+                            sendNotification(String.format("La oferta %s ha sido cancelada", statusNotification.getOffer()));
+                        }
+                        checkNotification(statusNotification.getId());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+                if(statusNotifications != null){
+                    for(StatusNotification savedStatusNotification : statusNotifications){
+                        boolean delete = false;
+                        for(StatusNotification statusNotification : newStatusNotifications){
+                            if(statusNotification.getId() == savedStatusNotification.getId())
+                                delete = true;
+                        }
+                        if(!delete)
+                            newStatusNotifications.add(savedStatusNotification);
+                    }
+                }
+                statusNotifications = newStatusNotifications;
+
+                updateNotifications();
+
+                ID ++;
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }*/
     }
 
-    private void checkNotification(int id){
+    private void checkNotification(long id){
         HashMap<String, Object> args = new HashMap<>();
         args.put("status", 1);
         ServerCommunication sc = new ServerCommunication.ServerCommunicationBuilder(
@@ -203,39 +274,94 @@ public class NotificationsListenerService extends Service {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
-                "My Notifications",
+                "YoDelegoChannel",
                 NotificationManager.IMPORTANCE_HIGH);
 
-            notificationChannel.setDescription("Channel description");
-            notificationChannel.enableLights(true);
-            notificationChannel.setLightColor(Color.RED);
-            notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
+            notificationChannel.setDescription("YoDelego Channel");
             notificationChannel.enableVibration(true);
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(
+                this, NOTIFICATION_CHANNEL_ID);
         notificationBuilder.setAutoCancel(true)
             .setDefaults(Notification.DEFAULT_ALL)
             .setWhen(System.currentTimeMillis())
             .setSmallIcon(R.mipmap.ic_notification)
             .setTicker("YoDelego")
-            .setPriority(Notification.PRIORITY_MAX)
+            .setPriority(Notification.PRIORITY_DEFAULT)
             .setContentTitle("YoDelego")
             .setContentText(remoteMessage)
             .setContentInfo("Info");
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
+
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent intent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+        notificationIntent.putExtra("user", user);
+        PendingIntent intent = PendingIntent.getActivity(
+                this,
+                (int)((new Date().getTime() / 1000L) % Integer.MAX_VALUE),
+                notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
         notificationBuilder.setContentIntent(intent);
         Notification notification = notificationBuilder.build();
         notification.flags |= Notification.FLAG_AUTO_CANCEL;
-        notificationManager.notify(1, notification);
+        notificationManager.notify(
+                (int)((new Date().getTime() / 1000L) % Integer.MAX_VALUE),
+                notification);
+    }
+
+    private static final int NOTIFICATION_ID = 543;
+
+    private void startServiceWithNotification() {
+        if (isServiceRunning)
+            return;
+        isServiceRunning = true;
+
+        mHandler = new Handler();
+        mHandler.post(runnableService);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationChannel notificationChannel = new NotificationChannel(
+                    SERVICE_NOTIFICATION_CHANNEL_ID,
+                    "YoDelegoService",
+                    NotificationManager.IMPORTANCE_MIN);
+
+            notificationChannel.setDescription("YoDelego Channel");
+            notificationChannel.enableVibration(true);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+
+        Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
+        notificationIntent.setAction("");
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        notificationIntent.putExtra("user", user);
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                this,
+                (int)((new Date().getTime() / 1000L) % Integer.MAX_VALUE),
+                notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, SERVICE_NOTIFICATION_CHANNEL_ID);
+        notificationBuilder.setAutoCancel(true)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setWhen(System.currentTimeMillis())
+                .setSmallIcon(R.mipmap.ic_notification)
+                .setTicker("YoDelego")
+                .setPriority(Notification.PRIORITY_MIN)
+                .setContentTitle("YoDelego")
+                .setContentIntent(pendingIntent)
+                .setContentInfo("Info");
+
+        Notification notification = notificationBuilder.build();
+        //notification.flags = notification.flags | Notification.FLAG_FOREGROUND_SERVICE;
+        startForeground(NOTIFICATION_ID, notification);
     }
 
     public interface NotificationListener {
-        void notification(List<kiwigroup.yodelego.model.Notification> notifications);
+        void notification(List<StatusNotification> statusNotifications);
     }
 
     public class LocalBinder extends Binder {

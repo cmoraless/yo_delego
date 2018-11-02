@@ -15,13 +15,16 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import kiwigroup.yodelego.adapter.WallAdapter;
-import kiwigroup.yodelego.model.Application;
-import kiwigroup.yodelego.model.NotificationResume;
 import kiwigroup.yodelego.model.Offer;
+import kiwigroup.yodelego.model.StatusNotification;
 import kiwigroup.yodelego.model.User;
 import kiwigroup.yodelego.model.WallItem;
 
-public class WallFragment extends Fragment implements WallAdapter.AdapterListener, OnWallUpdateListener, SwipeRefreshLayout.OnRefreshListener {
+public class WallFragment extends Fragment
+        implements
+            WallAdapter.AdapterListener,
+            OnWallUpdateListener,
+            SwipeRefreshLayout.OnRefreshListener {
     private User user;
     private static WallFragment fragment;
     private OnUserFragmentsListener mListener;
@@ -105,8 +108,8 @@ public class WallFragment extends Fragment implements WallAdapter.AdapterListene
     }
 
     @Override
-    public void closeNotifications() {
-        mListener.closeNotifications();
+    public void closeNotification(StatusNotification notification) {
+        mListener.closeNotification(notification);
     }
 
     @Override
@@ -136,8 +139,8 @@ public class WallFragment extends Fragment implements WallAdapter.AdapterListene
     }
 
     @Override
-    public void onNotificationResponse(NotificationResume notificationResume) {
-        adapter.addNotificationResume(notificationResume);
+    public void onNotificationResponse(List<StatusNotification> notificationResume) {
+        adapter.updateStatusNotification(notificationResume);
         wallRecyclerView.smoothScrollToPosition(0);
     }
 
