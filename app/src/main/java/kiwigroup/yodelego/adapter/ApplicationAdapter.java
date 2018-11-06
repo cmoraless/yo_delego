@@ -58,7 +58,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         for(Offer offer : applications){
 
-            if(offer.getStatus() == Offer.OfferStatus.CANCELED)
+            if(offer.getStatus() == Offer.OfferStatus.CANCELED || offer.getStatus() == Offer.OfferStatus.PAUSED )
                 continue;
 
             if(completeFilter){
@@ -77,8 +77,8 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 }
             } else if(reviewingFilter) {
                 if(!offer.hasStarted()
-                    && !offer.isPaid()
-                    && (offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED || offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.REVISION)) {
+                    && (!offer.isPaid() && offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED ||
+                        offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.REVISION)) {
                     this.applications.add(offer);
                 }
             }

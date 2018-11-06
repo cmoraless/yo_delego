@@ -793,6 +793,7 @@ public class MainActivity
     @Override
     public void closeNotification(StatusNotification notification) {
         //statusNotifications.remove(notification);
+        this.statusNotifications.remove(notification);
         notificationService.removeNotification(notification);
     }
 
@@ -816,7 +817,11 @@ public class MainActivity
         Intent serviceIntent = new Intent(this, NotificationsListenerService.class);
         serviceIntent.setAction(ACTION_START_SERVICE);
         serviceIntent.putExtra("user", user);
-        startService(serviceIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else {
+            startService(serviceIntent);
+        }
         if (bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE)){
             mShouldUnbind = true;
         }

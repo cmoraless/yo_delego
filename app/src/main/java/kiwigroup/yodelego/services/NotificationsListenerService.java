@@ -159,7 +159,8 @@ public class NotificationsListenerService extends Service {
                         }
                         statusNotifications = newStatusNotifications;
 
-                        updateNotifications();
+                        if(response.length() > 0)
+                            updateNotifications();
                     }
                 }
             })
@@ -356,7 +357,6 @@ public class NotificationsListenerService extends Service {
                 .setContentInfo("Info");
 
         Notification notification = notificationBuilder.build();
-        //notification.flags = notification.flags | Notification.FLAG_FOREGROUND_SERVICE;
         startForeground(NOTIFICATION_ID, notification);
     }
 

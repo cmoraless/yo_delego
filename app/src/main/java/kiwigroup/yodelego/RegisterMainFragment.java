@@ -277,7 +277,9 @@ public class RegisterMainFragment extends Fragment {
         textViewTermsConditions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainIntent = new Intent().setClass(getContext(), TermsAndConditionsActivity.class);
+                //Intent mainIntent = new Intent().setClass(getContext(), TermsAndConditionsActivity.class);
+                //startActivity(mainIntent);
+                Intent mainIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://web.yodelego.com/terms/"));
                 startActivity(mainIntent);
             }
         });
