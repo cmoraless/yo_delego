@@ -56,7 +56,7 @@ public class Offer implements Serializable, WallItem{
         DateFormat df3 = new SimpleDateFormat("HH:mm:ss", new Locale("es", "ES"));
         try {
 
-            Log.e("Offer", " OFFER ****** " + object.toString());
+            //Log.e("Offer", " OFFER ****** " + object.toString());
 
             offer.setId(object.getLong("id"));
             offer.setTitle(object.getString("title"));

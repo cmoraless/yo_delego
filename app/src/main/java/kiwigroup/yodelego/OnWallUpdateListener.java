@@ -10,8 +10,6 @@ public interface OnWallUpdateListener {
     void cleanWall();
     void onLoadingWallItems();
     void onWallItemsResponse(List<WallItem> wallOffers);
-    void onWallItemsError(String error);
     void onApplicationsResponse(List<Offer> applications);
-    void onApplicationError(String error);
     void onNotificationResponse(List<StatusNotification> notificationResume);
 }

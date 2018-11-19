@@ -479,7 +479,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
                             ContextCompat.getDrawable(this, R.drawable.ic_accepted_offer));
                 }
             } else {
-                if(offer.getApplication().isClosed()) {
+                if(offer.getApplication().isClosed() || offer.hasStarted()) {
                     accept_button.setVisibility(GONE);
                     bottom_message_bar.setVisibility(View.VISIBLE);
                     bottom_message_text.setText("Esta oferta está cerrada");
@@ -512,10 +512,17 @@ public class OfferDetailsActivity extends AppCompatActivity {
             bottom_message_text.setText("Lamentablemente no has sido seleccionado para esta tarea");
             bottom_message_bar_button.setVisibility(GONE);
         } else if(application.getApplicationStatus() == Application.ApplicationStatus.REVISION) {
-            accept_button.setVisibility(GONE);
-            bottom_message_bar.setVisibility(View.VISIBLE);
-            bottom_message_text.setText("Has postulado a esta tarea, te avisaremos cuando sea adjudicada");
-            bottom_message_bar_button.setVisibility(View.VISIBLE);
+            if(offer.getApplication().isClosed() || offer.hasStarted()) {
+                accept_button.setVisibility(GONE);
+                bottom_message_bar.setVisibility(View.VISIBLE);
+                bottom_message_text.setText("Esta oferta está cerrada");
+                bottom_message_bar_button.setVisibility(GONE);
+            } else {
+                accept_button.setVisibility(GONE);
+                bottom_message_bar.setVisibility(View.VISIBLE);
+                bottom_message_text.setText("Has postulado a esta tarea, te avisaremos cuando sea adjudicada");
+                bottom_message_bar_button.setVisibility(View.VISIBLE);
+            }
         } else if(application.getApplicationStatus() == Application.ApplicationStatus.CANCELED_BY_APPLICANT) {
             accept_button.setVisibility(GONE);
             bottom_message_bar.setVisibility(View.VISIBLE);

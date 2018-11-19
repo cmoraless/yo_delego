@@ -46,7 +46,7 @@ public class ApplicationsFragment extends Fragment {
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         viewPager = view.findViewById(R.id.pager);
-        viewPager.setOffscreenPageLimit(1);
+        viewPager.setOffscreenPageLimit(0);
 
         adapter = new PagerAdapter(((MainActivity)getContext()).getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
@@ -103,17 +103,17 @@ public class ApplicationsFragment extends Fragment {
                 case 0:
                     if(mReviewingApplicationsFragment == null)
                         mReviewingApplicationsFragment = new ReviewingApplicationsFragment();
-                    mReviewingApplicationsFragment.updateData();
+                    //mReviewingApplicationsFragment.updateData();
                     return mReviewingApplicationsFragment;
                 case 1:
                     if(mAdjudicatedApplicationsFragment == null)
                         mAdjudicatedApplicationsFragment = new AdjudicatedApplicationsFragment();
-                    mAdjudicatedApplicationsFragment.updateData();
+                    //mAdjudicatedApplicationsFragment.updateData();
                     return mAdjudicatedApplicationsFragment;
                 case 2:
                     if(mCompleteApplicationsFragment == null)
                         mCompleteApplicationsFragment = new CompleteApplicationsFragment();
-                    mCompleteApplicationsFragment.updateData();
+                    //mCompleteApplicationsFragment.updateData();
                     return mCompleteApplicationsFragment;
                 default:
                     return null;

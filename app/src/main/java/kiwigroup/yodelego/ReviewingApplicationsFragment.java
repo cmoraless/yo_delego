@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,15 +49,20 @@ public class ReviewingApplicationsFragment
         return view;
     }
 
-    public void updateData() {
-        if(adapter != null && mListener != null){
-            updatingData();
-            mListener.getWallItems(this);
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser){
+            updateData();
         }
     }
 
-    private void updatingData(){
-        adapter.showLoading();
+    public void updateData() {
+        Log.d("REVIEWING", "*** updateData: ");
+        if(adapter != null && mListener != null){
+            adapter.showLoading();
+            mListener.getWallItems();
+        }
     }
 
     @Override
@@ -64,6 +70,7 @@ public class ReviewingApplicationsFragment
         super.onAttach(context);
         if (context instanceof OnUserFragmentsListener) {
             mListener = (OnUserFragmentsListener) context;
+            mListener.addWallUpdateListener(this);
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnApplicationsListListener");
@@ -73,12 +80,15 @@ public class ReviewingApplicationsFragment
     @Override
     public void onDetach() {
         super.onDetach();
+        mListener.removeWallUpdateListener(this);
         mListener = null;
     }
 
     @Override
     public void cleanWall() {
-        adapter.clear();
+        if(adapter != null) {
+            adapter.clear();
+        }
     }
 
     @Override
@@ -91,23 +101,26 @@ public class ReviewingApplicationsFragment
 
     }
 
-    @Override
+    /*@Override
     public void onWallItemsError(String error) {
 
-    }
+    }*/
 
     @Override
     public void onApplicationsResponse(List<Offer> applications) {
-        adapter.hideLoading();
-        adapter.update(applications);
-        mSwipeRefreshLayout.setRefreshing(false);
+        Log.d("REVIEWING", "*** onApplicationsResponse: " + applications.size());
+        if(adapter != null) {
+            adapter.hideLoading();
+            adapter.update(applications);
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
     }
 
-    @Override
+    /*@Override
     public void onApplicationError(String error) {
         adapter.hideLoading();
         mSwipeRefreshLayout.setRefreshing(false);
-    }
+    }*/
 
     @Override
     public void onNotificationResponse(List<StatusNotification> notificationResume) {
@@ -116,6 +129,8 @@ public class ReviewingApplicationsFragment
 
     @Override
     public void onRefresh() {
-        mListener.refreshWall(this);
+        adapter.showLoading();
+        //mSwipeRefreshLayout.setRefreshing(false);
+        mListener.refreshWall();
     }
 }

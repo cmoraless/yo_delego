@@ -25,6 +25,7 @@ public class WallFragment extends Fragment
             WallAdapter.AdapterListener,
             OnWallUpdateListener,
             SwipeRefreshLayout.OnRefreshListener {
+
     private User user;
     private static WallFragment fragment;
     private OnUserFragmentsListener mListener;
@@ -78,14 +79,17 @@ public class WallFragment extends Fragment
             }
         };
         wallRecyclerView.addOnScrollListener(listener);
-        mListener.getWallItems(this);
+        Log.d("WallFragment", "-------> onViewCreated");
+        mListener.getWallItems();
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        Log.d("WallFragment", "-------> onAttach");
         if (context instanceof OnUserFragmentsListener) {
             mListener = (OnUserFragmentsListener) context;
+            mListener.addWallUpdateListener(this);
         } else {
             throw new RuntimeException(context.toString() + " must implement OnRegisterFragmentListener");
         }
@@ -94,6 +98,8 @@ public class WallFragment extends Fragment
     @Override
     public void onDetach() {
         super.onDetach();
+        Log.d("WallFragment", "-------> onDetach");
+        mListener.removeWallUpdateListener(this);
         mListener = null;
     }
 
@@ -129,7 +135,7 @@ public class WallFragment extends Fragment
 
     @Override
     public void onWallItemsResponse(List<WallItem> wallOffers) {
-        Log.d("onWallItemsResponse","->>>>>>: s" + wallOffers.size());
+        Log.d("WallFragment", "-------> onWallItemsResponse");
         mSwipeRefreshLayout.setRefreshing(false);
         adapter.hideLoading();
         for(WallItem offer : wallOffers){
@@ -145,23 +151,13 @@ public class WallFragment extends Fragment
     }
 
     @Override
-    public void onWallItemsError(String error) {
-
-    }
-
-    @Override
     public void onApplicationsResponse(List<Offer> applications) {
 
     }
 
     @Override
-    public void onApplicationError(String error) {
-
-    }
-
-    @Override
     public void onRefresh() {
-        mListener.refreshWall(this);
+        mListener.refreshWall();
     }
 
     public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnScrollListener {

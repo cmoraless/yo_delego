@@ -29,6 +29,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -352,71 +353,15 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
         }
     }
 
-    private class BooleanRequest extends Request<Boolean> {
-        private final Response.Listener<Boolean> mListener;
-        private final Response.ErrorListener mErrorListener;
-        private final String mRequestBody;
-
-        private final String PROTOCOL_CHARSET = "utf-8";
-        private final String PROTOCOL_CONTENT_TYPE = String.format("application/json; charset=%s", PROTOCOL_CHARSET);
-
-        public BooleanRequest(int method, String url, String requestBody, Response.Listener<Boolean> listener, Response.ErrorListener errorListener) {
-            super(method, url, errorListener);
-            this.mListener = listener;
-            this.mErrorListener = errorListener;
-            this.mRequestBody = requestBody;
-        }
-
-        @Override
-        protected Response<Boolean> parseNetworkResponse(NetworkResponse response) {
-            Boolean parsed;
-            try {
-                parsed = Boolean.valueOf(new String(response.data, HttpHeaderParser.parseCharset(response.headers)));
-            } catch (UnsupportedEncodingException e) {
-                parsed = Boolean.valueOf(new String(response.data));
-            }
-            return Response.success(parsed, HttpHeaderParser.parseCacheHeaders(response));
-        }
-
-        @Override
-        protected VolleyError parseNetworkError(VolleyError volleyError) {
-            return super.parseNetworkError(volleyError);
-        }
-
-        @Override
-        protected void deliverResponse(Boolean response) {
-            mListener.onResponse(response);
-        }
-
-        @Override
-        public void deliverError(VolleyError error) {
-            mErrorListener.onErrorResponse(error);
-        }
-
-        @Override
-        public String getBodyContentType() {
-            return PROTOCOL_CONTENT_TYPE;
-        }
-
-        @Override
-        public byte[] getBody() throws AuthFailureError {
-            try {
-                return mRequestBody == null ? null : mRequestBody.getBytes(PROTOCOL_CHARSET);
-            } catch (UnsupportedEncodingException uee) {
-                VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s",
-                        mRequestBody, PROTOCOL_CHARSET);
-                return null;
-            }
-        }
-
-    }
-
-
 
     public class VolleyMultipartRequest extends Request<NetworkResponse> {
         private final String twoHyphens = "--";
         private final String lineEnd = "\r\n";
         private final String boundary = "apiclient-" + System.currentTimeMillis();
+
+        protected static final String PROTOCOL_CHARSET = "utf-8";
+        protected final String PROTOCOL_CONTENT_TYPE =
+                String.format("application/json; charset=%s", PROTOCOL_CHARSET);
 
         private Response.Listener<NetworkResponse> mListener;
         private Response.ErrorListener mErrorListener;
@@ -465,7 +410,7 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
 
         @Override
         public String getBodyContentType() {
-            return "multipart/form-data; charset=utf-8;boundary=" + boundary;
+            return "multipart/form-data; charset=utf-8; boundary=" + boundary;
         }
 
         @Override
@@ -565,12 +510,20 @@ public class ServerCommunication extends AsyncTask<String, String, String> {
          * @param parameterValue   value of input
          * @throws IOException
          */
+
         private void buildTextPart(DataOutputStream dataOutputStream, String parameterName, Object parameterValue) throws IOException {
             dataOutputStream.writeBytes(twoHyphens + boundary + lineEnd);
+
             dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"" + parameterName + "\"" + lineEnd);
             dataOutputStream.writeBytes("Content-Type: text/plain; charset=utf-8" + lineEnd);
             dataOutputStream.writeBytes(lineEnd);
-            dataOutputStream.writeBytes(parameterValue + lineEnd);
+            if(parameterValue instanceof String){
+                String parameter = (String) parameterValue;
+                dataOutputStream.write(parameter.getBytes("UTF-8"));
+                dataOutputStream.writeBytes(lineEnd);
+            } else {
+                dataOutputStream.writeBytes(parameterValue + lineEnd);
+            }
         }
 
         /**

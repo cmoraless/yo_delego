@@ -49,15 +49,20 @@ public class AdjudicatedApplicationsFragment
         return view;
     }
 
-    public void updateData() {
-        if(adapter != null && mListener != null){
-            updatingData();
-            mListener.getWallItems(this);
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser){
+            updateData();
         }
     }
 
-    private void updatingData(){
-        adapter.showLoading();
+    public void updateData() {
+        Log.d("ADJUDICATED", "*** updateData: ");
+        if(adapter != null && mListener != null){
+            adapter.showLoading();
+            mListener.getWallItems();
+        }
     }
 
     @Override
@@ -65,6 +70,7 @@ public class AdjudicatedApplicationsFragment
         super.onAttach(context);
         if (context instanceof OnUserFragmentsListener) {
             mListener = (OnUserFragmentsListener) context;
+            mListener.addWallUpdateListener(this);
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnApplicationsListListener");
@@ -74,12 +80,15 @@ public class AdjudicatedApplicationsFragment
     @Override
     public void onDetach() {
         super.onDetach();
+        mListener.removeWallUpdateListener(this);
         mListener = null;
     }
 
     @Override
     public void cleanWall() {
-        adapter.clear();
+        if(adapter != null) {
+            adapter.clear();
+        }
     }
 
     @Override
@@ -93,23 +102,20 @@ public class AdjudicatedApplicationsFragment
     }
 
     @Override
-    public void onWallItemsError(String error) {
-
-    }
-
-    @Override
     public void onApplicationsResponse(List<Offer> applications) {
         Log.d("ADJUDICATED", "*** onApplicationsResponse: " + applications.size());
-        adapter.hideLoading();
-        adapter.update(applications);
-        mSwipeRefreshLayout.setRefreshing(false);
+        if(adapter != null){
+            adapter.hideLoading();
+            adapter.update(applications);
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
     }
 
-    @Override
+    /*@Override
     public void onApplicationError(String error) {
         adapter.hideLoading();
         mSwipeRefreshLayout.setRefreshing(false);
-    }
+    }*/
 
     @Override
     public void onNotificationResponse(List<StatusNotification> notificationResume) {
@@ -118,6 +124,8 @@ public class AdjudicatedApplicationsFragment
 
     @Override
     public void onRefresh() {
-        mListener.refreshWall(this);
+        adapter.showLoading();
+        //mSwipeRefreshLayout.setRefreshing(false);
+        mListener.refreshWall();
     }
 }

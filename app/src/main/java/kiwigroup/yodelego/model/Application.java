@@ -32,7 +32,7 @@ public class Application implements Serializable {
     public static Application parseFromJson(JSONObject object){
         Application application = new Application();
 
-        Log.d("Offer", " APPLICATION ****** " + object.toString());
+        //Log.d("Offer", " APPLICATION ****** " + object.toString());
 
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", new Locale("es", "ES"));
         try {

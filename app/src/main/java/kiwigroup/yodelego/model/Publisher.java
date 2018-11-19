@@ -20,7 +20,7 @@ public class Publisher implements Serializable {
         Publisher publisher = new Publisher();
         try {
 
-            Log.d("Offer", " PUBLISHER ****** " + object.toString());
+            //Log.d("Offer", " PUBLISHER ****** " + object.toString());
 
             if(!object.isNull("name"))
                 publisher.setName(object.getString("name"));

@@ -3,6 +3,7 @@ package kiwigroup.yodelego.adapter;
 import android.graphics.PorterDuff;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,13 +49,14 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     public void update(List<Offer> applications) {
-        this.applications.clear();
 
         Collections.sort(applications, new Comparator<Offer>() {
             public int compare(Offer o1, Offer o2) {
                 return o1.getCreationDate().compareTo(o2.getCreationDate());
             }
         });
+
+        this.applications.clear();
 
         for(Offer offer : applications){
 
@@ -87,14 +89,17 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     public void showLoading() {
-        applications = new ArrayList<>();
+        //applications = new ArrayList<>();
+        applications.clear();
         applications.add(null);
         notifyDataSetChanged();
     }
 
     public void hideLoading() {
-        applications.clear();
-        notifyDataSetChanged();
+        if(applications.size() == 1 && applications.get(0) == null) {
+            applications.clear();
+            notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -121,7 +126,8 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     public void clear() {
-        applications.clear();
+        if(applications.size() != 1 || (applications.get(0) != null))
+            applications.clear();
         notifyDataSetChanged();
     }
 

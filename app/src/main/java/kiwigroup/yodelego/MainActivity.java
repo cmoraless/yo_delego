@@ -43,6 +43,7 @@ import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import kiwigroup.yodelego.model.Application;
 import kiwigroup.yodelego.model.Offer;
@@ -375,96 +376,102 @@ public class MainActivity
 
     }
 
-    private OnWallUpdateListener listener;
+    private final List<OnWallUpdateListener> listeners = new ArrayList<>();
     private List<WallItem> wallOffers;
-    private List<Offer> myOfferApplications;
+    private List<Offer> myApplications;
     private String next;
     private List<StatusNotification> statusNotifications;
     private boolean wallEnded;
 
     @Override
-    public void getWallItems(final OnWallUpdateListener listener) {
-        this.listener = listener;
+    public void addWallUpdateListener(OnWallUpdateListener listener) {
+        synchronized(listeners){
+            listeners.add(listener);
+        }
+    }
+
+    @Override
+    public void removeWallUpdateListener(OnWallUpdateListener listener) {
+        synchronized(listeners) {
+            listeners.remove(listener);
+        }
+    }
+
+    @Override
+    public void getWallItems() {
         getWallItemsForListener();
         if(statusNotifications != null && statusNotifications.size() > 0)
-            listener.onNotificationResponse(statusNotifications);
-    }
-
-    @Override
-    public void getMoreWallItems() {
-        if(!wallEnded && wallOffers != null){
-            listener.onLoadingWallItems();
-            getWallItemsFromServer(listener, myOfferApplications);
-        }
-    }
-
-    @Override
-    public void refreshWall(final OnWallUpdateListener listener) {
-        this.listener = listener;
-        listener.cleanWall();
-        wallOffers = null;
-        myOfferApplications = null;
-        wallEnded = false;
-        next = null;
-
-        ApplicationsFragment myFragment = (ApplicationsFragment)
-                getSupportFragmentManager().findFragmentByTag(getString(R.string.id_applications));
-        if (myFragment != null && myFragment.isVisible()) {
-            myFragment.updateFragmentsData();
-        }
-
-        getWallItems(listener);
+            synchronized(listeners) {
+                for(OnWallUpdateListener listener : listeners)
+                    if(listener != null)
+                        listener.onNotificationResponse(statusNotifications);
+            }
     }
 
     private void getWallItemsForListener() {
-        if(listener == null)
-            return;
-
-        listener.cleanWall();
-        if(myOfferApplications == null){
+        if(myApplications == null){
             getMyApplications(new OnApplicationUpdateListener() {
                 @Override
                 public void onApplicationsResponse(List<Offer> applications) {
-                    myOfferApplications = applications;
-                    returnWallItems(applications);
+                    myApplications = applications;
+                    returnWallItems(myApplications);
                 }
 
                 @Override
                 public void onApplicationError(String error) {
-
+                    synchronized(listeners) {
+                        for(OnWallUpdateListener listener : listeners)
+                            if(listener != null)
+                                listener.onApplicationsResponse(new ArrayList<Offer>());
+                    }
                 }
             }, true);
         } else {
-            returnWallItems(myOfferApplications);
+            returnWallItems(myApplications);
         }
     }
 
     private void returnWallItems(List<Offer> applications){
+        synchronized(listeners) {
+            for(OnWallUpdateListener listener : listeners)
+                if(listener != null)
+                    listener.cleanWall();
+        }
+
         if(wallOffers == null){
-            listener.onLoadingWallItems();
+            synchronized(listeners) {
+                for(OnWallUpdateListener listener : listeners)
+                    if(listener != null)
+                        listener.onLoadingWallItems();
+            }
             wallOffers = new ArrayList<>();
         }
         if(wallOffers.size() > 0){
-            listener.onWallItemsResponse(wallOffers);
-            listener.onApplicationsResponse(applications);
+            synchronized(listeners) {
+                for(OnWallUpdateListener listener : listeners)
+                    if(listener != null) {
+                        listener.onWallItemsResponse(wallOffers);
+                        listener.onApplicationsResponse(applications);
+                    }
+            }
         } else {
-            getWallItemsFromServer(listener, applications);
+            getWallItemsFromServer(applications);
         }
     }
 
-    private void getWallItemsFromServer(final OnWallUpdateListener listener, final List<Offer> myApplications) {
+    private void getWallItemsFromServer(final List<Offer> myApplications) {
         ServerCommunication userSC = new ServerCommunication.ServerCommunicationBuilder(
-            MainActivity.this,
-            next == null ? "offers/" : next)
+                MainActivity.this,
+                next == null ? "offers/" : next)
                 .GET()
                 .tokenized(true)
                 .objectReturnListener(new Response.Listener<JSONObject>(){
                     @Override
                     public void onResponse(JSONObject response) {
                         if(response != null) {
-                            Log.d("MainActivity", "**** WALL: " + response.toString());
+                            //Log.d("MainActivity", "**** WALL: " + response.toString());
                             try {
-                                Log.d("MainActivity", "**** myOfferApplications: " + myApplications.size());
+                                //Log.d("MainActivity", "**** myApplications: " + myApplications.size());
                                 String url = response.getString("next");
                                 if(response.isNull("next")){
                                     wallEnded = true;
@@ -485,17 +492,30 @@ public class MainActivity
                                     }
                                     // update WallAdapter if this status are supported
                                     if(!(offer.getStatus() == CANCELED ||
-                                        offer.getStatus() == PAUSED ||
-                                        offer.getStatus() == DEACTIVATED))
-                                            newWallOffers.add(offer);
+                                            offer.getStatus() == PAUSED ||
+                                            offer.getStatus() == DEACTIVATED))
+                                        newWallOffers.add(offer);
                                 }
                                 if(wallOffers != null){
-                                    listener.onWallItemsResponse(newWallOffers);
-                                    listener.onApplicationsResponse(myApplications);
+                                    synchronized(listeners) {
+                                        for(OnWallUpdateListener listener : listeners)
+                                            if(listener != null) {
+                                                listener.onWallItemsResponse(newWallOffers);
+                                                listener.onApplicationsResponse(myApplications);
+                                            }
+                                    }
                                     wallOffers.addAll(newWallOffers);
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
+                            }
+                        } else {
+                            synchronized(listeners) {
+                                for(OnWallUpdateListener listener : listeners)
+                                    if(listener != null) {
+                                        listener.onWallItemsResponse(new ArrayList<WallItem>());
+                                        listener.onApplicationsResponse(new ArrayList<Offer>());
+                                    }
                             }
                         }
                     }
@@ -504,21 +524,55 @@ public class MainActivity
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         volleyError.printStackTrace();
+                        synchronized(listeners) {
+                            for(OnWallUpdateListener listener : listeners)
+                                if(listener != null) {
+                                    listener.onWallItemsResponse(new ArrayList<WallItem>());
+                                    listener.onApplicationsResponse(new ArrayList<Offer>());
+                                }
+                        }
                     }
                 })
                 .build();
         userSC.execute();
     }
 
+    @Override
+    public void getMoreWallItems() {
+        if(!wallEnded && wallOffers != null){
+            synchronized(listeners) {
+                for(OnWallUpdateListener listener : listeners)
+                    if(listener != null)
+                        listener.onLoadingWallItems();
+            }
+            getWallItemsFromServer(myApplications);
+        }
+    }
+
+    @Override
+    public void refreshWall() {
+        synchronized(listeners) {
+            for(OnWallUpdateListener listener : listeners)
+                if(listener != null)
+                    listener.cleanWall();
+        }
+        wallOffers = null;
+        myApplications = null;
+        wallEnded = false;
+        next = null;
+
+        getWallItems();
+    }
+
     private ServerCommunication MyApplicationsWS;
 
     @Override
     public void getMyApplications(final OnApplicationUpdateListener mOnApplicationUpdateListener,  boolean forceReload) {
-        if(myOfferApplications == null){
-            myOfferApplications = new ArrayList<>();
+        if(myApplications == null){
+            myApplications = new ArrayList<>();
         }
 
-        if(forceReload || myOfferApplications.size() == 0){
+        if(forceReload || myApplications.size() == 0){
             if(MyApplicationsWS == null){
                 MyApplicationsWS = new ServerCommunication.ServerCommunicationBuilder(MainActivity.this, "applications/")
                     .GET()
@@ -527,8 +581,8 @@ public class MainActivity
                         @Override
                         public void onResponse(JSONArray response) {
                             if (response != null) {
-                                Log.d("MainActivity", "**** applications response: " + response.toString());
-                                myOfferApplications.clear();
+                                //Log.d("MainActivity", "**** applications response: " + response.toString());
+                                myApplications.clear();
                                 if(response.length() > 0){
                                     for (int i = 0; i < response.length(); i++) {
                                         try {
@@ -614,15 +668,17 @@ public class MainActivity
                                                 application.setClosed(false);
                                             }*/
 
-                                            myOfferApplications.add(offer);
+                                            myApplications.add(offer);
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
                                     }
-                                    mOnApplicationUpdateListener.onApplicationsResponse(myOfferApplications);
+                                    mOnApplicationUpdateListener.onApplicationsResponse(myApplications);
                                 } else {
-                                    mOnApplicationUpdateListener.onApplicationsResponse(myOfferApplications);
+                                    mOnApplicationUpdateListener.onApplicationsResponse(myApplications);
                                 }
+                            } else {
+                                mOnApplicationUpdateListener.onApplicationError("");
                             }
                             MyApplicationsWS = null;
                         }
@@ -631,6 +687,7 @@ public class MainActivity
                            @Override
                            public void onErrorResponse(VolleyError error) {
                                error.printStackTrace();
+                               mOnApplicationUpdateListener.onApplicationError("");
                                MyApplicationsWS = null;
                            }
                        }
@@ -638,7 +695,7 @@ public class MainActivity
                 MyApplicationsWS.execute();
             }
         } else {
-            mOnApplicationUpdateListener.onApplicationsResponse(myOfferApplications);
+            mOnApplicationUpdateListener.onApplicationsResponse(myApplications);
         }
     }
 
@@ -646,7 +703,6 @@ public class MainActivity
     public void onWallOfferSelected(Offer offer) {
         Intent mainIntent = new Intent().setClass(MainActivity.this, OfferDetailsActivity.class);
         mainIntent.putExtra("offer", offer);
-        Log.e("Main", " OFFER ****** location: " + offer.getLocation());
         startActivityForResult(mainIntent, APPLICATION_MODIFIED);
     }
 
@@ -654,7 +710,6 @@ public class MainActivity
     public void onApplicationSelected(Offer offer) {
         Intent mainIntent = new Intent().setClass(MainActivity.this, OfferDetailsActivity.class);
         mainIntent.putExtra("offer", offer);
-        Log.e("Main", " OFFER ****** location: " + offer.getLocation());
         startActivityForResult(mainIntent, APPLICATION_MODIFIED);
     }
 
@@ -674,9 +729,7 @@ public class MainActivity
                         heightofBitMap = width * heightofBitMap / widthofBitMap;
                         widthofBitMap = width;
                         bitmap = Bitmap.createScaledBitmap(bitmap, widthofBitMap, heightofBitMap, true);
-
-                        Log.d("Size*****", "** size: " + bitmap.getHeight()*bitmap.getWidth());
-                    }
+                        }
                     onGalleryImageListener.onImageSelected(bitmap);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -685,7 +738,7 @@ public class MainActivity
         } if (requestCode == APPLICATION_MODIFIED) {
             if(resultCode == Activity.RESULT_OK) {
                 Log.d("MainActivity", "application modified. Refreshing wall");
-                refreshWall(listener);
+                refreshWall();
             }
         }
     }
@@ -836,90 +889,14 @@ public class MainActivity
 
     @Override
     public void notification(List<StatusNotification> statusNotifications) {
-        /*List<StatusNotification> newStatusNotifications = new ArrayList<>();
-        if(this.statusNotifications != null){
-            for(StatusNotification savedStatusNotification : this.statusNotifications){
-                boolean delete = false;
-                for(StatusNotification statusNotification : statusNotifications){
-                    if(statusNotification.getId() == savedStatusNotification.getId())
-                        delete = true;
-                }
-                if(!delete)
-                    newStatusNotifications.add(savedStatusNotification);
-            }
-        }
-        newStatusNotifications.addAll(0, statusNotifications);
-        this.statusNotifications = newStatusNotifications;*/
-
         this.statusNotifications = statusNotifications;
-        if(this.statusNotifications.size() > 0 && listener!= null){
-            listener.onNotificationResponse(this.statusNotifications);
-            refreshWall(listener);
+        if(this.statusNotifications.size() > 0 && listeners != null){
+            //listener.onNotificationResponse(this.statusNotifications);
+            refreshWall();
         }
-
-        /*notificationResume = null;
-
-        if(this.statusNotifications.size() == 0){
-            return;
-        }
-
-        int available_offers = 0;
-        int accepted_offers = 0;
-        int rejected_offers = 0;
-        int cancelled_by_applicant_offers = 0;
-        int paused_offers = 0;
-        int cancelled_offers = 0;
-
-        for(StatusNotification statusNotification : this.statusNotifications){
-            if (statusNotification.getKind() ==  0){
-                available_offers ++;
-            } if (statusNotification.getKind() == 1){
-                accepted_offers ++;
-            } else if (statusNotification.getKind() == 2){
-                rejected_offers ++;
-            } else if (statusNotification.getKind() == 3){
-                //cancelled_by_applicant_offers ++;
-            } else if (statusNotification.getKind() == 4){
-                paused_offers ++;
-            } else if (statusNotification.getKind() == 5){
-                cancelled_offers ++;
-            }
-        }
-
-        if( available_offers > 0){
-            this.notificationResume = new NotificationResume(String.format(new Locale("es", "ES"), "Tienes %d oferta nueva", available_offers));
-        } else if(accepted_offers > 0 && rejected_offers > 0){
-            this.notificationResume = new NotificationResume(String.format(new Locale("es", "ES"), "Tienes %d postulaciones adjudicadas y %d rechazadas", accepted_offers, rejected_offers));
-        } else if (accepted_offers > 0) {
-            this.notificationResume = new NotificationResume(String.format(new Locale("es", "ES"), "Tienes %d postulaciones adjudicadas", accepted_offers));
-        } else if (rejected_offers > 0) {
-            this.notificationResume = new NotificationResume(String.format(new Locale("es", "ES"), "Tienes %d postulaciones rechazadas", rejected_offers));
-        } else if (cancelled_by_applicant_offers > 0) {
-            //this.notificationResume = new NotificationResume(String.format(new Locale("es", "ES"), "has cancelado tu postulación a una oferta", cancelled_by_applicant_offers));
-        } else if (cancelled_offers > 0) {
-            this.notificationResume = new NotificationResume(String.format(new Locale("es", "ES"), "La oferta %s ha sido cancelada", rejected_offers));
-        }
-
-        if(notificationResume != null){
-            notificationResume.setAcceptedOffers(accepted_offers);
-            notificationResume.setRejectedOffers(rejected_offers);
-
-            if(listener!= null)
-                listener.onNotificationResponse(notificationResume);
-
-            refreshWall(listener);
-        }*/
-
-        /*OFFER_AVAILABLE = 0
-        APPLICATION_ACCEPTED = 1
-        APPLICATION_REJECTED = 2
-        APPLICATION_CANCELED_BY_APPLICANT = 3
-        OFFER_PAUSED = 4
-        OFFER_CANCELED = 5*/
     }
 
     public interface OnGalleryImageListener {
         void onImageSelected(Bitmap bitmap);
-        //void onImageSelected(Uri selectedImage);
     }
 }
