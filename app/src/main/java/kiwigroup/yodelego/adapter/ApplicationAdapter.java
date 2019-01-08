@@ -66,8 +66,8 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             if(completeFilter){
                 if(offer.hasFinished() &&
                     offer.getApplication().getApplicationStatus() == Application.ApplicationStatus.ACCEPTED &&
-                    offer.isPaid() &&
-                    !offer.getApplication().isClosed()) {
+                    offer.isPaid() /*&&
+                    !offer.getApplication().isClosed()*/) {
                     this.applications.add(offer);
                 }
             } else if(adjudicatedFilter) {
@@ -75,7 +75,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         && offer.isPaid()
                         && !offer.hasFinished()
                         && !offer.getApplication().isClosed()) {
-                    this.applications.add(offer);
+                    this.applications.  add(offer);
                 }
             } else if(reviewingFilter) {
                 if(!offer.hasStarted()

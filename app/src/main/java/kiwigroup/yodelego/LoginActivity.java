@@ -134,7 +134,7 @@ public class LoginActivity extends BaseLoginActivity {
     }
 
     public void forgotPasswordClicked(View v){
-        Intent mainIntent = new Intent().setClass(LoginActivity.this, ForgotPasswordActivity.class);
+        Intent mainIntent = new Intent().setClass(LoginActivity.this, ForgotPasswordWebViewActivity.class);
         startActivity(mainIntent);
     }
 

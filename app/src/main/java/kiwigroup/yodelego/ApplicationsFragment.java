@@ -103,17 +103,14 @@ public class ApplicationsFragment extends Fragment {
                 case 0:
                     if(mReviewingApplicationsFragment == null)
                         mReviewingApplicationsFragment = new ReviewingApplicationsFragment();
-                    //mReviewingApplicationsFragment.updateData();
                     return mReviewingApplicationsFragment;
                 case 1:
                     if(mAdjudicatedApplicationsFragment == null)
                         mAdjudicatedApplicationsFragment = new AdjudicatedApplicationsFragment();
-                    //mAdjudicatedApplicationsFragment.updateData();
                     return mAdjudicatedApplicationsFragment;
                 case 2:
                     if(mCompleteApplicationsFragment == null)
                         mCompleteApplicationsFragment = new CompleteApplicationsFragment();
-                    //mCompleteApplicationsFragment.updateData();
                     return mCompleteApplicationsFragment;
                 default:
                     return null;
@@ -125,20 +122,4 @@ public class ApplicationsFragment extends Fragment {
             return mNumOfTabs;
         }
     }
-
-    public void updateFragmentsData(){
-        if(adapter.mAdjudicatedApplicationsFragment != null){
-            adapter.mAdjudicatedApplicationsFragment.cleanWall();
-            adapter.mAdjudicatedApplicationsFragment.updateData();
-        }
-        if(adapter.mReviewingApplicationsFragment != null){
-            adapter.mReviewingApplicationsFragment.cleanWall();
-            adapter.mReviewingApplicationsFragment.updateData();
-        }
-        if(adapter.mCompleteApplicationsFragment != null){
-            adapter.mCompleteApplicationsFragment.cleanWall();
-            adapter.mCompleteApplicationsFragment.updateData();
-        }
-    }
-
 }

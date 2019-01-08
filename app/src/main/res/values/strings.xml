@@ -32,10 +32,10 @@
     <string name="prompt_confirm_password">Confirmar Contraseña</string>
     <string name="forgot_password">Recuperar Contraseña</string>
     <string name="please_enter_email">Por favor ingresa tu correo</string>
-    <string name="forgot_password_description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua.</string>
+    <string name="forgot_password_description">Ingresa abajo tu dirección de correo electrónico, y te enviaremos las instrucciones para establecer una nueva.</string>
     <string name="sign_in_to_continue">Sign in to continue</string>
     <string name="welcome_back">Bienvenido,</string>
-    <string name="forgot_your_password">Olvidaste tu contraseña?</string>
+    <string name="forgot_your_password">¿Olvidaste tu contraseña?</string>
 
     <string name="error_login_login">Problema en el servicio de login</string>
     <string name="error_login_commerce">Commerce service problem</string>
@@ -83,7 +83,7 @@
     <string name="applicated">Postulando</string>
 
     <string name="error_recovering_password">Error mientras recuperas tu contraseña</string>
-    <string name="password_recovery_message">Recuperación de la contraseña exitosa</string>
+    <string name="password_recovery_message">Le hemos enviado por email las instrucciones para restablecer la contraseña, si es que existe una cuenta con la dirección electrónica que indicó. Debería recibirlas en breve.</string>
     <string name="password_recovery">Recuperación de contraseña</string>
 
     <string name="inactive_account_title">Inactive account</string>

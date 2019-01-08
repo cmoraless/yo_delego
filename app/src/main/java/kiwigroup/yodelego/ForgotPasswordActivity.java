@@ -120,30 +120,26 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     private void startRecoveryProcess(final String email){
         HashMap<String, Object> args = new HashMap<>();
         args.put("email", email);
-        ServerCommunication serverCommunication = new ServerCommunication.ServerCommunicationBuilder(this, "api/auth/recovery/")
+        ServerCommunication serverCommunication = new ServerCommunication.ServerCommunicationBuilder(this, "accounts/password-reset/")
                 .POST()
                 .tokenized(false)
                 .parameters(args)
                 .nullableListener(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject JSONResponse) {
-                        if(JSONResponse == null) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(ForgotPasswordActivity.this);
-                            builder.setTitle(getString(R.string.password_recovery));
-                            builder.setMessage(getString(R.string.password_recovery_message));
-                            builder.setPositiveButton("OK",
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-                                            finish();
-                                        }
-                                    });
-                            builder.show();
-                            showProgress(false);
-                        } else {
-                            Toast.makeText(ForgotPasswordActivity.this, "login server null response", Toast.LENGTH_LONG).show();
-                        }
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ForgotPasswordActivity.this);
+                        builder.setTitle(getString(R.string.password_recovery));
+                        builder.setMessage(getString(R.string.password_recovery_message));
+                        builder.setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        finish();
+                                    }
+                                });
+                        builder.show();
+                        showProgress(false);
                     }
                 })
                 .errorListener(new Response.ErrorListener() {
