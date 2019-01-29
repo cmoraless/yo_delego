@@ -469,7 +469,7 @@ public class MainActivity
                     @Override
                     public void onResponse(JSONObject response) {
                         if(response != null) {
-                            //Log.d("MainActivity", "**** WALL: " + response.toString());
+                            Log.d("MainActivity", "**** WALL: " + response.toString());
                             try {
                                 //Log.d("MainActivity", "**** myApplications: " + myApplications.size());
                                 String url = response.getString("next");

@@ -323,63 +323,70 @@ public class OfferDetailsActivity extends AppCompatActivity {
         textViewAmount.setText(String.format("$%s", new DecimalFormat("#,###", otherSymbols).format(offer.getWage())));
 
         if(!offer.isAppliedByMe()){
-            if (offer.getStatus() == Offer.OfferStatus.ENTERED ||
-                    offer.getStatus() == Offer.OfferStatus.REVISION ||
-                    offer.getStatus() == Offer.OfferStatus.ACCEPTED_APPLICATION){
-                if(offer.hasStarted()){
-                    accept_button.setVisibility(GONE);
-                    bottom_message_bar.setVisibility(View.VISIBLE);
-                    bottom_message_text.setText("Esta oferta está cerrada");
-                    bottom_message_bar_button.setVisibility(GONE);
-                } else {
-                    // ABIERTO
-                }
-            } else if (offer.getStatus() == Offer.OfferStatus.FILLED ){
-                if(offer.hasStarted()){
-                    accept_button.setVisibility(GONE);
-                    bottom_message_bar.setVisibility(View.VISIBLE);
-                    bottom_message_text.setText("Esta oferta está cerrada");
-                    bottom_message_bar_button.setVisibility(GONE);
-                } else {
-                    if(offer.isPaid()){
+            if(offer.getVacancy() == 0){
+                accept_button.setVisibility(GONE);
+                bottom_message_bar.setVisibility(View.VISIBLE);
+                bottom_message_text.setText("Esta oferta esta sin vacantes");
+                bottom_message_bar_button.setVisibility(GONE);
+            } else {
+                if (offer.getStatus() == Offer.OfferStatus.ENTERED ||
+                        offer.getStatus() == Offer.OfferStatus.REVISION ||
+                        offer.getStatus() == Offer.OfferStatus.ACCEPTED_APPLICATION){
+                    if(offer.hasStarted()){
                         accept_button.setVisibility(GONE);
                         bottom_message_bar.setVisibility(View.VISIBLE);
-                        bottom_message_text.setText("Esta oferta ha sido adjudicada por otro usuario");
+                        bottom_message_text.setText("Esta oferta está cerrada");
+                        bottom_message_bar_button.setVisibility(GONE);
+                    } else {
+                        // ABIERTO
+                    }
+                } else if (offer.getStatus() == Offer.OfferStatus.FILLED ){
+                    if(offer.hasStarted()){
+                        accept_button.setVisibility(GONE);
+                        bottom_message_bar.setVisibility(View.VISIBLE);
+                        bottom_message_text.setText("Esta oferta está cerrada");
+                        bottom_message_bar_button.setVisibility(GONE);
+                    } else {
+                        if(offer.isPaid()){
+                            accept_button.setVisibility(GONE);
+                            bottom_message_bar.setVisibility(View.VISIBLE);
+                            bottom_message_text.setText("Esta oferta ha sido adjudicada por otro usuario");
+                            bottom_message_bar_button.setVisibility(GONE);
+                        } else {
+                            accept_button.setVisibility(GONE);
+                            bottom_message_bar.setVisibility(View.VISIBLE);
+                            bottom_message_text.setText("Esta oferta esta sin vacantes");
+                            bottom_message_bar_button.setVisibility(GONE);
+                        }
+                    }
+                } else if(offer.getStatus() == Offer.OfferStatus.CLOSED ){
+                    accept_button.setVisibility(GONE);
+                    bottom_message_bar.setVisibility(View.VISIBLE);
+                    bottom_message_text.setText("Esta oferta está cerrada");
+                    bottom_message_bar_button.setVisibility(GONE);
+                } else if(offer.getStatus() == Offer.OfferStatus.CANCELED ){
+                    accept_button.setVisibility(GONE);
+                    bottom_message_bar.setVisibility(View.VISIBLE);
+                    bottom_message_text.setText("Esta oferta ha sido cancelada");
+                    bottom_message_bar_button.setVisibility(GONE);
+                } else if (offer.getStatus() == Offer.OfferStatus.PAUSED ){
+                    if(offer.hasStarted()){
+                        accept_button.setVisibility(GONE);
+                        bottom_message_bar.setVisibility(View.VISIBLE);
+                        bottom_message_text.setText("Esta oferta está cerrada");
                         bottom_message_bar_button.setVisibility(GONE);
                     } else {
                         accept_button.setVisibility(GONE);
                         bottom_message_bar.setVisibility(View.VISIBLE);
-                        bottom_message_text.setText("Esta oferta esta sin vacantes");
+                        bottom_message_text.setText("Esta oferta ha sido pausada");
                         bottom_message_bar_button.setVisibility(GONE);
                     }
-                }
-            } else if(offer.getStatus() == Offer.OfferStatus.CLOSED ){
-                accept_button.setVisibility(GONE);
-                bottom_message_bar.setVisibility(View.VISIBLE);
-                bottom_message_text.setText("Esta oferta está cerrada");
-                bottom_message_bar_button.setVisibility(GONE);
-            } else if(offer.getStatus() == Offer.OfferStatus.CANCELED ){
-                accept_button.setVisibility(GONE);
-                bottom_message_bar.setVisibility(View.VISIBLE);
-                bottom_message_text.setText("Esta oferta ha sido cancelada");
-                bottom_message_bar_button.setVisibility(GONE);
-            } else if (offer.getStatus() == Offer.OfferStatus.PAUSED ){
-                if(offer.hasStarted()){
+                } else if(offer.getStatus() == Offer.OfferStatus.DEACTIVATED ){
                     accept_button.setVisibility(GONE);
                     bottom_message_bar.setVisibility(View.VISIBLE);
-                    bottom_message_text.setText("Esta oferta está cerrada");
-                    bottom_message_bar_button.setVisibility(GONE);
-                } else {
-                    accept_button.setVisibility(GONE);
-                    bottom_message_bar.setVisibility(View.VISIBLE);
-                    bottom_message_text.setText("Esta oferta ha sido pausada");
+                    bottom_message_text.setText("Esta oferta ha sido desactivada");
                     bottom_message_bar_button.setVisibility(GONE);
                 }
-            } else if(offer.getStatus() == Offer.OfferStatus.DEACTIVATED ){
-                accept_button.setVisibility(GONE);
-                bottom_message_bar.setVisibility(View.VISIBLE);
-                bottom_message_text.setText("Esta oferta ha sido desactivada");
-                bottom_message_bar_button.setVisibility(GONE);
             }
         }
 

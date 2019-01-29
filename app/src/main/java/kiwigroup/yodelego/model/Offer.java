@@ -41,6 +41,7 @@ public class Offer implements Serializable, WallItem{
     private OfferStatus status;
     private boolean appliedByMe;
     private boolean isPaid;
+    private int vacancy;
 
     private Publisher publisher;
 
@@ -94,7 +95,10 @@ public class Offer implements Serializable, WallItem{
             if(!object.isNull("attachments"))
                 offer.setAttaches(object.getJSONArray("attachments"));
 
-            offer.setStatus(Offer.OfferStatus.fromInteger(object.getInt("status")));
+            if(!object.isNull("attachments"))
+                offer.setAttaches(object.getJSONArray("attachments"));
+
+            offer.setVacancy(object.getInt("vacancy"));
 
         } catch (JSONException | ParseException e) {
             e.printStackTrace();
@@ -351,6 +355,14 @@ public class Offer implements Serializable, WallItem{
                 e.printStackTrace();
             }
         }
+    }
+
+    public int getVacancy() {
+        return vacancy;
+    }
+
+    public void setVacancy(int vacancy) {
+        this.vacancy = vacancy;
     }
 
 
