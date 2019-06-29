@@ -249,7 +249,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
                             });
                             builder.setView(view);
                             builder.setTitle("Calificación de postulación");
-                            builder.setMessage(Html.fromHtml("¿Qué calificación le das a <b>" + offer.getTitle()+ "</b>?"));
+                            builder.setMessage(Html.fromHtml("¿Qué calificación le das al ofertante de <b>" + offer.getTitle()+ "</b>?"));
                             builder.setCancelable(true);
                             builder.setPositiveButton("Calificar", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
@@ -390,6 +390,8 @@ public class OfferDetailsActivity extends AppCompatActivity {
             }
         }
 
+        Log.e("OfferDetailsActivity", "*********" + offer.getPublisher().getRating());
+
         if(offer.getPublisher().getRating() == -1.0f)
             textViewRating.setText("");
         else
@@ -438,7 +440,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
 
     private void setUpForApplication(final Application application){
         if(application.getApplicationStatus() == Application.ApplicationStatus.ACCEPTED){
-            if(offer.isPaid()){
+            /*if(offer.isPaid()){
                 if(offer.hasFinished()){
                     if(!offer.getApplication().isClosed()){
                         if(offer.getApplication().isQualifiable()) {
@@ -498,7 +500,13 @@ public class OfferDetailsActivity extends AppCompatActivity {
                     bottom_message_bar_button.setVisibility(View.VISIBLE);
                 }
 
-            }
+            }*/
+            complete = true;
+            accept_button.setVisibility(GONE);
+            bottom_message_bar.setVisibility(View.VISIBLE);
+            bottom_message_text.setText("Puedes calificar esta oferta");
+            bottom_message_bar_button.setVisibility(View.VISIBLE);
+            cancel_text.setText("Calificar");
             /*if(offer.isPaid()){
                 accept_button.setEnabled(false);
                 textViewButtonText.setText("adjudicada");
@@ -662,6 +670,7 @@ public class OfferDetailsActivity extends AppCompatActivity {
             .objectReturnListener(new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
+                    Log.d("OfferDetailsActivity", "rateApplication. onResponse: " + response.toString());
                     AlertDialog.Builder builder = new AlertDialog.Builder(OfferDetailsActivity.this);
                     builder.setTitle(getString(R.string.application));
                     builder.setMessage("Tu calificación ha sido registrada con éxito");

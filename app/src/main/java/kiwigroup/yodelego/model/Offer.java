@@ -100,6 +100,8 @@ public class Offer implements Serializable, WallItem{
 
             offer.setVacancy(object.getInt("vacancy"));
 
+            offer.setStatus(Offer.OfferStatus.fromInteger(object.getInt("status")));
+
         } catch (JSONException | ParseException e) {
             e.printStackTrace();
         }

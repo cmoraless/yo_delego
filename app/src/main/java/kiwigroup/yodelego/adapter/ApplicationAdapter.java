@@ -75,7 +75,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         && offer.isPaid()
                         && !offer.hasFinished()
                         && !offer.getApplication().isClosed()) {
-                    this.applications.  add(offer);
+                    this.applications.add(offer);
                 }
             } else if(reviewingFilter) {
                 if(!offer.hasStarted()

@@ -482,18 +482,19 @@ public class MainActivity
                                 JSONArray array = response.getJSONArray("results");
                                 ArrayList<WallItem> newWallOffers = new ArrayList<>();
                                 for (int i = 0; i < array.length() ; i++) {
-                                    Log.d("MainActivity", "**** WALL ITEM: " + i);
                                     JSONObject object = array.getJSONObject(i);
                                     Offer offer = Offer.parseFromJson(object);
+
+                                    Log.d("MainActivity", "**** WALL ITEM: " + i + " status: " + offer.getStatus());
                                     for(Offer savedOffer : myApplications){
                                         if(savedOffer.getId() == offer.getId()){
                                             offer = savedOffer;
                                         }
                                     }
                                     // update WallAdapter if this status are supported
-                                    if(!(offer.getStatus() == CANCELED ||
+                                    if( ! (offer.getStatus() == CANCELED ||
                                             offer.getStatus() == PAUSED ||
-                                            offer.getStatus() == DEACTIVATED))
+                                            offer.getStatus() == DEACTIVATED) && offer.isPaid())
                                         newWallOffers.add(offer);
                                 }
                                 if(wallOffers != null){

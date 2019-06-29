@@ -122,7 +122,8 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        Log.d("WallAdapter", "**** bind position: " + position);
         if (holder instanceof OfferViewHolder) {
             final OfferViewHolder offerViewHolder = (OfferViewHolder)holder;
             final Offer offer = (Offer) offers.get(position);
@@ -148,23 +149,26 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
 
             if(offer.getPublisher().getProfilePictureUrl() != null && !offer.getPublisher().getProfilePictureUrl().isEmpty()){
-                Picasso.get().load(offer.getPublisher().getProfilePictureUrl()).into(offerViewHolder.profileImage);
+                Picasso.get()
+                        .load(offer.getPublisher().getProfilePictureUrl())
+                        .into(offerViewHolder.profileImage);
+            } else {
+                Picasso.get()
+                        .load(R.drawable.ic_profile)
+                        .into(offerViewHolder.profileImage);
             }
 
             if(!offer.isAppliedByMe()){
-                Log.d("WallAdapter", "**** pos: " + position + " hasStarted: " + offer.hasStarted());
-
-                if(offer.getVacancy() == 0){
-                    offerViewHolder.status.setText("sin vacantes");
-                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
-                            R.color.colorRed),
-                            PorterDuff.Mode.SRC);
-                } else {
-                    if (offer.getStatus() == Offer.OfferStatus.ENTERED ||
-                            offer.getStatus() == Offer.OfferStatus.REVISION ||
-                            offer.getStatus() == Offer.OfferStatus.ACCEPTED_APPLICATION) {
-                        if (offer.hasStarted()) {
-                            offerViewHolder.status.setText("cerrado");
+                Log.d("WallAdapter", "**** pos: " + position + " hasStarted: " + offer.hasStarted() + " status: " + offer.getStatus());
+                if (offer.getStatus() == Offer.OfferStatus.ENTERED) {
+                    if (offer.hasStarted()) {
+                        offerViewHolder.status.setText("cerrado");
+                        offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                                R.color.colorRed),
+                                PorterDuff.Mode.SRC);
+                    } else {
+                        if(offer.getVacancy() == 0){
+                            offerViewHolder.status.setText("sin vacantes");
                             offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
                                     R.color.colorRed),
                                     PorterDuff.Mode.SRC);
@@ -174,66 +178,103 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                     R.color.colorGreenText),
                                     PorterDuff.Mode.SRC);
                         }
-                    } else if (offer.getStatus() == Offer.OfferStatus.FILLED) {
-                        if (offer.hasStarted()) {
-                            offerViewHolder.status.setText("cerrado");
-                            offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
-                                    R.color.colorRed),
-                                    PorterDuff.Mode.SRC);
-                        } else {
-                            if (offer.isPaid()) {
-                                offerViewHolder.status.setText("adjudicado");
-                                offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
-                                        R.color.colorAdjudicated),
-                                        PorterDuff.Mode.SRC);
-                            } else {
-                                offerViewHolder.status.setText("sin vacantes");
-                                offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
-                                        R.color.colorGreyButton),
-                                        PorterDuff.Mode.SRC);
-                                offerViewHolder.status.setTextColor(ContextCompat.getColor(offerViewHolder.status.getContext(),
-                                        R.color.colorPrimaryDark));
-                            }
-                        }
-                    } else if (offer.getStatus() == Offer.OfferStatus.CLOSED) {
+                    }
+                } else if (offer.getStatus() == Offer.OfferStatus.REVISION) {
+                    if (offer.hasStarted()) {
                         offerViewHolder.status.setText("cerrado");
                         offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
                                 R.color.colorRed),
                                 PorterDuff.Mode.SRC);
-                    } else if (offer.getStatus() == Offer.OfferStatus.CANCELED) {
-                        offerViewHolder.status.setText("cancelado");
-                        offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
-                                R.color.colorRed),
-                                PorterDuff.Mode.SRC);
-                    } else if (offer.getStatus() == Offer.OfferStatus.PAUSED) {
-                        if (offer.hasStarted()) {
-                            offerViewHolder.status.setText("cerrado");
+                    } else {
+                        if(offer.getVacancy() == 0){
+                            offerViewHolder.status.setText("sin vacantes");
                             offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
                                     R.color.colorRed),
                                     PorterDuff.Mode.SRC);
                         } else {
-                            offerViewHolder.status.setText("pausado");
+                            offerViewHolder.status.setText("abierto");
+                            offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                                    R.color.colorGreenText),
+                                    PorterDuff.Mode.SRC);
+                        }
+                    }
+                } else if (offer.getStatus() == Offer.OfferStatus.ACCEPTED_APPLICATION) {
+                    if (offer.hasStarted()) {
+                        offerViewHolder.status.setText("cerrado");
+                        offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                                R.color.colorRed),
+                                PorterDuff.Mode.SRC);
+                    } else {
+                        if(offer.getVacancy() == 0){
+                            offerViewHolder.status.setText("sin vacantes");
+                            offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                                    R.color.colorRed),
+                                    PorterDuff.Mode.SRC);
+                        } else {
+                            offerViewHolder.status.setText("abierto");
+                            offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                                    R.color.colorGreenText),
+                                    PorterDuff.Mode.SRC);
+                        }
+                    }
+                } else if (offer.getStatus() == Offer.OfferStatus.FILLED) {
+                    if (offer.hasStarted()) {
+                        offerViewHolder.status.setText("cerrado");
+                        offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                                R.color.colorRed),
+                                PorterDuff.Mode.SRC);
+                    } else {
+                        if (offer.isPaid()) {
+                            offerViewHolder.status.setText("adjudicado");
+                            offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                                    R.color.colorAdjudicated),
+                                    PorterDuff.Mode.SRC);
+                        } else {
+                            offerViewHolder.status.setText("sin vacantes");
                             offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
                                     R.color.colorGreyButton),
                                     PorterDuff.Mode.SRC);
                             offerViewHolder.status.setTextColor(ContextCompat.getColor(offerViewHolder.status.getContext(),
                                     R.color.colorPrimaryDark));
                         }
-
-                    } else if (offer.getStatus() == Offer.OfferStatus.DEACTIVATED) {
-                        offerViewHolder.status.setText("desactivado");
-                        offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
-                                R.color.colorRed),
-                                PorterDuff.Mode.SRC);
                     }
-                    /*if(offer.hasStarted()){
+                } else if (offer.getStatus() == Offer.OfferStatus.CLOSED) {
+                    offerViewHolder.status.setText("cerrado papaxxx");
+                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                            R.color.colorRed),
+                            PorterDuff.Mode.SRC);
+                } else if (offer.getStatus() == Offer.OfferStatus.CANCELED) {
+                    offerViewHolder.status.setText("cancelado");
+                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                            R.color.colorRed),
+                            PorterDuff.Mode.SRC);
+                } else if (offer.getStatus() == Offer.OfferStatus.PAUSED) {
+                    if (offer.hasStarted()) {
                         offerViewHolder.status.setText("cerrado");
                         offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
                                 R.color.colorRed),
                                 PorterDuff.Mode.SRC);
-                    }*/
-                }
+                    } else {
+                        offerViewHolder.status.setText("pausado");
+                        offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                                R.color.colorGreyButton),
+                                PorterDuff.Mode.SRC);
+                        offerViewHolder.status.setTextColor(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                                R.color.colorPrimaryDark));
+                    }
 
+                } else if (offer.getStatus() == Offer.OfferStatus.DEACTIVATED) {
+                    offerViewHolder.status.setText("desactivado");
+                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                            R.color.colorRed),
+                            PorterDuff.Mode.SRC);
+                }
+                /*if(offer.hasStarted()){
+                    offerViewHolder.status.setText("cerrado");
+                    offerViewHolder.status.getBackground().setColorFilter(ContextCompat.getColor(offerViewHolder.status.getContext(),
+                            R.color.colorRed),
+                            PorterDuff.Mode.SRC);
+                }*/
             } else {
                 if(offer.getApplication().getApplicationStatus() == REJECTED){
                     offerViewHolder.status.setText("no califica");
@@ -326,7 +367,7 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             LoadingViewHolder loadingViewHolder = (LoadingViewHolder) holder;
             loadingViewHolder.progressBar.setIndeterminate(true);
         } else if (holder instanceof NotificationViewHolder) {
-            NotificationViewHolder notificationViewHolder = (NotificationViewHolder)holder;
+            final NotificationViewHolder notificationViewHolder = (NotificationViewHolder)holder;
             final StatusNotification notification = (StatusNotification) offers.get(position);
             if(notification.getKind() == StatusNotification.NotificationKinds.OFFER_AVAILABLE){
                 notificationViewHolder.notification.setText("Existe una nueva oferta disponible");
@@ -345,8 +386,8 @@ public class WallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             notificationViewHolder.close.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    offers.remove(position);
-                    notifyItemRemoved(position);
+                    offers.remove(notificationViewHolder.getAdapterPosition());
+                    notifyItemRemoved(notificationViewHolder.getAdapterPosition());
                     listener.closeNotification(notification);
                 }
             });
